@@ -1,0 +1,47 @@
+---
+title: "Week 1&2 Lab Handout"
+author: "Yuanchao Zhang"
+date: "1/3/2018"
+output: 
+  html_document:
+    theme: united
+    toc: true
+    number_sections: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+
+```
+
+This handout covers the topics that we will go through during the lab session. The content is similar to the lecture note but with more focus on operational details. 
+
+There are two main sections in this handout, required and optional. 
+
+* The required section covers the topics listed in the syllabus. 
+* The optional section covers some other useful topics in case the lab session ends too early. 
+
+# Required
+
+## Install R programming language
+
+1. Go to <https://www.r-project.org/>. 
+2. Click `download R`. 
+
+![Command Line with Some Examples]()
+
+
+```{r cars}
+if (require('ggplot2')) print(123)
+summary(cars)
+```
+
+# Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
