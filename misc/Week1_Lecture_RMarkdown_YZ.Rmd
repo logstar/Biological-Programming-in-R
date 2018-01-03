@@ -1,0 +1,607 @@
+---
+title: "Course Content for Biom612, Week 1"
+author: "Deanne Taylor and Joe Dybas"
+date: "Jan 8th, 2018"
+output: 
+  pdf_document:
+    toc: true
+    number_sections: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(knitr); #If this is the first time you are running this script, you will need to install the knitr package to not get an error message.
+
+```
+
+
+
+# Introduction to R
+
+R is a powerful and useful computing language, and is written to be easy to use. If you can learn some basic R programming skills, they will be very useful to you in the future. Learning R is more useful overall than learning 3rd party analysis software packages.
+
+Back in the 1970s, 9 IT scientists at Bell Labs came up with a Statistical programming language they named 'S'. Since S was so popular, but cost money to license, a group of people set out to re-create and improve on 'S' with a version that was a free and open-source, meaning that communities of people could contribute to the language development. They named this language “R”. R has become quite popular, so one of the major advantages of using R is that it has many published and pre-configured statistical software packages submitted by a vast community of developers in every quantitative scientific field. With all these packages and plenty of references to back them up, there's no need to re-write the same code to do specialized computational tasks. In fact, there are hundreds of different, useful packages (“libraries”) provided in the R repositories, provided by academic and industrial groups whose submitted work is scrutinized, curated, and then accepted by the R-using community. Many methods and R packages have been published in peer-reviewed journals and some cited thousands of times.
+
+
+# Getting R
+
+The “native” operating environment for R is the command line. 
+
+Figure 1 shows an R session in a Mac Terminal, accessed by simply typing “R” on a command line in an environment where R is installed. We'll be installing R next.
+
+The top lines that appear at opening the R environment gives information on the R version, the platform for which it was compiled, and some information on the program
+
+![Command Line with Some Examples](R_Command_Line.png)
+
+## Download R for your platform
+
+Download R from CRAN (the comprehensive R archive network) at this link:
+
+<http://cran.mirrors.hoobly.com/>
+
+Click on one of the download platforms and follow the directions to install R.
+
+# Installing the GUI: RStudio
+
+R in the command line is powerful but not super user-friendly. For that reason, several "wrappers" have been designed that sit "on top of" R in order to provide a better user experience.  RStudio is one such GUI ( Graphical User Interface ) to R that provides a great desktop environement. 
+
+After you install R, install RStudio from this link: <https://www.rstudio.com/products/rstudio/download2/>
+
+Install with defaults for your platform.
+
+1. Open RStudio. Double Click on the R Studio icon. In RStudio, "projects" are just organized directories and collections of files. It's a good way to keep track of all your data associated with a particular task. 
+
+2. Create a Project.  On your computer's desktop, or anywhere else you'd like to create your directory that's easy to access, create a new directory “RCourse”. Once in RStudio, we will create a new "project". 
+To navigate, you will select from the menu, `File -> New Project -> Existing Directory`, and navigate to the folder you just created. 
+
+You can repeatedly use this organized directory ("project") for this assignment by using `File -> 'Recent Projects'`
+
+3. Create a File. There are many different types of files we can create that can produce R output. We'll start with a simple script. From the menu, select `File -> New File -> R Script`.
+
+Your environment should look like that in Figure 2, minus the big blue letters of course. :) 
+
+![The R Studio Environment after creating an R Script file with added annotations for each window](RStudioSetup.png)
+
+## Getting Help
+
+When asking for help on an R function or operator, the best bet is to enclose them in quotes after a question mark.
+
+`?"+"` gives you help on the plus symbol. `?"sub"` gives you help on the substitution operator. If you want to do a more global search for a term in the help files, use double question marks, such as `??"Operators"`.
+
+
+# Installing R packages
+
+In your lower right window, click on the Packages tab. Click on the Install tab that shows up and type in a package name (assuming it's not already installed). To activate a package, you can either check the box in the RStudio display, or you can type 
+
+`library(packagename)`
+or 
+`require(packagename)`
+
+Alternatively you can use a function from a package without loading the whole package (assuming you already have the library installed), using the function call `package::function` such as `knitr::kable` where `knitr` is the library and `kable` is the function.
+
+# The .Rmd file in R Studio
+
+Because we named this file that you're reading right now, to end with the suffix ".Rmd", RStudio understands this file to be an R Markdown type file. This means we'll have more functionality in how RStudio offers to run and execute code, than if it was a simple R script.
+
+Help on Markdown has been selected and assembled from help files and other sources as noted. More markdown help can be found at <http://rmarkdown.rstudio.com>.
+
+The PDF output from this document represents the output of an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. 
+
+R Markdown has simple formatting rules that can be interepreted to generate professional-looking documents. We discuss more of those below.
+
+
+# Basic Data Types and Data Entry
+
+As mentioned above, the command line is R's native habitat. The RStudio GUI is simply a wrapper on top of R's executable that also helps with the management of libraries (packages), plots, and the computational environment. 
+
+Let's start with some command-line entry. Click in the lower left window (Command Line Window in Figure 2). You can paste any R text into your window or use the provided script if you have this document open in R. Select the text you'd like to run in this or any script, and click "Run", then "Run Selected Lines" in the upper part of the script window.
+
+The code inside the code chunks shown in this document should be able to be pasted into R directly or run line-by-line, but beware double quotes that are sometimes changed in translation in any document. Error messages may be due to cut-and-paste transforms of double quotes into something that R can't understand. If you get error messages on something with double or single quotes, try typing them into the command line manually to make sure you're using the correct text-based quotes.
+
+## Variable Assignment
+
+Like a calculator, R can calculate on any number without assigning it a variable, for instance, "`5+1`" or "`10/2`" can be typed right in the R command window on the lower left window of your R Studio application. However, you will often want to store values in a variable,  called 'assignment' of a number to a variable.
+
+In R, a value is assigned to a variable (such as 'x') using one of several assignment operators: 
+
+* `x <- value`  (this is the most common form). Assign value to x.
+* `x <<- value`  (used most often in functions)
+* `value -> x`   (less used form)
+* `value ->> x` (used in functions)
+* `x=value` (can be used in special conditions, see below)
+
+The operator `<-` assigns into the environment in which it is  evaluated. The operator `<-` can be used anywhere, whereas the operator `=` is only allowed at the top level (e.g., in the complete expression typed at the command prompt) or as one of the subexpressions in a braced list of expressions.
+
+When in doubt, use the typical assignment operator '`<-`'. 
+
+## Numbers and representations
+
+Characters are represented with quotes around them. `"Hi"`, numbers are just entered in as numbers or decimal points. There are  other special types: `NA, NaN, Inf, -Inf`. `NA` is "Not Available" and used for missing values. There are no "blank" assignments in R. `NaN` is used for number results and stands for 'Not A Number'. `Inf` and `-Inf` are positive and negative infinity. Instead of producing an error in many cases, R will produce these special values that can show up in a result.
+
+# R Code Chunks
+
+R code chunks are specific for markdown type documents. Chunks are used as a means to delineate and render R output. You have seen code chunks if you open an R Markdown (.Rmd) file in R. They are defined by three backquotes and a bracketed name. They begin with the small letter 'r' and following that is the name of the chunk.  You can create code chunks with the "Insert" menu at the top of your script window (look for the little green "c") or you can "manually" type three backticks, a bracketed command, and three backticks to close out the chunk.
+
+In your script window you will see the code chunks colored a light grey, as long as the file is named with an .Rmd suffix:
+
+
+```{r summary of cars, echo=FALSE}
+
+summary(cars)
+
+```
+
+Other options in the bracketed header at the top of each chunk can relay how the data is output and viewed.  Chunks cannot share the same name.  R code in chunks are executed as the document is assembled. R code can be displayed except if certain options are selected, such as `echo=FALSE`:  `{r cars, echo=FALSE}` which prevents the code from being displayed before the results are shown.
+
+There are several other options in chunks...to display R code without evaluating it, you specify the `eval=FALSE` chunk option: `{r, eval=FALSE}`
+
+By default data frames and matrixes are output as they would be in the R terminal (in a monospaced font). However, if you prefer that data be displayed with additional formatting you can use the `knitr::kable` function. The kable function includes several options to control the maximum number of digits displayed in numeric columns, the column contents alignment and etc. See documentation (`help("kable")`)
+
+The Tidy function helps make sure text is well behaved, wraps properly and/or observes page boundaries.. Options can be set globally at the beginning of the document or within the chunk definition itself.
+
+When you click the **Knit** button in R Studio when an R Markdown file is open, a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. 
+
+```{r my cars etc, tidy=TRUE}
+
+knitr::kable(mtcars) 
+
+```
+
+
+# Built-in data sets and basic plotting
+
+R has many built-in data sets for testing. They are 'installed' when you install R. They are available at any time for you to test code or graphics against. 
+
+One such data set is the pressure data set. 
+
+Using R chunks, you can embed plots in the R markdown document, for example:
+
+```{r pressure}
+
+# Let's look at the pressure table, using the nice formatting table function 
+# "kable" from knitr:
+
+knitr::kable(pressure)
+
+# Plotting in R is very easy, but has lots of options available. Let's start 
+# with the most basic:
+
+plot(pressure)
+
+# Let's look at the first fifty colors R offers (for the full range of hundreds 
+# of colors, just type colors() )
+
+colors()[1:50]
+# Let's re-do that plot:
+
+plot(pressure, pch=16, cex=2, col="turquoise2")
+
+# R also has some built-in color gradients, such as rainbow:
+
+plot(pressure, pch=c(1:19), cex=2, col=rainbow(nrow(pressure)), 
+     xlab="temp", ylab="p",
+     main="Pressure Data \n From R dataset")
+
+```
+
+Typical plot symbols for R scatterplots:
+
+![PCH Symbols](PCHSymbols.png){width=50%}
+
+
+# Deleting your environment elements
+
+Want to delete your old data from the environment and start fresh? Use the `rm()` command like so:
+
+```{r delete environment}
+
+rm(list=ls())
+
+```
+
+# Basics of R Markdown Format
+
+Everything outside of a code chunk in an .Rmd file is parsed as R Markdown. There are some very simple rules to produce a great quality document. A good source for details is this page or examples throughout this document.
+
+You can also peruse the R studio markdown pages here:
+http://rmarkdown.rstudio.com/authoring_basics.html
+
+Also check out the R Markdown reference "cheatsheet": http://www.rstudio.com/wp-content/uploads/2016/03/rmarkdown-cheatsheet-2.0.pdf 
+
+Subscripts are produced using the tilde sign on either side:
+
+``` 
+My~subscript~
+
+```
+
+My~subscript~
+
+
+# Data Types
+
+## Vectors
+
+Vectors are a basic data type in R. Most everything you will be operating on in R is a vector. To create a vector in R, one way is ot use the '`c`' function, which stands for 'combine'. 
+
+To create a vector, you can type this:
+
+
+```{r create vector}
+
+myvec <- c(1,2,3,4)
+
+# type the variable name to return what is stored in the variable:
+myvec
+
+```
+
+but you will not be able to do this without the combine function. (note the missing '`c`' in front of the parenthesis!)
+
+`myvec <- (1,3,4,5)`
+
+There is no such thing as a 'naked' number or character in R. In R, `x<-5` assigns a vector of length 1. It is equivalent to `x<-c(5)`  The maximum length of (number of elements in) a vector is `2^31-1`, about 2 billion.
+
+
+### Vector types
+
+Vector types are: "logical", "integer", "numeric" (also synonym "double"), "complex", "character" and "raw".   
+
+The three most common vector types you will encouter are "integer", "numeric" and "character".
+
+Vectors are "strictly typed".  That is, a vector is only allowed to be one type. This is a very important point. If you try to insert a character such as "Hi" int o a numeric vector, it will change the entire vector into a character vector. Your numbers will become characters. Some frustrating errors can happen that way, where your calculations are not working because your vector is a character not a number --  which is why you need the functions typeof and structure ('`str`') to help you figure out what you're working with. R cannot do numerical calculations on a character vector.
+
+```{r data type examples}
+
+# character vector
+myDogs<-c("Chihuahua","Shetland Sheepdog", "Dachshund", "Cocker Spaniel")
+myDogs # type the name of the item to see it returned.
+
+?str # help on structure. 
+str(myDogs) # structure of an R object
+
+?typeof # type or storage mode of an object
+typeof(myDogs)
+
+
+# number vector
+testnums<-c(1,2,3,4,5,6)
+testnums
+str(testnums)
+typeof(testnums)
+
+# fast way to generate a number vector
+testspan<-c(1:16)
+testspan
+
+# add together two vectors
+
+newvec<-append(testnums, c(7,8,9))
+newvec
+
+# try appending a character vector
+newvec2<-append(testnums, c("Hi", "there"))
+newvec2
+str(newvec2)
+typeof(newvec2)
+```
+
+
+## Factors
+
+Factors are a special type of data in R. It is a way of representing (encoding) strings (characters) as numbers. Factors can be an annoyance if you just want the character vectors as they essentially force categories (levels) on each string. The default for reading in files is to turn all character columns into factors, so in this course we will show you how to avoid that complication.
+
+Imagine you had a column of length 10 that only held three different types of items "red", "blue", "green". Factors represent those three different types as 'levels', the levels being ("blue", "green", "red") here in alphabetical order. Let's try it out.
+
+```{r Factors}
+
+myfactordata<-c("red", "blue", "red", "green", "red", "blue", "blue", "red", "green", "green")
+str(myfactordata)
+typeof(myfactordata)
+
+# now let's turn myfactordata into a factor.
+myfactor<-factor(myfactordata) 
+str(myfactor)
+typeof(myfactor)  # what happened? My character vector is now an integer?
+myfactor
+myfactor[2]
+levels(myfactor) 
+
+```
+
+## Matrices
+
+Matrices are strongly typed arrays of numbers or characters. Vectors can be coerced into matrices. Many R functions require matrices and will not accept data frames. We will be discussing matrices throughout the course, so we will simply introduce them here.
+
+```{r matrices}
+# matrices are arrays of a single type (either number, or character...)
+testmat_col<-matrix(testspan, nrow=4, ncol=4)
+testmat_col
+# another way to arrange a matrix.
+testmat_row<-matrix(testspan, nrow=4, ncol=4, byrow=T)
+testmat_row
+
+```
+
+## Data Frames
+
+Data frames are one of the major data types in R. Data Frames are different than matrices as you can have mixed types in data frames, but matrices are strongly typed. Data frames can be considered containers of vectors. Each column in a dataframe is a vector, and must have the same length as every other vector in the data frame. You can think of a data frame as a container for vectors. 
+
+Below, I use the '`kable`' command from the knitr package 
+to neaten up the view. If you don't have the kable package installed 
+you won't be able to use this command. You can just type the data 
+frame name to see the data.
+
+```{r Data frames}
+
+# create a bunch of mixed vectors.
+
+dogweights <- c(10.11, 20.42, 15.15, 35.73) #Numerical
+dogages<-c("4", "5","6", "7") #Integer
+dogbreeds<-c("Chihuahua","Shetland Sheepdog", "Dachshund", "Cocker Spaniel") #character
+dognames<-c("Spike", "Trixie", "Buster", "Basil")
+
+# combine these into a data frame with names representing the columns.
+
+mydat1<-data.frame("Name"=dognames, "Breed"=dogbreeds,"Weight"=dogweights, 
+                   "Age"=dogages, stringsAsFactors = F)
+
+kable(mydat1) 
+
+# creating a data frame with no labels
+mydat2<-data.frame(dognames, dogbreeds,dogweights, dogages,stringsAsFactors = F)
+kable(mydat2)
+
+# create the data in situ in the data frame.
+
+mydat3<-data.frame(c(10.11, 20.42, 15.15, 35.73), 
+                   c("4", "5","6", "7"), 
+                   c("Chihuahua","Shetland Sheepdog", "Dachshund", "Cocker Spaniel"), 
+                   c("Spike", "Trixie", "Buster", "Basil"), 
+                   stringsAsFactors = F)
+
+kable(mydat3)
+# well that looks terrible!
+# let's add some actual names to those columns.
+
+colnames(mydat3)<-c("Name", "Breed", "Weight", "Age")
+rownames(mydat3)<-c("Dog1", "Dog2", "Dog3", "Dog4")
+kable(mydat3)
+
+# What is the breed of the third dog in the table?
+# addressing a data frame goes by [row,column]
+mydat3[3,3]
+
+# which dog is fourth (row) in the data frame?
+mydat3[4,]
+
+# Pull out the second column.
+mydat3[,2]
+
+```
+
+# Operators and Functions
+
+## Arithmetic Operators
+
+There are familiar arithmetic operators in R, but a few that are specific for the R language. 
+
+```{r Operators}
+x=10
+y=5
+
++ x     # (change the sign to positive)
+- x     # (change the sign to negative)
+x + y   # (add y to x)
+x - y   # (subtract y from x)
+x * y   # (multiple x by y)
+x / y   # (divide x by y)
+x ^ y   # (raise x to the power of y)
+x %% y  # (x mod y)
+x %/% y # (integer division (does not return a floating point number))
+
+
+```
+
+## Basic Functions
+R has some basic functions that appear in (no surprise) the R library called '`base`'.  These include summation, rounding, etc. You can get a list of all the functions in the base package with the `library(help='package')` command:
+
+`library(help = "base")`
+
+Here are a few examples:
+
+
+```{r Basic functions}
+
+testnums<-c(1:10)  # create a vector.
+typeof(testnums) # what type is it?
+
+mean(testnums) # mean
+sum(testnums)  # sum
+sd(testnums)  # standard deviation
+round(sd(testnums),digits=2)  # let's round up that example.
+summary(testnums)  # produce useful statistics on the vector.
+
+```
+
+
+## Logical Operators
+
+We'll cover the subset function, a convenience function to manipulate data frames built into basic R. 
+
+In order to use subset, you'll need to know about logical operators. Here are the most common ones used:
+
+* `! x`   : NOT x
+* `x & y` : x AND y
+* `x | y` : x OR y
+* `== x`  : is equal to x
+* `> x`   : greater than x
+* `< x`   : less than x
+* `<= x`  : less than or equal to x
+* `>= x`  : greater than or equal to x
+
+Also, there are others that are useful that also deliver TRUE/FALSE results:
+
+* `x %in% y` : Is x in y?
+* `is.na(x)` : Is x an NA (not available) result?
+* `is.nan(x)` : Is x a Not A Number result?
+* `is.finite(x)` : Is x a  finite number?
+* `is.infinite(x)` : Is x an infinite result?
+
+
+Let's try the logical operation again:
+
+```{r logical}
+
+x <- 5
+y <- c(1:10)
+
+y != x
+y==x
+y>x
+y<x
+y>= x
+y<=x
+y>8 & y !=9
+y<3 | y>7
+
+x %in% y #x in y
+
+!(x %in% y) #NOT x in y?
+
+```
+
+So what do the logical vectors allow us to do? In several ways of manipulating R vectors and data frames, it allows us to select out elements, based on the logical operators that are TRUE versus FALSE.
+
+In order to do the subset, you have to give the column name that you are trying to do a logical operaton on. To figure out which column names we have we'll use the mtcars data set as an example.
+
+
+## Manipulating and reporting data frames with Logical Operators
+
+As we mentioned, data frames are collections of column vectors. 
+
+We'll use the mtcars data set included in R for this exercise.
+
+
+```{r mtcars subset manipulation, tidy=T}
+
+#pick out some data
+mtcars[3,4] #access data by row-col (position)
+
+mtcars["Datsun 710", "hp"] #Same data this time by row-col names
+
+#subset data across a larger collection. subset() is the easiest way 
+# in basic R to get this accomplished.
+subset(mtcars, hp >= 250)
+
+#you can also use subset to select out certain columns for your subset.
+
+subset(mtcars, hp >= 250, select=c(mpg,gear)) 
+
+#make a wider selection
+subset(mtcars, hp >= 250, select=c(mpg:gear)) 
+
+subset(mtcars, (hp >= 250 | hp < 70), select=c(mpg:wt)) 
+
+```
+
+As a convenience function, there are other ways to do subsetting, including with the which() function.
+
+First we'll show how which() can use logical operators.
+
+How do we tell which() which column to select? Clearly subset can do this pretty easily...but for which we'll use the $ operator. This is called Extract (note capital E) and you will have to type help("Extract") to get more information.
+
+
+```{r some data manipulations }
+mtcars$mpg  # extract out just the column with mpg
+mtcars[,1]
+mtcars$mpg > 30
+which(mtcars$mpg > 30)
+
+# let's just select the rows where mpg > 30 in mtcars, which is the form that 
+# mimics subset.
+
+mtcars[which(mtcars$mpg >30),]
+
+mtcars[which((mtcars$mpg >30 | mtcars$hp >200) & mtcars$cyl==8 ),]
+
+```
+
+## Convenience Functions
+
+These functions allow you to start exploring a data set using shortcuts.
+
+```{r Other mtcars manipulations using convenience functions}
+
+# select a random sample of 10 cars from the mtcars data w/out replacement. 
+# This sample will change every time you invoke the function.
+mtcar_sample <- mtcars[sample(1:nrow(mtcars), 10,
+   replace=FALSE),]
+
+knitr::kable(mtcar_sample)
+
+# Details on the mtcars dataframe
+# number of rows, columns in dataframe
+nrow(mtcars)
+ncol(mtcars)
+
+# report out just the top of the data frame
+head(mtcars)
+
+# get the row,column names of the data frame.
+rownames(mtcars)
+colnames(mtcars)
+
+# manipulate your column names
+
+colnames(mtcars)[1]<-"MPG"
+
+# create a new vector of the same length as the columns of the data frame:
+
+newvec1<-rownames(mtcars)
+
+# check the length
+length(newvec1)
+
+# add the new vector to your data frame with column bind:
+new_col_mtcars<-cbind(mtcars, newvec1)
+
+knitr::kable(new_col_mtcars)
+
+# create a new row with the same length as the rows in mtcars:
+newvec2<-c(1:ncol(mtcars))
+
+# add the new row to mtcars
+new_row_mtcars<-rbind(mtcars, newvec2)
+
+knitr::kable(new_row_mtcars)
+
+```
+
+
+# Reading and writing files into R
+
+Save the following file into your RCourse folder and unzip the file:
+ftp://ftp.ncbi.nlm.nih.gov/geo/datasets/GDS4nnn/GDS4778/soft/GDS4778_full.soft.gz
+
+After unzipping, your file should be named `GDS4778_full.soft`
+
+If we try to read that file into R without any manipulation, we'll get an error message because the first 29 rows are information about the experiment. 
+
+This is where Bioconductor will come in handy in two weeks, as we can read these files "natively" and all the information will be stored. For now, let's read the data frame directly into R by skipping the first 70 lines.
+
+There are several ways of reading and writing data from R, but the functions I'll cover are "`read.csv`", "`write.csv`", "`read.table`", and "`write.table`"
+
+`read.csv` and `write.csv` are convenience functions for the `read.table` and `write.table`. 
+
+Note we use the `stringsAsFactors=F` again. We don't want the text-based part of this large file to be transformed into factors.
+
+The header parameter defaults to "`T`" but I put it in for emphasis -- not all your data will have a header (column names).
+
+`row.names` parameter tells R where to get the rownames. Here I'm saying column 1 (`row.names=1`) is where the row names are contained.
+
+`Sep` is a parameter indicating the delimiter for your file. In `read.csv` and `write.csv` it defaults to comma. In `read.table` it needs to be delimited. You should know that the encoding for a tab character in R is "`\t`", which we will use to parse the SOFT file. You can set this in `read.csv`. I suggest looking at the help for `read.table` to get more information.
+
+
