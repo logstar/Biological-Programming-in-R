@@ -4,14 +4,14 @@ author: "Yuanchao Zhang"
 date: "1/3/2018"
 output: 
   html_document:
-    theme: united
     toc: true
     number_sections: true
     toc_depth: 3
+    fig_caption: true
 ---
 
 ```{r setup, include=FALSE}
-
+knitr::opts_chunk$set(fig.align="center")
 ```
 
 This handout covers the topics that we will go through during the lab session. The content is similar to the lecture note but with more focus on operational details. 
@@ -26,22 +26,144 @@ There are two main sections in this handout, required and optional.
 ## Install R programming language
 
 1. Go to <https://www.r-project.org/>. 
-2. Click `download R`. 
 
-![Command Line with Some Examples]()
+2. Click `download R` in the `Getting Started` section.
+
+3. Click <https://cloud.r-project.org/>, the first link under **0-Cloud**. Listed in this page are the URLs to the mirrors of Comprehensive R Archive Network (CRAN). A mirror is a replicate of the contents of the main server, of which the URL is <http://cran.r-project.org>. Therefore, you can choose any of the URLs listed if you want. 
+
+4. Choose the download link based on your operating system. 
+  + Linux: Choose your linux distribution and follow the installation instructions.
+  + Mac OS X: Download `R-3.4.3.pkg`. Open the downloaded file to install. 
+  + Windows: Choose `base`, then `Download R 3.4.3 for Windows`. Open the downloaded file to install. 
+
+## Install RStudio
+
+1. Go to <https://www.rstudio.com/products/rstudio/download/#download>. 
+2. Choose the installer to download based on your operating system. For linux users, check if you are running 32-bit or 64-bit system.
+3. Open the downloaded file to install. If you are running ubuntu, you might need to install using the `gdebi` utility, and you can find more information at [here](https://medium.com/@GalarnykMichael/install-r-and-rstudio-on-ubuntu-12-04-14-04-16-04-b6b3107f7779).
+
+Note on 32-bit and 64-bit:  Most of the time, we only need to know this information when trying to install or run some software. 32-bit or 64-bit refers to the size of register in the central processing unit (CPU). [32-bit](https://en.wikipedia.org/wiki/32-bit) system allows direct access of $2^{32}$ bytes of memory, and [64-bit](https://en.wikipedia.org/wiki/64-bit_computing) allows direct access of $2^{64}$ bytes of memory. 
+
+## Run RStudio
+
+1. Open the installed RStudio. If all went well, there should no error message, and there should be several panes. 
+2. Find the pane with the `Console` tab in it and select that tab, which is the left pane by default if you have not opened any script yet. The console runs an R programming language interpreter, which executes the R code for you.
+3. Select the `Console` pane by clicking on its inner area. You should see a cursor blinking after the prompt `> `.
+4. Type `print("Hello World!")` and hit enter. You should see the following promt in the next line `[1] "Hello World!"`. An R base function `print()` is called with the positional parameter `"Hello World"`. After this line of code is executed, the parameter is printed by the computer to the console. 
+
+Even though this line of code is simple, there are actually many things happened behind the scene:
+
+1. RStudio starts running. RStudio is an integrated development environment (IDE) for R programming language. RStudio is written mainly in Java, C++, and JavaScript. You can look at their source code stats if you are interested by going to the following link, <https://github.com/rstudio/rstudio>. 
+
+2. RStudio runs R programming language interpreter and shows its output in the `Console` tab. The R programming language interpreter is basically an infinite loop with memory of executions within the same session:
+  + Prompt `> `.
+  + Takes in code expression. 
+  + Executes the code expression. When execution is done, promt `> ` again and ready for the next code expression. However, if one or more variables are created or updated, the interpreter will remember them.
+
+3. You typed in `print("Hello World!")` and "enter" in the R interpreter.
+
+4. When R interpreter sees the "enter", it checks your code before the "enter". If you wonder why this is necessary, try type `print("Hello World!"` and "enter". Note that the `)` is missing at the end. Then, at the next line with the prompt `+ `, type `)` and "enter". 
+
+5. R interpreter found a complete code expression and starts executing the code without the "enter".
+
+6. R interpreter starts executing `print("Hello World!")`, which is a function to print data out. **At this point**, the prompt `[1] "Hello World!"` is printed out. Question: why is there `[1] ` before `"Hello World"`? Hint: try to run `print(1:100)`, where `1:100` creates a vector of integers from 1 to 100.
+
+7. `print("Hello World!")` function returns `"Hello World!"`, but there is no variable assigned to that return value. Try to run `myVariable <- print("Hello World!")` and see what is value in `myVariable`. You can see it either by typing `myVariable` and "enter" in the console, or find it in the `Environment` tab of another pane. Environment is basically a collection of variables. 
+
+8. R interpreter evaluation loop resumes running to take in the next code expression. If you would like to see the suspension of R interpreter evaluation loop, try to run `Sys.sleep(10)` which asks the interpreter to idle for 10 seconds. You should see a blinking cursor at the beginning of the line. Try:
+  + When the evaluation loop suspends, type in `print("Hello World!")` and "enter". 
+  + When the evaluation loop suspends, hit "esc". 
 
 
-```{r cars}
-if (require('ggplot2')) print(123)
-summary(cars)
+## Install and use `packages`
+
+An R package is essentially a collection of code for certain purposes, such as performing differential expression analysis ([`DESeq2`](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)), convert R markdown to HTML/PDF/Word ([`Knitr`](https://www.rdocumentation.org/packages/knitr/versions/1.17)), and general plotting ([`ggplot2`](http://ggplot2.tidyverse.org/index.html)). 
+
+In order to better share the code, an R package usually contains the following things as well:
+
+* Tutorials to help users to get quickly started. 
+* Documentations including the details about how to use the code for your own analysis. 
+
+In this section, we will go through the following:
+
+* Install packages:
+  + Packages from [CRAN](https://cran.r-project.org/) using the `install.packages()` function.
+  + Packages from [Bioconductor](http://bioconductor.org/) using the `biocLite()` function. 
+* Use packages:
+  + **Import** packages using `library()` function.
+  + Call functions in packages without importing using the `libraryName::functionName` syntax.
+  + Get help from documentations and tutorials.
+
+### Install packages
+
+#### CRAN
+
+To install from CRAN, run the following code:
+
+```{r install from CRAN, eval=FALSE}
+install.packages("ggplot2")
 ```
 
-# Including Plots
+If you are calling it the first time, you might be prompted to select the mirrors, which is the same as downling R programming language. You can just choose the same one as above <http://cran.r-project.org>. 
 
-You can also embed plots, for example:
+`install.packages()` is the function to install package. The first parameter `"ggplot2"` is the name of the package. 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+#### Bioconductor
+
+To install from CRAN, run the following code:
+
+```{r install from Bioconductor, eval=FALSE}
+# Run the script at https://bioconductor.org/biocLite.R , which defines the 
+# function `biocLite()`.
+# You can use your browser to see the code by opening the link. 
+source("https://bioconductor.org/biocLite.R")
+
+# Install core packages
+biocLite()
+
+# Install a specific package named DESeq2
+biocLite("DESeq2")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Note: `#` starts a comment, `#` and everything afterwards within the same line are not going to be executed. 
+
+#### Overview 
+
+For both CRAN and Bioconductor packages, the installing process of a package includes basically two steps:
+
+1. Download the package from CRAN or Bioconductor to your computer.
+2. Set up downloaded package(s) in one or more locations on your computer. These locations are called the library of your R environment, which can be checked using function `.libPaths()`. 
+
+You might wonder why couldn't we have just one repository. Just to list a few reasons:
+
+* CRAN and Bioconductor developer communities are distinct. From my impresion, the CRAN community focus more on general usage such as plotting and data manipulations, whereas the Bioconductor community focus more on analyzing a specific type of biological data. 
+
+* R packages are peer-reviewed by the community. A general purpose package developer might not be able to review a package specifically designed for biological data. 
+
+* Publishing rules of Bioconductor are more strict than CRAN, which guarentee certain minimum level of package quality. 
+
+
+### Use packages
+
+The code for using CRAN and Bioconductors are the same. You can either import the whole package to your environment using function `library()`, or execute certain function within a package using the `packageName::functionName` syntax.
+
+```{r use package, eval=TRUE, echo=TRUE, message=F, warning=F}
+# Run functions using the :: operator
+# NOTE: ggplot2::mpg refers to the dataset `mpg` in the package `ggplot2`
+
+ggplot2::ggplot(ggplot2::mpg, ggplot2::aes(displ, hwy, colour = class)) + 
+  ggplot2::geom_point()
+
+# Import an installed CRAN package
+library("ggplot2")
+
+# Import an installed Bioconductor package
+# Note that the quotes are optional
+library(DESeq2)
+
+# Run imported functions from ggplot2
+ggplot(mpg, aes(displ, hwy, colour = class)) + 
+  geom_point()
+```
+
+You might wonder why do we need to import a library after installing it. The intuition is that after you install a software, such as RStudio, you might not want to open it and keep it constantly running at the backgorund after starting your computer, because that will slow down your computer and make your working space crowded. 
