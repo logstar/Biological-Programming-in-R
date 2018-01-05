@@ -2,24 +2,32 @@
 title: "Week 1&2 Lab Handout"
 author: "Yuanchao Zhang"
 date: "1/3/2018"
-output: 
+output:
   html_document:
-    toc: true
-    number_sections: true
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
     toc_depth: 3
-    fig_caption: true
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+    highlight: tango
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(fig.align="center")
 ```
 
-This handout covers the topics that we will go through during the lab session. The content is similar to the lecture note but with more focus on operational details. 
+This handout covers the topics that we will go through during the lab session. 
 
 There are two main sections in this handout, required and optional. 
 
 * The required section covers the topics listed in the syllabus. 
 * The optional section covers some other useful topics in case the lab session ends too early. 
+
+In the required section, we are going to set up R and RStudio on your computer. Learn how to use R packages and create R Markdown files. Then, we are going to go through the basics of R programming by analyzing a simple biological dataset. 
+
+In the optional section, we are going to run Linux operating system on a virtual machine. 
 
 # Required
 
@@ -32,9 +40,9 @@ There are two main sections in this handout, required and optional.
 3. Click <https://cloud.r-project.org/>, the first link under **0-Cloud**. Listed in this page are the URLs to the mirrors of Comprehensive R Archive Network (CRAN). A mirror is a replicate of the contents of the main server, of which the URL is <http://cran.r-project.org>. Therefore, you can choose any of the URLs listed if you want. 
 
 4. Choose the download link based on your operating system. 
-  + Linux: Choose your linux distribution and follow the installation instructions.
-  + Mac OS X: Download `R-3.4.3.pkg`. Open the downloaded file to install. 
-  + Windows: Choose `base`, then `Download R 3.4.3 for Windows`. Open the downloaded file to install. 
+    + Linux: Choose your linux distribution and follow the installation instructions.
+    + Mac OS X: Download `R-3.4.3.pkg`. Open the downloaded file to install. 
+    + Windows: Choose `base`, then `Download R 3.4.3 for Windows`. Open the downloaded file to install. 
 
 ## Install RStudio
 
@@ -56,9 +64,9 @@ Even though this line of code is simple, there are actually many things happened
 1. RStudio starts running. RStudio is an integrated development environment (IDE) for R programming language. RStudio is written mainly in Java, C++, and JavaScript. You can look at their source code stats if you are interested by going to the following link, <https://github.com/rstudio/rstudio>. 
 
 2. RStudio runs R programming language interpreter and shows its output in the `Console` tab. The R programming language interpreter is basically an infinite loop with memory of executions within the same session:
-  + Prompt `> `.
-  + Takes in code expression. 
-  + Executes the code expression. When execution is done, promt `> ` again and ready for the next code expression. However, if one or more variables are created or updated, the interpreter will remember them.
+    + Prompt `> `.
+    + Takes in code expression. 
+    + Executes the code expression. When execution is done, promt `> ` again and ready for the next code expression. However, if one or more variables are created or updated, the interpreter will remember them.
 
 3. You typed in `print("Hello World!")` and "enter" in the R interpreter.
 
@@ -71,8 +79,8 @@ Even though this line of code is simple, there are actually many things happened
 7. `print("Hello World!")` function returns `"Hello World!"`, but there is no variable assigned to that return value. Try to run `myVariable <- print("Hello World!")` and see what is value in `myVariable`. You can see it either by typing `myVariable` and "enter" in the console, or find it in the `Environment` tab of another pane. Environment is basically a collection of variables. 
 
 8. R interpreter evaluation loop resumes running to take in the next code expression. If you would like to see the suspension of R interpreter evaluation loop, try to run `Sys.sleep(10)` which asks the interpreter to idle for 10 seconds. You should see a blinking cursor at the beginning of the line. Try:
-  + When the evaluation loop suspends, type in `print("Hello World!")` and "enter". 
-  + When the evaluation loop suspends, hit "esc". 
+    + When the evaluation loop suspends, type in `print("Hello World!")` and "enter". 
+    + When the evaluation loop suspends, hit "esc". 
 
 
 ## Install and use `packages`
@@ -82,17 +90,17 @@ An R package is essentially a collection of code for certain purposes, such as p
 In order to better share the code, an R package usually contains the following things as well:
 
 * Tutorials to help users to get quickly started. 
-* Documentations including the details about how to use the code for your own analysis. 
+* Reference manuals containing the details about how to use the code for your own analysis. 
 
 In this section, we will go through the following:
 
 * Install packages:
-  + Packages from [CRAN](https://cran.r-project.org/) using the `install.packages()` function.
-  + Packages from [Bioconductor](http://bioconductor.org/) using the `biocLite()` function. 
+    + Packages from [CRAN](https://cran.r-project.org/) using the `install.packages()` function.
+    + Packages from [Bioconductor](http://bioconductor.org/) using the `biocLite()` function. 
 * Use packages:
-  + **Import** packages using `library()` function.
-  + Call functions in packages without importing using the `libraryName::functionName` syntax.
-  + Get help from documentations and tutorials.
+    + **Import** packages using `library()` function.
+    + Call functions in packages without importing using the `libraryName::functionName` syntax.
+* Get help from documentations
 
 ### Install packages
 
@@ -102,6 +110,7 @@ To install from CRAN, run the following code:
 
 ```{r install from CRAN, eval=FALSE}
 install.packages("ggplot2")
+install.packages("dplyr")
 ```
 
 If you are calling it the first time, you might be prompted to select the mirrors, which is the same as downling R programming language. You can just choose the same one as above <http://cran.r-project.org>. 
@@ -147,7 +156,7 @@ You might wonder why couldn't we have just one repository. Just to list a few re
 
 The code for using CRAN and Bioconductors are the same. You can either import the whole package to your environment using function `library()`, or execute certain function within a package using the `packageName::functionName` syntax.
 
-```{r use package, eval=TRUE, echo=TRUE, message=F, warning=F}
+```{r use package, eval=TRUE, echo=TRUE, message=F, warning=F, cache=TRUE}
 # Run functions using the :: operator
 # NOTE: ggplot2::mpg refers to the dataset `mpg` in the package `ggplot2`
 
@@ -162,8 +171,587 @@ library("ggplot2")
 library(DESeq2)
 
 # Run imported functions from ggplot2
+# You will get an error if you run this without importing ggplot2
 ggplot(mpg, aes(displ, hwy, colour = class)) + 
   geom_point()
 ```
 
-You might wonder why do we need to import a library after installing it. The intuition is that after you install a software, such as RStudio, you might not want to open it and keep it constantly running at the backgorund after starting your computer, because that will slow down your computer and make your working space crowded. 
+You might wonder why do we still need to import a library after installing it. The intuition is an analogy to installing a software on your computer. After you install a software, such as RStudio, you might not want to open it and keep it constantly running at the backgorund after starting your computer, because that will slow down your computer and make your working space crowded. When R interpreter starts running, it only has a minimum set of data and functions defined, which is similar to a just started computer. If you want to use the R interpreter to do something else, you need to get those data and functions into your environment, which is similar to open an application, such as browser, on your computer. 
+
+However, this analogy does not explain the `packageName::functionName` syntax, and we need more details to understand what really happened. 
+
+Recall that a package is a collection of code structured into a directory located in the R library on your computer. Following is a screen shot of one R library location:
+
+![R library](rlib.png){width=70%}
+
+Each folder is an installed package with the name of corresponding package, and the `ggplot2` package is the first one in the list. The content of `ggplot2` is structured within the folder. Following is the screenshot of the files within the `ggplot2` folder:
+
+![`ggplot2` package directory structure](ggplot2.png){width=70%}
+
+All packages are structured in the same way but with different content in these files. The code of a package is stored in the `R` directory, and the datasets are in the `data` directory. Other files and directories contain documentations, license, citation, etc. 
+
+Therefore, using a package, either through importing or `::` operator, is to ask R interpreter to use the stored code or datasets. However, there are important distinctions between these two methods. 
+
+Importing a packages **loads** all code and datasets into your R interpreter, so that you can call the package defined functions and use its datasets directly. However, importing will not execute the loaded code. 
+
+On the other hand, `packageName::functionName` does not load anything into your R interpreter but just **execute** the function. After the executed function returned, the function will not be loaded. 
+
+Because R interpreter starts with only a minimum set of packages imported, if you want to use a function or dataset within a package that has not been imported, you can either import that package and use it directly afterwards, or use it through `::` operator. 
+
+### Get help from the documentations
+
+You can get help from two types of documentations, tutorial (vignette) and reference manual. A tutorial helps a beginner to quickly get started using the package, but a reference manual lists all the details about the code and datasets included in the package for a more experienced user to look up. 
+
+You can get both tutorial and manual either using RStudio or online. 
+
+#### Get documentations using RStudio 
+
+There are R functions to look up the package documentations in your library (recall the figure of package structure). The function `vignette("packageName")` looks up for tutorial, and `help("functionName")` looks up for the manual section of that function. After the function being executed by your R interpreter and the specified documation was found, the documation will show up in the `help` tab in one of your RStudio panes. You will receive an error in the `console` tab if the specified documentation was not found. 
+
+Following is a demo of how to use `vignette()` and `help()` functions.
+
+```{r get docs, message=FALSE, eval=FALSE}
+# I want to see the the vignette of DESeq2
+# This does not require DESeq2 to be imported
+vignette("DESeq2")
+
+# I want to get help on the function DESeq() in DESeq2
+# This requires DESeq2 to be imported. If we did not import DESeq2 previously, 
+# you will receive an error message. 
+help(DESeq)
+
+# However, if you do not want to import DESeq but just want to see the documentation
+# of DESeq(), you can use the following code
+help(DESeq, package = "DESeq2")
+
+# If you want to know more about these two functions, check their manuals
+help(vignette)
+help(help)
+```
+
+#### Get documentations online
+
+Google the package and go to either CRAN or Bioconductor depending on the package source. Find the documentations listed in the webpage. Following are the screenshots of the location of the documentation:
+
+![`ggplot2` documentations at <https://cran.r-project.org/web/packages/ggplot2/index.html>](ggplot2Doc.png)
+
+![`DESeq2` documentations at https://bioconductor.org/packages/release/bioc/html/DESeq2.html](DESeq2Doc.png)
+
+The first documentation of DESeq2 on Bioconductor *Analyzing RNA-seq data with DESeq2* is the tutorial. 
+
+Documentations are usually very helpful, but also keep in mind that Google is also your best friend when learning programming. There are many helpful Q&As on [StackOverflow](https://stackoverflow.com/) and [Biostars](https://www.biostars.org/). StackOverflow community is focused on general programming and statistics, whereas Biostars community is focused on bioinformatics. 
+
+
+## R Markdown
+
+R Markdown is a markup language for formatting an analysis report written in R, which allows you to embed your R analysis code into a document explaining your analysis. 
+
+The R package [`knitr`](https://yihui.name/knitr/) converts R Markdown files into generate easy-to-read report in HTML, PDF, or Word format. 
+
+To start using R Markdown in RStudio:
+
+1. Click menu `File -> New File ->` **`R Markdown`**. Then, you will be prompted by a wndow to fill in some relevant parameters. In the `Default Output Format:` option, select [`HTML`](https://en.wikipedia.org/wiki/HTML) (important), which is the standard markup language for creating web pages. It worths of time to read the explanations of each option. After clicking `OK`, a new R Markdown file will show up in a pane of RStudio. 
+
+2. Click the `Knit` option at the top of the Markdown file pane. Then, you will be prompted to save the R Markdown file. If you hit `Knit` for the first time, you will be prompted to install several packages that are required to run the "knitting" process. Install them. 
+
+3. Give the file a name such as `test` and save it anywhere you prefer. Then, you will see an `R Markdown` tab show up in the `Console` pane, and it starts running. When running, `knitr` executes all R code and generates an HTML report. After it is done, a new window containing the generated HTML report will show up. The report file will also be stored in the same directory as the R Markdown file. 
+
+If you want to generate your report in PDF, you will need to install a extra tool on your computer outside of RStudio. This tool, [TeX](https://en.wikipedia.org/wiki/TeX), helps `knitr` to convert R Markdown into PDF. In order to get this tool, click the tiny triangle at the right side of `Knit` option and select `Knit to PDF`, and you will receive an error message in the R Markdown tab. Follow the instructions in the error message carefully to install the TeX distribution. 
+
+We will expore the features of R Markdown in the next section. 
+
+## R basic operations
+
+In this section, we will go through the basics of R programming language by analyzing a simple and fake biological dataset. 
+
+The dataset is collected in an experiment to study the correlation between the expression level of a gene and the proliferation rate of a cell line. In the hypothesis, this gene is able to decrease the proliferation rate of the cells. This dataset includes the expression levels of the gene in wild type, knock down, and overexpressed cells and their proliferation rates. Each condition has 10 biological replicates.
+
+This analysis includes the following steps:
+
+1. Create an R project.
+
+2. Create an R Markdown file.
+
+3. Load the dataaset into R.
+
+4. Analyze the loaded dataset:
+    + Correlation between expression level and proliferation rate.
+    + Compare expression level between conditions.
+    + Compare proliferation rate between conditions. 
+
+5. Output plots and tables.
+
+**Important**: The things that you need to do are marked with **ACTION**. 
+
+### Create an R project
+
+**ACTION**: Create a new `R project`: Click menu `File -> New Project -> Existing Directory ->` select the directory of lab 1 handout as the project working directory (**very important**) `->` create. 
+
+An `R project` is a session of RStudio, and the `workding directory` is the directory where R interpreter starts running.
+
+**ACTION**: After the project is created, type `dir()` and hit "enter" in your `Console` tab, you should see `"cell_exp_proliferation.csv"` included in the output together with some other files. The function `dir()` lists all files under the working directory of R. 
+
+The file named `cell_exp_proliferation.csv` is the dataset that we are going to analyze. 
+
+### Create an R Markdown file in the project
+
+**ACTION**: Create a new R Markdown file as described above, click menu `File -> Save`, and save it under lab 1 and 2 handout directory (**very important**). 
+
+The first section is your header, which is as following:
+
+```
+---
+title: "Your Title"
+author: "Your Name"
+date: "Some Date"
+output: html_document
+---
+```
+
+Then it comes the first R code chunk named `setup`.
+
+```{r comment=NA, echo=FALSE}
+cat("```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```")
+```
+
+An R code chunk is in the following format:
+
+```{r comment=NA, echo=FALSE}
+cat(paste0("```{r Your Code Chunk Name, yourCodeChunkParameters=yourParamterValue}\n", 
+           "# Your R code to be evaluated by R interpreter. \n", 
+           "print(\"Hello World!\")",
+           "\n```"))
+```
+
+Only code in the code chunks will be executed. Everything outside code chunks will be formated by `knitr` as plain text. 
+
+A **important** behavior of `knitr` is that when knitting an R Markdown file (after clicking `Knit`), `knitr` starts a brand **new** R interpreter and evaluates all code chunks from beginning to the end. As a result, `knitr` will not be able to access the variables in the `console` R interpreter environment. 
+
+**ACTION**: Delete everything below this chunk, and we are going to create our own analysis R Markdown file. 
+
+### Load dataset into R environment
+
+**ACTION**: Add a level 1 header to notify the start of the data loading section by adding the following text:
+
+```
+# Load dataset into R environment
+```
+
+The `#` at the beginning indicates that the line is a level one header. When `knitr` sees the `#` it will format it as the level 1 header in the output report. Similarly `##` indicates a level 2 header, `###` indicates a level 3 header, etc. More information about the formatting conventions can be found at <http://rmarkdown.rstudio.com/authoring_basics.html>. 
+
+**ACTION**: Add the following code chunk into the created R Markdown file to load the `cell_exp_proliferation.csv` into your environment:
+
+```{r comment=NA, echo=FALSE}
+cat(paste0("```{r load dataset}\n", 
+           "# Load the data of cell_exp_proliferation.csv into the variable exp_prolif_df\n", 
+           "# 'df' in the end indicates that the variable is a dataframe\n", 
+           "# stringsAsFactors=FALSE indicates that we do not want to convert strings into factors\n", 
+           "exp_prolif_df <- read.csv(\"cell_exp_proliferation.csv\", stringsAsFactors=FALSE)\n\n",
+           "# Print the data stored in variable exp_prolif_df\n", 
+           "exp_prolif_df\n",
+           "```"))
+```
+
+The dataset is stored in a file named `cell_exp_proliferation.csv` under the same directory as the handout. A comma separated values (CSV) format is commonly used to store a spreadsheet in plain text. CSV file can be opened by text editor, Excel, and RStudio. The units of proliferation rate and expression level are both arbitrary.
+
+Each row is a biological replicate. The columns are the proliferation rate, expression level, and condition. 
+
+In this code chunk, we loaded `cell_exp_proliferation.csv` as a `dataframe` into R environment. "`R environment`" has been mentioned many times in this handout, and you might wonder what it really is. 
+
+#### R environment
+
+An `R environment` is associated with each R interpreter session, and it includes all variables that you can access in that R interpreter session. Recall that when an R interpreter session started, only a minimum set of packages are imported into its environment. 
+
+In the code chunk above, after the interpreter executes `exp_prolif_df <- read.csv("cell_exp_proliferation.csv", stringsAsFactors=FALSE)`, its environment will have an additional variable named `exp_prolif_df`. Then, we can print that variable in that interpreter session. 
+
+However, you cannot print `exp_prolif_df` in your console session even after knitting the current document, because `knitr` starts a new session when `knitting` an document. 
+
+Similarly, if you import a library in an interpreter session, all code and datasets included in its associated R environment, and you can use the imported code and datasets in that interpreter session. However, if you quit the current interpreter session and starts a new one, you will need to import that package again before using its code and datasets.
+
+In addition to the functions and datasets, an R environment also keeps track of many system parameters such as the library location, and the most important one is the **current working directory**. You might wonder why it is very important to create the R project and R Markdown files in the lab handout directory, and the reason is that the locations of the R project and R Markdown file are the current workding directory of the `Console` R interpreter session and `knitr` interpreter session respectively. 
+
+If your **current workding directory** does not include `cell_exp_proliferation.csv`, you will receive an error when running `exp_prolif_df <- read.csv("cell_exp_proliferation.csv", stringsAsFactors=FALSE)`, because R interpreter cannot find the file `cell_exp_proliferation.csv`. 
+
+You can change your **current workding directory** (CWD) by clicking menu `Session -> Set Working Directory -> Choose Directory`. 
+
+#### File path
+
+The locations of files on your computer are specified by their paths. Following are some examples on Windows, Mac, and Linux.
+
+* Windows path of a file named `very_important_file.txt` under the C disk directory: `C:\very_important_file.txt`.
+
+* Windows path of a file named `not_important_file.txt` under a directory called `outdated_files` under C disk directory: `C:\outdated_files\not_important_file.txt`. 
+
+* Mac path of file named `very_important_file.txt` under your Documents directory: `/Users/yourUserName/Documents/very_important_file.txt`.
+
+* Mac path of file named `not_important_file.txt` under a directory called `outdated_files` under your Documents directory: `/Users/yourUserName/Documents/outdated_files/not_important_file.txt`.
+
+* Linux path of file named `very_important_file.txt` under your Documents directory: `/home/yourUserName/Documents/very_important_file.txt`.
+
+* Linux path of file named `not_important_file.txt` under a directory called `outdated_files` under your Documents directory: `/home/yourUserName/Documents/outdated_files/not_important_file.txt`.
+
+A path describes the exact method to find your file. For example if you want to find the `not_important_file.txt`:
+
+* Windows: open C disk `->` open directory `outdated_files`. 
+
+* Mac: open finder `->` open `Documents` directory `->` open directory `outdated_files`.
+
+* Linux: similar to Mac. 
+
+The way how `knitr` R interpreter finds `cell_exp_proliferation.csv` is through a path **relative** to CWD. `read.csv("cell_exp_proliferation.csv")` asks R interpreter to find `cell_exp_proliferation.csv` under CWD. You can check your CWD path by typing `getwd()` in `Console` tab and hit "enter". If a path is specified without `/` (Mac/linux) `DiskLetter:\` (Windows), it will be prepended with the path of CWD to form an **absolute** path, and R interpreter will further look up the absolute path. If the absolute path does not exist, an error message will be prompted stating that the file is not found. 
+
+Following is an example of how R failed to find `cell_exp_proliferation.csv`:
+
+* Absolute path of `cell_exp_proliferation.csv`: `/home/youUserName/Documents/lab1/cell_exp_proliferation.csv`.
+* CWD path of an R interpreter session: `/home/youUserName/Documents/someOtherDirectory`.
+* Relative path R tries to find when we running `read.csv("cell_exp_proliferation.csv")` on the R session: `cell_exp_proliferation.csv`.
+* Absolute path R tries to find when we running `read.csv("cell_exp_proliferation.csv")` on the R session: `/home/youUserName/Documents/someOtherDirectory/cell_exp_proliferation.csv`.
+* Because `/home/youUserName/Documents/someOtherDirectory/cell_exp_proliferation.csv` does not exist, an error message will be prompted. 
+
+There are two exceptoinal relative paths:
+* `.` refers to the CWD.
+* `..` refers the directory at the immediate upper level of CWD.
+
+For example, when current workding directory is `/home/youUserName/Documents/someOtherDirectory`:
+
+* The absolute path of `.` is the same as CWD: `/home/youUserName/Documents/someOtherDirectory`
+* The absolute path of `..` is the immediate upper level directory of CWD: `/home/youUserName/Documents`
+* The absolute path of `../someOtherDirectory` is the same as CWD. 
+* The absolute path of `./.` is the same as CWD. 
+
+### Analyze the loaded dataset
+
+We are going to do the following two analysis:
+
+1. Check linear correlation between expression level and proliferation rate using linear regression.
+
+2. Test whether the means of expression levels are significantly different between conditions using t-test.
+
+3. Test whether the means of proliferation rate are significantly different between conditions using t-test.
+
+#### Check linear correlation
+
+**ACTION**: Add a level 1 header to notify the start of data anlysis section:
+
+```
+# Analyze the loaded dataset
+```
+
+**ACTION**: Add a level 2 header to notify the start of linear correlation analysis:
+
+```
+## Check linear correlation between gene expression level and cell proliferation rate
+```
+
+**ACTION**: Add the following code to create a scatter plot of expression level versus proliferation rate:
+
+```{r comment=NA, echo=FALSE}
+cat(paste0("```{r plot linear correlation}\n", 
+           "# Import the package ggplot2\n", 
+           "library(ggplot2)\n\n", 
+           "# Create a scatter plot of expression level versus proliferation with linear regression line\n", 
+           "lin_cor_plot <- ggplot(data = exp_prolif_df,\n",
+           "                       mapping = aes(x = Proliferation.Rate, \n", 
+           "                                     y = Expression.Level)) +\n",
+           "  geom_point(aes(color = Condition)) +\n",
+           "  geom_smooth(method=\"lm\", se = FALSE) +\n",
+           "  labs(x = \"Proliferation Rate\", y = \"Expression Level\", color = \"Condition\")\n\n",
+           "# Display the plot. The function call print() is optional.\n",
+           "print(lin_cor_plot)\n",
+           "```"))
+```
+
+**ACTION**: Knit the document by clicking `Knit`. 
+
+In this code chunk, we imported `ggplot2` and created a scatter plot using it. We will talk more about making plots using `ggplot2` in later lab sessions. The code is explained line by line as the following:
+
+* `lin_cor_plot <- ggplot(data = exp_prolif_df, mapping = aes(x = Proliferation.Rate, y = Expression.Level))`:
+    + Note that a code expression can be written in multiple lines following certain rules. 
+    + `lin_cor_plot <- ggplot()`: The function `ggplot()` is called to make a new plot and store that plot in variable `lin_cor_plot`.
+    + `data = exp_prolif_df`, specifies that the dataset we are plotting is variable `exp_prolif_df`.
+    + `mapping = aes(x = Proliferation.Rate, y = Expression.Level)` specifies that we want to plot the column `Proliferation.Rate` in x-axis and the column `Expression.Level` in the y-axis. 
+    + **NOTE**: that there is a `+` at the end of line, which indicates that the plotting is not ended yet. 
+
+* `geom_point(aes(color = Condition))`:
+    + `geom_point()`: make a scatter plot.
+    + `aes(color = Condition)`: color the points according to the `Condition` column. 
+
+* `geom_smooth(method="lm", se = FALSE)`:
+    + `geom_smooth`: add a regression line to the scatter plot.
+    +  `method = lm`:  use linear regression. `lm` refers to the function `lm()` that is used to fit a linear model. 
+    + `se = FALSE`: do not plot the confidence intervals of the linear regression. 
+    
+* `labs(x = "Proliferation Rate", y = "Expression Level", color = "Condition")`
+    + `labs()`: label the plot.
+    + `x = "Proliferation Rate"`: label x-axis as `Proliferation Rate`.
+    + `y = "Expression Level"`: label y-axis as `Expression Level`.
+    + `color = "Condition"`: label the color of points as `condition`. 
+    + **NOTE**: Because there is no `+` at the end of the line, this line concludes the code expression to create the plot. 
+
+**ACTION**: Add the following code chunk to print out the statistics of the linear regression:
+
+```{r comment=NA, echo=FALSE}
+cat(paste0("```{r print linear correlation stats}\n", 
+           "# Print the statistics of linear regression\n", 
+           "summary(lm(Expression.Level ~ Proliferation.Rate, data = exp_prolif_df))\n",
+           "```"))
+```
+
+**ACTION**: Knit the document by clicking `Knit`. 
+
+Code explanation:
+
+* `summary(lm(Expression.Level ~ Proliferation.Rate, data = exp_prolif_df))`:
+    + `summary()`: summarize `lm(Expression.Level ~ Proliferation.Rate, data = exp_prolif_df)`
+    + `lm()`: fit a linear model. 
+    + `Expression.Level ~ Proliferation.Rate`: the formula of the linear model, which specifies that we want the linear model to be `Expression.Level` column versus `Proliferation.Rate` column. 
+    + `data = exp_prolif_df`: the dataset is variable `exp_prolif_df`.
+
+The **p-value** of the linear regression will be printed in the last line of the linear model stats. 
+
+#### Test gene expression level differences
+
+The purpose of this analysis is to validate that the gene is knocked down or overexpressed. 
+
+**ACTION**: Add a level 2 header to notify the start of expression level comprisons:
+
+```
+## Compare gene expression levels between different conditions
+```
+
+**ACTION**: Add a code chunk to create a boxplot of the expression levels of all conditions:
+
+```{r comment=NA, echo=FALSE}
+cat(paste0("```{r plot gene exp}\n", 
+           "# Create boxplot of gene expression levels\n",
+           "exp_boxplot <- ggplot(data = exp_prolif_df, \n",
+           "                      aes(x = Condition, y = Expression.Level, \n",
+           "                          color = Condition)) + \n",
+           "  geom_boxplot() +\n",
+           "  geom_dotplot(aes(fill = Condition), binaxis='y', \n",
+           "               stackdir='center', binwidth = 1, dotsize = 0.75) +\n",
+           "  labs(x = 'Condition', y = 'Expression Level')\n\n",
+           "exp_boxplot\n",
+           "```"))
+```
+
+**ACTION**: Knit the document by clicking `Knit`. 
+
+Each box refers to a condition, and the dots are the measurements stacked into bins. 
+
+Code explanation:
+
+* `ggplot(data = exp_prolif_df, aes(x = Condition, y = Expression.Level, color = Condition)) + `: similar as previously mentioned. 
+* `geom_boxplot() +`: make a boxplot
+* `geom_dotplot(aes(fill = Condition), binaxis='y', stackdir='center', binwidth = 1, dotsize = 0.75) +`:
+    + `geom_dotplot()`: make a [dotplot](http://ggplot2.tidyverse.org/reference/geom_dotplot.html) on top of the box plot.
+    + `aes(fill = Condition)`: fill the dots according to their conditions. 
+* `labs(x = 'Condition', y = 'Expression Level')`: similar as previously mentioned. 
+
+
+**ACTION**: Add a code chunk to test the difference between each condition using t-test.
+
+```{r comment=NA, echo=FALSE}
+cat(paste0("```{r test exp mean diff, message=FALSE}\n", 
+           "library(dplyr)\n",
+           "# Select the expression levels of each condition and store them into individual variables. \n",
+           "wt_exp <- exp_prolif_df[exp_prolif_df$Condition == 'Wild Type', 'Expression.Level']\n",
+           "kd_exp <- subset(exp_prolif_df, Condition == 'Knock Down', select = 'Expression.Level', drop = TRUE)\n",
+           "oe_exp <- filter(exp_prolif_df, Condition == 'Overexpression') %>% pull(Expression.Level)\n\n",
+           "# knock down versus wild type\n",
+           "t.test(x = kd_exp, y = wt_exp, alternative = 'l')\n\n",
+
+           "# wild type versus overexpression\n",
+           "t.test(x = wt_exp, y = oe_exp, alternative = 'l')\n\n",
+
+          "# knock down versus overexpression\n",
+          "t.test(x = kd_exp, y = oe_exp, alternative = 'l')\n",
+           "```"))
+```
+
+**ACTION**: Knit the document by clicking `Knit`. 
+
+The p-values will be printed out.
+
+Code explanation:
+
+We first selected the expression levels of the three conditions using three different methods:
+
+* `wt_exp <- exp_prolif_df[exp_prolif_df$Condition == 'Wild Type', 'Expression.Level']`: This line of code used boolean and direct indexing. 
+    + The syntax of indexing is: `myDataFrameOrMatrix[rowIndicesToSelect, columnIndicesToSelect]` .
+    + There are many types of indices, such as number, column name, and boolean. 
+    + `exp_prolif_df$Condition == 'Wild Type'`: boolean indexing. We want the rows of `exp_prolif_df` where the column `Condition` values are equal to the string `"Wild Type"`. `exp_prolif_df$Condition` selects the `Condition` column of `exp_prolif_df`.
+    + `'Expression.Level'`: column name indexing. 
+
+* `kd_exp <- subset(exp_prolif_df, Condition == 'Knock Down', select = 'Expression.Level', drop = TRUE)`: This line of code used the function `subset()`. Check the documentation of `subset` to look for more details. 
+
+* `oe_exp <- filter(exp_prolif_df, Condition == 'Overexpression') %>% pull(Expression.Level)`: This line of code used the package `dplyr`. Go to <http://dplyr.tidyverse.org/index.html> for more details. 
+
+The operator `%>%`, which is defined in the package `dplyr`, passes the return value of previous expression into the parameter of the next function call. For example, `"Hello World!" %>% print()` is equivalent to `print("Hello World")`. The main purpose of introducing the operator `%>%` is to improve the readability of R code. 
+
+Then, we used t-test to test for the differences of expression level between conditions. 
+
+* `t.test(x = wt_exp, y = oe_exp, alternative = 'l')`
+    + `x = wt_exp, y = oe_exp`: compare values in `wt_exp` and `oe_exp`. 
+    + `alternative = 'l'`: alternative hypothesis of this test is that the mean of `wt_exp` is less than `oe_exp`.
+    + Look at the documentataion of `t.test` for more details. 
+
+When performing t-test, we selected the expression levels and stored them into differrent variables. This procedure belongs to "data manipulation".
+
+##### Data manipulation
+
+Data manipulation is a very general practice when doing data analysis, in which data in one form are turned into another form in order to complete the following analysis. For example, in this analysis, we have to extract the expression values from `exp_prolif_df` to complete t-tests. 
+
+There are basically 3 ways of data manipulation:
+
+* Select or filter: select certain data points of interest from a bigger dataset. 
+
+* Summarize: calculate summary statistics, such mean and standard deviation, of multiple data points.
+
+* Reshape: change the "design" of a table. There are two types of table "design", "wide" and "long" format. One format can be "reshaped" into another using packages like [`reshape2`](https://cran.rstudio.com/web/packages/reshape2/index.html) and [`tidyr`](https://cran.r-project.org/web/packages/tidyr/index.html). 
+    
+    + "Wide" table:
+
+        |geneName | expressionInCellLineA| expressionInCellLineB| expressionInCellLineC|
+        |:--------|---------------------:|---------------------:|---------------------:|
+        |GeneA    |                     1|                    20|                     5|
+        |GeneB    |                     5|                     5|                    20|
+        |GeneC    |                    10|                    15|                    30|  
+    
+    + "Long" table:
+
+        |geneName |cellLine              | expressionLevel|
+        |:--------|:---------------------|---------------:|
+        |GeneA    |expressionInCellLineA |               1|
+        |GeneB    |expressionInCellLineA |               5|
+        |GeneC    |expressionInCellLineA |              10|
+        |GeneA    |expressionInCellLineB |              20|
+        |GeneB    |expressionInCellLineB |               5|
+        |GeneC    |expressionInCellLineB |              15|
+        |GeneA    |expressionInCellLineC |               5|
+        |GeneB    |expressionInCellLineC |              20|
+        |GeneC    |expressionInCellLineC |              30|
+    
+    + melt/gather/stack: wide format `->` long format.
+    + dcast/spread/unstack: long format `->` wide format. 
+    
+An analysis might be more easily done if the data is in either wide or long format. For more details, check this introduction to the R package `reshape2`, <http://seananderson.ca/2013/10/19/reshape.html> .
+
+#### Test cell proliferation rate differences
+
+**NOTE**: I encrouage you to write the code chunks of this section yourself before using the code we provide below, because this analysis is the same as the previous section on expression level analysis.
+
+**ACTION**: Add a level 2 header to notify the start of proliferation rate comprisons:
+
+```
+## Compare proliferation rates between different conditions
+```
+
+**ACTION**: Add a code chunk to create a boxplot of the proliferation rates of all conditions:
+
+```{r comment=NA, echo=FALSE}
+cat(paste0("```{r plot proliferation rate}\n", 
+           "# Create boxplot of proliferation rates\n",
+           "prolif_boxplot <- ggplot(data = exp_prolif_df, \n", 
+           "                         aes(x = Condition, y = Proliferation.Rate, \n",
+           "                             color = Condition)) + \n",
+           "  geom_boxplot() +\n",
+           "  geom_dotplot(aes(fill = Condition), binaxis='y', \n",
+           "               stackdir='center', binwidth = 1, dotsize = 0.75) +\n",
+           "  labs(x = 'Condition', y = 'Proliferation Rate')\n\n",
+           "prolif_boxplot\n",
+           "```"))
+```
+
+**ACTION**: Knit the document by clicking `Knit`. 
+
+
+**ACTION**: Add a code chunk to test the difference between each condition using t-test.
+
+```{r comment=NA, echo=FALSE}
+cat(paste0("```{r test proliferation rate diff}\n", 
+           "# Select the proliferation rates of each condition and store them into individual variables. \n",
+           "wt_prolif <- exp_prolif_df[exp_prolif_df$Condition == 'Wild Type', 'Proliferation.Rate']\n",
+           "kd_prolif <- subset(exp_prolif_df, Condition == 'Knock Down', select = 'Proliferation.Rate', drop = TRUE)\n",
+           "oe_prolif <- filter(exp_prolif_df, Condition == 'Overexpression') %>% pull(Proliferation.Rate)\n\n",
+           "# knock down versus wild type\n",
+           "t.test(x = kd_prolif, y = wt_prolif, alternative = 'g')\n\n",
+
+           "# wild type versus overexpression\n",
+           "t.test(x = wt_prolif, y = oe_prolif, alternative = 'g')\n\n",
+
+          "# knock down versus overexpression\n",
+          "t.test(x = kd_prolif, y = oe_prolif, alternative = 'g')\n",
+           "```"))
+```
+
+**ACTION**: Knit the document by clicking `Knit`. 
+
+### Output plots and tables
+
+Finally, we output the plots and tables for the record. 
+
+**ACTION**: Add a level 1 header to indicate the start of output section.
+
+```
+# Output results and plots
+```
+
+**ACTION**: Add a code chunk to save the plots we made. 
+
+```{r comment=NA, echo=FALSE}
+cat(paste0("```{r output plots, results='hide'}\n", 
+"# Save plot in a PDF file named cell_prolif_exp_plots.pdf\n", 
+"# You can also output your plots **individually** in other formats using other \n",
+"# functions, such as bmp(), jpeg(), and png(). Check the documentation of the \n",
+"# png() function for more details.\n",
+"pdf('cell_prolif_exp_plots.pdf')\n\n",
+
+"# Now, the following plots will be printed into cell_prolif_exp_plots.pdf .\n",
+"lin_cor_plot\n",
+"exp_boxplot\n",
+"prolif_boxplot\n",
+
+"# dev.off() tells R that we are done saving plots into cell_prolif_exp_plots.pdf .\n",
+"dev.off()\n",
+"```"))
+```
+
+**ACTION**: Knit the document by clicking `Knit`. 
+
+You should see a PDF file named `cell_prolif_exp_plots.pdf` generated in your CWD. You can open it using your file browser. 
+
+**ACTION**: Add a code chunk to calculate the mean and standard deviation of the data and output it into a table.
+
+```{r comment=NA, echo=FALSE}
+cat(paste0("```{r output stats, results='hide'}\n", 
+"# Calculate summary statistics of all conditions\n",
+"exp_prolif_stats_df <- exp_prolif_df %>% \n",
+"  group_by(Condition) %>% \n",
+"  summarise(expLevelMean = mean(Expression.Level),\n",
+"            expLevelSd = sd(Expression.Level),\n",
+"            prolifRateMean = mean(Proliferation.Rate),\n",
+"            prolifRateSd = sd(Proliferation.Rate))\n",
+"\n",
+"# Output the summary statistics table\n",
+"write.csv(exp_prolif_stats_df, 'exp_prolif_stats.csv',\n",
+"          row.names = FALSE)\n",
+"```"))
+```
+
+**ACTION**: Knit the document by clicking `Knit`. 
+
+You should see a CSV file named `exp_prolif_stats.csv` generated in your CWD. You can open it using text editor or Excel. 
+
+This concludes our data analysis. 
+
+# Optional
+
+The optional topics will only be discussed in the lab session if it ends too early. The topics are selected by the TAs to help you better understand programming and statistics. If you are not interested in any optional topic, you can safely ignore it. 
+
+## Run Linux operating system on a virtual machine
+
+### Why?
+
+### How?
+
