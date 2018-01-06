@@ -2,6 +2,7 @@
 title: "Week 1&2 Lab Handout"
 author: "Yuanchao Zhang"
 date: "1/3/2018"
+geometry: margin=1in
 output:
   html_document:
     fig_caption: yes
@@ -25,7 +26,7 @@ There are two main sections in this handout, required and optional.
 * The required section covers the topics listed in the syllabus. 
 * The optional section covers some other useful topics in case the lab session ends too early. 
 
-In the required section, we are going to set up R and RStudio on your computer. Learn how to use R packages and create R Markdown files. Then, we are going to go through the basics of R programming by analyzing a simple biological dataset. 
+In the required section, we are going to set up R and RStudio on your computer. Learn how to use R packages and create R Markdown files. Then, we are going to go through the basics of R programming by analyzing a simple biological data set. 
 
 In the optional section, we are going to run Linux operating system on a virtual machine. 
 
@@ -37,18 +38,22 @@ In the optional section, we are going to run Linux operating system on a virtual
 
 2. Click `download R` in the `Getting Started` section.
 
-3. Click <https://cloud.r-project.org/>, the first link under **0-Cloud**. Listed in this page are the URLs to the mirrors of Comprehensive R Archive Network (CRAN). A mirror is a replicate of the contents of the main server, of which the URL is <http://cran.r-project.org>. Therefore, you can choose any of the URLs listed if you want. 
+> ![](downloadR.png){width=70%}
+
+3. Click <https://cloud.r-project.org/>, the first link under **0-Cloud**. The URLs to the mirrors of Comprehensive R Archive Network (CRAN) are listed in this page. A mirror is a replicate of the contents of the main server, of which the URL is <http://cran.r-project.org>. Therefore, you can choose any of the URLs listed if you want. 
+
+> ![](selectMirror.png){width=50%}
 
 4. Choose the download link based on your operating system. 
-    + Linux: Choose your linux distribution and follow the installation instructions.
+    + Linux: Choose your Linux distribution and follow the installation instructions.
     + Mac OS X: Download `R-3.4.3.pkg`. Open the downloaded file to install. 
     + Windows: Choose `base`, then `Download R 3.4.3 for Windows`. Open the downloaded file to install. 
 
 ## Install RStudio
 
 1. Go to <https://www.rstudio.com/products/rstudio/download/#download>. 
-2. Choose the installer to download based on your operating system. For linux users, check if you are running 32-bit or 64-bit system.
-3. Open the downloaded file to install. If you are running ubuntu, you might need to install using the `gdebi` utility, and you can find more information at [here](https://medium.com/@GalarnykMichael/install-r-and-rstudio-on-ubuntu-12-04-14-04-16-04-b6b3107f7779).
+2. Choose the installer to download based on your operating system. For Linux users, check if you are running 32-bit or 64-bit system.
+3. Open the downloaded file to install. If you are running Ubuntu, you might need to install by using the `gdebi` utility, and you can find more information at <https://medium.com/@GalarnykMichael/install-r-and-rstudio-on-ubuntu-12-04-14-04-16-04-b6b3107f7779>.
 
 Note on 32-bit and 64-bit:  Most of the time, we only need to know this information when trying to install or run some software. 32-bit or 64-bit refers to the size of register in the central processing unit (CPU). [32-bit](https://en.wikipedia.org/wiki/32-bit) system allows direct access of $2^{32}$ bytes of memory, and [64-bit](https://en.wikipedia.org/wiki/64-bit_computing) allows direct access of $2^{64}$ bytes of memory. 
 
@@ -57,7 +62,7 @@ Note on 32-bit and 64-bit:  Most of the time, we only need to know this informat
 1. Open the installed RStudio. If all went well, there should no error message, and there should be several panes. 
 2. Find the pane with the `Console` tab in it and select that tab, which is the left pane by default if you have not opened any script yet. The console runs an R programming language interpreter, which executes the R code for you.
 3. Select the `Console` pane by clicking on its inner area. You should see a cursor blinking after the prompt `> `.
-4. Type `print("Hello World!")` and hit enter. You should see the following promt in the next line `[1] "Hello World!"`. An R base function `print()` is called with the positional parameter `"Hello World"`. After this line of code is executed, the parameter is printed by the computer to the console. 
+4. Type `print("Hello World!")` and hit enter. You should see the following prompt in the next line `[1] "Hello World!"`. An R base function `print()` is called with the positional parameter `"Hello World"`. After this line of code is executed, the parameter is printed by the computer to the console. 
 
 Even though this line of code is simple, there are actually many things happened behind the scene:
 
@@ -66,7 +71,7 @@ Even though this line of code is simple, there are actually many things happened
 2. RStudio runs R programming language interpreter and shows its output in the `Console` tab. The R programming language interpreter is basically an infinite loop with memory of executions within the same session:
     + Prompt `> `.
     + Takes in code expression. 
-    + Executes the code expression. When execution is done, promt `> ` again and ready for the next code expression. However, if one or more variables are created or updated, the interpreter will remember them.
+    + Executes the code expression. When execution is done, prompt `> ` again and ready for the next code expression. However, if one or more variables are created or updated, the interpreter will remember them.
 
 3. You typed in `print("Hello World!")` and "enter" in the R interpreter.
 
@@ -113,7 +118,7 @@ install.packages("ggplot2")
 install.packages("dplyr")
 ```
 
-If you are calling it the first time, you might be prompted to select the mirrors, which is the same as downling R programming language. You can just choose the same one as above <http://cran.r-project.org>. 
+If you are calling it for the first time, you might be prompted to select the mirrors, which is the same as downloading R programming language. You can just choose the same one as above <http://cran.r-project.org>. 
 
 `install.packages()` is the function to install package. The first parameter `"ggplot2"` is the name of the package. 
 
@@ -143,7 +148,7 @@ For both CRAN and Bioconductor packages, the installing process of a package inc
 1. Download the package from CRAN or Bioconductor to your computer.
 2. Set up downloaded package(s) in one or more locations on your computer. These locations are called the library of your R environment, which can be checked using function `.libPaths()`. 
 
-You might wonder why couldn't we have just one repository. Just to list a few reasons:
+You might wonder why couldn't we just have one repository. Just list a few reasons:
 
 * CRAN and Bioconductor developer communities are distinct. From my impresion, the CRAN community focus more on general usage such as plotting and data manipulations, whereas the Bioconductor community focus more on analyzing a specific type of biological data. 
 
@@ -154,7 +159,7 @@ You might wonder why couldn't we have just one repository. Just to list a few re
 
 ### Use packages
 
-The code for using CRAN and Bioconductors are the same. You can either import the whole package to your environment using function `library()`, or execute certain function within a package using the `packageName::functionName` syntax.
+The code for using CRAN and Bioconductors is the same. You can either import the whole package to your environment using function `library()`, or execute certain function within a package using the `packageName::functionName` syntax.
 
 ```{r use package, eval=TRUE, echo=TRUE, message=F, warning=F, cache=TRUE}
 # Run functions using the :: operator
@@ -176,17 +181,17 @@ ggplot(mpg, aes(displ, hwy, colour = class)) +
   geom_point()
 ```
 
-You might wonder why do we still need to import a library after installing it. The intuition is an analogy to installing a software on your computer. After you install a software, such as RStudio, you might not want to open it and keep it constantly running at the backgorund after starting your computer, because that will slow down your computer and make your working space crowded. When R interpreter starts running, it only has a minimum set of data and functions defined, which is similar to a just started computer. If you want to use the R interpreter to do something else, you need to get those data and functions into your environment, which is similar to open an application, such as browser, on your computer. 
+You might wonder why we still need to import a library after installing it. The intuition is an analogy to installing a software on your computer. After you install a software, such as RStudio, you might not want to open it and keep it constantly running at the backgorund after starting your computer, because that will slow down your computer and make your working space crowded. When R interpreter starts running, it only has a minimum set of data and functions defined, which is similar to a just started computer. If you want to use the R interpreter to do something else, you need to get those data and functions into your environment, which is similar to open an application, such as browser, on your computer. 
 
 However, this analogy does not explain the `packageName::functionName` syntax, and we need more details to understand what really happened. 
 
 Recall that a package is a collection of code structured into a directory located in the R library on your computer. Following is a screen shot of one R library location:
 
-![R library](rlib.png){width=70%}
+> ![R library](rlib.png){width=70%}
 
 Each folder is an installed package with the name of corresponding package, and the `ggplot2` package is the first one in the list. The content of `ggplot2` is structured within the folder. Following is the screenshot of the files within the `ggplot2` folder:
 
-![`ggplot2` package directory structure](ggplot2.png){width=70%}
+> ![`ggplot2` package directory structure](ggplot2.png){width=70%}
 
 All packages are structured in the same way but with different content in these files. The code of a package is stored in the `R` directory, and the datasets are in the `data` directory. Other files and directories contain documentations, license, citation, etc. 
 
@@ -206,7 +211,7 @@ You can get both tutorial and manual either using RStudio or online.
 
 #### Get documentations using RStudio 
 
-There are R functions to look up the package documentations in your library (recall the figure of package structure). The function `vignette("packageName")` looks up for tutorial, and `help("functionName")` looks up for the manual section of that function. After the function being executed by your R interpreter and the specified documation was found, the documation will show up in the `help` tab in one of your RStudio panes. You will receive an error in the `console` tab if the specified documentation was not found. 
+There are R functions to look up the package documentations in your library (recall the figure of package structure). The function `vignette("packageName")` looks up for tutorial, and `help("functionName")` looks up for the manual section of that function. After the function being executed by your R interpreter and the specified documentation was found, the documentation will show up in the `help` tab in one of your RStudio panes. You will receive an error in the `console` tab if the specified documentation was not found. 
 
 Following is a demo of how to use `vignette()` and `help()` functions.
 
@@ -233,9 +238,9 @@ help(help)
 
 Google the package and go to either CRAN or Bioconductor depending on the package source. Find the documentations listed in the webpage. Following are the screenshots of the location of the documentation:
 
-![`ggplot2` documentations at <https://cran.r-project.org/web/packages/ggplot2/index.html>](ggplot2Doc.png)
+> ![`ggplot2` documentations at <https://cran.r-project.org/web/packages/ggplot2/index.html>](ggplot2Doc.png)
 
-![`DESeq2` documentations at https://bioconductor.org/packages/release/bioc/html/DESeq2.html](DESeq2Doc.png)
+> ![`DESeq2` documentations at https://bioconductor.org/packages/release/bioc/html/DESeq2.html](DESeq2Doc.png)
 
 The first documentation of DESeq2 on Bioconductor *Analyzing RNA-seq data with DESeq2* is the tutorial. 
 
@@ -250,7 +255,7 @@ The R package [`knitr`](https://yihui.name/knitr/) converts R Markdown files int
 
 To start using R Markdown in RStudio:
 
-1. Click menu `File -> New File ->` **`R Markdown`**. Then, you will be prompted by a wndow to fill in some relevant parameters. In the `Default Output Format:` option, select [`HTML`](https://en.wikipedia.org/wiki/HTML) (important), which is the standard markup language for creating web pages. It worths of time to read the explanations of each option. After clicking `OK`, a new R Markdown file will show up in a pane of RStudio. 
+1. Click menu `File -> New File ->` **`R Markdown`**. Then, you will be prompted by a wndow to fill in some relevant parameters. In the `Default Output Format:` option, select [`HTML`](https://en.wikipedia.org/wiki/HTML) (important), which is the standard markup language for creating web pages. It worth taking time to read the explanations of each option. After clicking `OK`, a new R Markdown file will show up in a pane of RStudio. 
 
 2. Click the `Knit` option at the top of the Markdown file pane. Then, you will be prompted to save the R Markdown file. If you hit `Knit` for the first time, you will be prompted to install several packages that are required to run the "knitting" process. Install them. 
 
@@ -287,7 +292,7 @@ This analysis includes the following steps:
 
 **ACTION**: Create a new `R project`: Click menu `File -> New Project -> Existing Directory ->` select the directory of lab 1 handout as the project working directory (**very important**) `->` create. 
 
-An `R project` is a session of RStudio, and the `workding directory` is the directory where R interpreter starts running.
+An `R project` is a session of RStudio, and the `working directory` is the directory where R interpreter starts running.
 
 **ACTION**: After the project is created, type `dir()` and hit "enter" in your `Console` tab, you should see `"cell_exp_proliferation.csv"` included in the output together with some other files. The function `dir()` lists all files under the working directory of R. 
 
@@ -368,27 +373,45 @@ However, you cannot print `exp_prolif_df` in your console session even after kni
 
 Similarly, if you import a library in an interpreter session, all code and datasets included in its associated R environment, and you can use the imported code and datasets in that interpreter session. However, if you quit the current interpreter session and starts a new one, you will need to import that package again before using its code and datasets.
 
-In addition to the functions and datasets, an R environment also keeps track of many system parameters such as the library location, and the most important one is the **current working directory**. You might wonder why it is very important to create the R project and R Markdown files in the lab handout directory, and the reason is that the locations of the R project and R Markdown file are the current workding directory of the `Console` R interpreter session and `knitr` interpreter session respectively. 
+In addition to the functions and datasets, an R environment also keeps track of many system parameters such as the library location, and the most important one is the **current working directory**. You might wonder why it is very important to create the R project and R Markdown files in the lab handout directory, and the reason is that the locations of the R project and R Markdown file are the current working directory of the `Console` R interpreter session and `knitr` interpreter session respectively. 
 
-If your **current workding directory** does not include `cell_exp_proliferation.csv`, you will receive an error when running `exp_prolif_df <- read.csv("cell_exp_proliferation.csv", stringsAsFactors=FALSE)`, because R interpreter cannot find the file `cell_exp_proliferation.csv`. 
+If your **current working directory** does not include `cell_exp_proliferation.csv`, you will receive an error when running `exp_prolif_df <- read.csv("cell_exp_proliferation.csv", stringsAsFactors=FALSE)`, because R interpreter cannot find the file `cell_exp_proliferation.csv`. 
 
-You can change your **current workding directory** (CWD) by clicking menu `Session -> Set Working Directory -> Choose Directory`. 
+You can change your **current working directory** (CWD) by clicking menu `Session -> Set Working Directory -> Choose Directory`. 
 
 #### File path
 
 The locations of files on your computer are specified by their paths. Following are some examples on Windows, Mac, and Linux.
 
-* Windows path of a file named `very_important_file.txt` under the C disk directory: `C:\very_important_file.txt`.
+* Windows path of a file named `very_important_file.txt` under the C disk directory: 
+```
+C:\very_important_file.txt
+```
 
-* Windows path of a file named `not_important_file.txt` under a directory called `outdated_files` under C disk directory: `C:\outdated_files\not_important_file.txt`. 
+* Windows path of a file named `not_important_file.txt` under a directory called `outdated_files` under C disk directory: 
+```
+C:\outdated_files\not_important_file.txt 
+```
 
-* Mac path of file named `very_important_file.txt` under your Documents directory: `/Users/yourUserName/Documents/very_important_file.txt`.
+* Mac path of file named `very_important_file.txt` under your Documents directory: 
+```
+/Users/yourUserName/Documents/very_important_file.txt
+```
 
-* Mac path of file named `not_important_file.txt` under a directory called `outdated_files` under your Documents directory: `/Users/yourUserName/Documents/outdated_files/not_important_file.txt`.
+* Mac path of file named `not_important_file.txt` under a directory called `outdated_files` under your Documents directory: 
+```
+/Users/yourUserName/Documents/outdated_files/not_important_file.txt
+```
 
-* Linux path of file named `very_important_file.txt` under your Documents directory: `/home/yourUserName/Documents/very_important_file.txt`.
+* Linux path of file named `very_important_file.txt` under your Documents directory: 
+```
+/home/yourUserName/Documents/very_important_file.txt
+```
 
-* Linux path of file named `not_important_file.txt` under a directory called `outdated_files` under your Documents directory: `/home/yourUserName/Documents/outdated_files/not_important_file.txt`.
+* Linux path of file named `not_important_file.txt` under a directory called `outdated_files` under your Documents directory: 
+```
+/home/yourUserName/Documents/outdated_files/not_important_file.txt
+```
 
 A path describes the exact method to find your file. For example if you want to find the `not_important_file.txt`:
 
@@ -412,7 +435,7 @@ There are two exceptoinal relative paths:
 * `.` refers to the CWD.
 * `..` refers the directory at the immediate upper level of CWD.
 
-For example, when current workding directory is `/home/youUserName/Documents/someOtherDirectory`:
+For example, when current working directory is `/home/youUserName/Documents/someOtherDirectory`:
 
 * The absolute path of `.` is the same as CWD: `/home/youUserName/Documents/someOtherDirectory`
 * The absolute path of `..` is the immediate upper level directory of CWD: `/home/youUserName/Documents`
@@ -421,7 +444,7 @@ For example, when current workding directory is `/home/youUserName/Documents/som
 
 ### Analyze the loaded dataset
 
-We are going to do the following two analysis:
+We are going to do the following two analyses:
 
 1. Check linear correlation between expression level and proliferation rate using linear regression.
 
@@ -751,7 +774,148 @@ The optional topics will only be discussed in the lab session if it ends too ear
 
 ## Run Linux operating system on a virtual machine
 
-### Why?
+In this section, we will discuss the pros and cons of using Linux operating system. If you are interested, we are going to create a virtual machine on your computer to run Linux. Don't worry, we are not going to ask you to erase all your data on your hard drive. 
 
-### How?
+Linux operating system is developed based on the Unix operating system, so as the Mac OS. Following is the pedigree of Unix based operating system downloaded from <https://en.wikipedia.org/wiki/MacOS>:
+
+> ![Unix based operating system](unixSystems.png)
+
+On the other hand, Microsoft Windows is not based on Unix. 
+
+### Unix based operating system is better for programming in the biological field
+
+You might wonder what is the difference between Linux, Mac OS, and Windows, because they all look the same. Even when you program using an IDE, such as RStudio, things might look the same to you as well. Thus, why bother switching to Linux. 
+
+Firstly, it is not very easy to run some bioinformatics tools on Windows. For example, a popular aligner [STAR](https://github.com/alexdobin/STAR/tree/master/bin) only provides ready-to-run executable files for Linux and Mac OS. If you would like to run it on Windows, you need to compile the executable from source code, which is sometimes very difficult. 
+
+In addition, `bash` script, <https://en.wikipedia.org/wiki/Bash_(Unix_shell)>, is very popular among bioinformaticians to do some simple data analysis, but it can only be easily run on Unix based systems. You might find answers to your programming questions written in `bash` script. 
+
+Most importantly but might not be very familiar to you, the high performance computing servers or clusters are mostly running Linux operating system. If you want to use these resources, you need to learn `bash` script. 
+
+Following is a list of a few general advantages and disadvantages of Unix based systems, 
+
+* Advantages:
+    - Most educational resources of programming use Unix based operating systems. 
+    - Free. 
+    - Fast.
+    - Almost never freeze. 
+
+* Disadvantages:
+    - It is easier to wreck your system by a mistake, and it will be very time consuming or impossible to recover. 
+    - Have to learn a lot of things to get started. 
+    - Takes some time to get familiar with. 
+
+We can easily prevent wrecking our real operating system by using a virtual machine. If you mistakenly wrecked the virtual machine, just delete everything in it and create a new one. 
+
+### Run Linux on virtual machine
+
+A virtual machine is a guest operating system (OS) running on the host OS through virtualizing the hardware resources. When you start your computer, the host OS runs on the hardware of your computer, such as CPU, memory, and network card. When using virtual machine monitor (VMM), you are able to run a guest OS of any kind on your host OS. The VMM uses software resources provided by host OS to simulate a set of hardware resources for guest OS to run. In the following illustration, real and virtual hardware layers are labeled in blue, and software layers are labeled in yellow. 
+
+> ![](vm.png)
+
+There are many VMM applications, and the most popular ones are costly [VMware products](https://www.vmware.com/products/personal-desktop-virtualization.html) and free [VirtualBox](https://www.virtualbox.org/).
+
+Following are the instructions to use VirtualBox for running Linux as a virtual machine:
+
+1. Download VirtualBox installer from <https://www.virtualbox.org/>. Click `Download`. Download VirtualBox platform package according to your operating system. 
+
+> ![](vbDownload.png)
+
+2. Open the downloaded file and follow the instructions to install. When prompted to install some other stuff, choose install. 
+3.  Download `Ubuntu 16.04.3 LTS` image from <https://www.ubuntu.com/download/desktop>. Wait for the file `ubuntu-16.04.3-desktop-amd64.iso` to be downloaded. **Important**: make sure that the there is `amd64` in the file name you are downloading, and it means that the image is a 64-bit version. 
+4. Open the installed VirtualBox software. You should see a window similar as following.
+
+> ![](vbWindow.png)
+
+5. Click `New` in the window. Fill the name with `ubuntuVM`. **Important**: make sure that the type is **Linux** and Version is **Ubuntu (64-bit)**. Click Continue. **Troubleshoot**: If you cannot find the `64-bit` option, try google for `32-bit ubuntu image` and downloaded it. Then, in `step 16`, use the `32-bit` image. 
+
+> ![](nameVM.png)
+
+6. Click `Continue` to set the memory size of the virtual machine we are creating as recommended.
+
+7. Choose `Create a virtual hard disk now` and click `Create`. This creates a file on your host OS to store the files in guest OS. 
+
+> ![](vmHardDisk.png)
+
+8. Choose `VDI (VirtualBox Disk Image)` and click `Continue`.
+
+> ![](vmhdtype.png)
+
+9. Choose `Dynamically allocated` and click `Continue`. It worth taking time to read through the explanation in the window.
+
+> ![](vmhdalloc.png)
+
+10. Choose the location of the guest virtual machine to be stored.
+11. Change the size of the virtual hard disk to 20-50GB depending on the free space on your computer. Click `Create`. 
+
+> ![](vmhdsize.png)
+
+12. You should see the newly created virtual machine in the list. 
+
+> ![](vmsetup.png)
+
+13. Selected the newly created virtual machine and click `Settings`.
+
+> ![](vmsettings.png)
+
+14. Select `Storage`. Click the `Empty` under `Controller: IDE`.
+
+> ![](vmLoadImg.png)
+
+15. Click the small disk label in the marked with red rectangle in the previous image. 
+
+> ![](vmLoadImage2.png)
+
+16. Select `Choose Virtual Optic Disk File...` and choose the Ubuntu image you downloaded in step 3. You should see the information updated similarly as following. 
+
+> ![](vmImageLoaded.png)
+
+17. Click OK. 
+
+18. Select the virtual machine and click `Start`. 
+
+> ![](vmStart.png)
+
+19. Click `Install Ubuntu`. 
+
+20. Select `Download updates when installing` and continue. 
+
+21. Select `Erase disk and install Ubuntu`. Don't worry. This will not erase your real hard drive. This is only going to erase the virtual disk we created. 
+
+22. Click `Continue`. Set up your time zone. Choose language. You might need to enlarge the window to click `Continue`. 
+
+23. Set username and password. **Important**: remember your password. Click `Continue`. Then, wait for the guest OS to be installed on your virtual machine. 
+
+24. Once the installation is done, click `Restart Now`. Similarly, this will only restart the virtual machine but not your real machine. 
+
+24. When you see the instruction to `remove the installation medium`, remove the Ubuntu image from the virtual optic drive. Similar to steps 13 - 17. By default, VirtualBox should have removed the image. 
+
+25. Enter the password to log in. After this step, your virtual machine is up and running. 
+
+**Note**: The following steps are optional, which allows you to copy and paste text between host and guest. This is usually a very useful feature. 
+
+26. Click the window running the virtual machine. 
+
+27. Click `Install guest additions CD image...`. You should see a disk show up in your virtual machine and click `Run`. Then type in the password you set up for your **virtual machine** to authenticate. 
+
+> ![](insAdd.png)
+
+28. Wait for the installation to be done. Following the instruction to hit `return` to close the window. 
+
+29. Click menu `Device -> Shared Clipboard -> Bidirectional`. This will work after restarting the virtual machine. 
+
+30. Restart your virtual machine by clicking the upper right corner and select `Shutdown`. Then choose restart at on the left. 
+
+> ![](shutdownUbuntu.png)
+
+31. Try copy some text on your host machine and paste to your guest machine `Firefox` browser. It should work if everything went well. I have tested it on both `Mac OS 10.12.6 (16G29)` and `Windows 10`. **Trouble shoot**: If this does not work, try restart virtual box. 
+
+
+Enjoy!
+
+
+
+
+
+
 
