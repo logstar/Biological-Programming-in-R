@@ -2,7 +2,6 @@
 title: "Week 1&2 Lab Handout"
 author: "Yuanchao Zhang"
 date: "1/3/2018"
-geometry: margin=1in
 output:
   html_document:
     fig_caption: yes
@@ -13,6 +12,13 @@ output:
     toc: yes
     toc_depth: '3'
     highlight: tango
+bibliography: lab1and2.bib
+nocite: |
+  @morandat_evaluating_2012, @MarkdownBasics, @UsingMarkdownClass, |
+  @Bioconductor2017, @Spreadkeyvaluepair, |
+  @BestrmarkdownexampleMarkdownexample2018, @OracleVMVirtualBox, |
+  @BioconductorInstall, @alexdobinSTARRNAseqaligner2018, @Pathcomputing2017, |
+  @Unix2018, @BashUnixshell2017, @HTML2017, @Markdown2018
 ---
 
 ```{r setup, include=FALSE}
@@ -26,7 +32,7 @@ There are two main sections in this handout, required and optional.
 * The required section covers the topics listed in the syllabus. 
 * The optional section covers some other useful topics in case the lab session ends too early. 
 
-In the required section, we are going to set up R and RStudio on your computer. Learn how to use R packages and create R Markdown files. Then, we are going to go through the basics of R programming by analyzing a simple biological data set. 
+In the required section, we are going to set up R and RStudio on your computer. Learn how to use R packages and create R Markdown files. Then, we are going to go through the basics of R programming by analyzing a simple biological data set. Finally, we conclude the required section by discussing the advantages of using R for data analysis comparing to Excel. 
 
 In the optional section, we are going to run Linux operating system on a virtual machine. 
 
@@ -61,8 +67,14 @@ Note on 32-bit and 64-bit:  Most of the time, we only need to know this informat
 
 1. Open the installed RStudio. If all went well, there should no error message, and there should be several panes. 
 2. Find the pane with the `Console` tab in it and select that tab, which is the left pane by default if you have not opened any script yet. The console runs an R programming language interpreter, which executes the R code for you.
+
+> ![](Rconsole.png)
+
 3. Select the `Console` pane by clicking on its inner area. You should see a cursor blinking after the prompt `> `.
+
 4. Type `print("Hello World!")` and hit enter. You should see the following prompt in the next line `[1] "Hello World!"`. An R base function `print()` is called with the positional parameter `"Hello World"`. After this line of code is executed, the parameter is printed by the computer to the console. 
+
+> ![](hw.png)
 
 Even though this line of code is simple, there are actually many things happened behind the scene:
 
@@ -75,13 +87,13 @@ Even though this line of code is simple, there are actually many things happened
 
 3. You typed in `print("Hello World!")` and "enter" in the R interpreter.
 
-4. When R interpreter sees the "enter", it checks your code before the "enter". If you wonder why this is necessary, try type `print("Hello World!"` and "enter". Note that the `)` is missing at the end. Then, at the next line with the prompt `+ `, type `)` and "enter". 
+4. When R interpreter sees the "enter", it checks your code before the "enter". If you wonder why this is necessary, try type `print("Hello World!"` and "enter". Note that the `)` is missing at the end. Then, at the next line with the prompt `+ `, type `)` and "enter". The `)` in the second line completes the code expression, and the R interpreter starts executing the code expression. 
 
 5. R interpreter found a complete code expression and starts executing the code without the "enter".
 
 6. R interpreter starts executing `print("Hello World!")`, which is a function to print data out. **At this point**, the prompt `[1] "Hello World!"` is printed out. Question: why is there `[1] ` before `"Hello World"`? Hint: try to run `print(1:100)`, where `1:100` creates a vector of integers from 1 to 100.
 
-7. `print("Hello World!")` function returns `"Hello World!"`, but there is no variable assigned to that return value. Try to run `myVariable <- print("Hello World!")` and see what is value in `myVariable`. You can see it either by typing `myVariable` and "enter" in the console, or find it in the `Environment` tab of another pane. Environment is basically a collection of variables. 
+7. `print("Hello World!")` function returns `"Hello World!"`, but there is no variable assigned to that return value. Try to run `myVariable <- print("Hello World!")` and see what the value is stored in `myVariable`. You can see it either by typing `myVariable` and "enter" in the console, or find it in the `Environment` tab of another pane. Environment is basically a collection of variables. 
 
 8. R interpreter evaluation loop resumes running to take in the next code expression. If you would like to see the suspension of R interpreter evaluation loop, try to run `Sys.sleep(10)` which asks the interpreter to idle for 10 seconds. You should see a blinking cursor at the beginning of the line. Try:
     + When the evaluation loop suspends, type in `print("Hello World!")` and "enter". 
@@ -120,15 +132,18 @@ install.packages("dplyr")
 
 If you are calling it for the first time, you might be prompted to select the mirrors, which is the same as downloading R programming language. You can just choose the same one as above <http://cran.r-project.org>. 
 
-`install.packages()` is the function to install package. The first parameter `"ggplot2"` is the name of the package. 
+`install.packages()` is the function to install package. The first parameter `"ggplot2"` is the name of the package to be installed. 
 
 #### Bioconductor
 
 To install from CRAN, run the following code:
 
 ```{r install from Bioconductor, eval=FALSE}
-# Run the script at https://bioconductor.org/biocLite.R , which defines the 
+# source() is a function to run an R program. 
+# source("https://bioconductor.org/biocLite.R"), runs the script at 
+# https://bioconductor.org/biocLite.R , which defines the 
 # function `biocLite()`.
+#
 # You can use your browser to see the code by opening the link. 
 source("https://bioconductor.org/biocLite.R")
 
@@ -146,7 +161,7 @@ Note: `#` starts a comment, `#` and everything afterwards within the same line a
 For both CRAN and Bioconductor packages, the installing process of a package includes basically two steps:
 
 1. Download the package from CRAN or Bioconductor to your computer.
-2. Set up downloaded package(s) in one or more locations on your computer. These locations are called the library of your R environment, which can be checked using function `.libPaths()`. 
+2. Set up downloaded package(s) in one or more locations on your computer. These locations are called the "library" of your R environment, which can be checked using function `.libPaths()`. 
 
 You might wonder why couldn't we just have one repository. Just list a few reasons:
 
@@ -181,17 +196,17 @@ ggplot(mpg, aes(displ, hwy, colour = class)) +
   geom_point()
 ```
 
-You might wonder why we still need to import a library after installing it. The intuition is an analogy to installing a software on your computer. After you install a software, such as RStudio, you might not want to open it and keep it constantly running at the backgorund after starting your computer, because that will slow down your computer and make your working space crowded. When R interpreter starts running, it only has a minimum set of data and functions defined, which is similar to a just started computer. If you want to use the R interpreter to do something else, you need to get those data and functions into your environment, which is similar to open an application, such as browser, on your computer. 
+You might wonder why we still need to import a library after installing it. The intuition is an analogy to installing a software on your computer. After you install a software, such as RStudio, you might not want to open it and keep it constantly running at the backgorund after starting your computer, because that will slow down your computer and make your working space crowded. When R interpreter starts running, it only has a minimum set of data and functions defined, which is similar to a just started computer. If you want to use the R interpreter to do something else, you need to get those data and functions into your environment, which is similar to opening an application, such as a web browser, on your computer. 
 
 However, this analogy does not explain the `packageName::functionName` syntax, and we need more details to understand what really happened. 
 
 Recall that a package is a collection of code structured into a directory located in the R library on your computer. Following is a screen shot of one R library location:
 
-> ![R library](rlib.png){width=70%}
+> ![](rlib.png){width=70%}
 
-Each folder is an installed package with the name of corresponding package, and the `ggplot2` package is the first one in the list. The content of `ggplot2` is structured within the folder. Following is the screenshot of the files within the `ggplot2` folder:
+Each folder is an installed package with the folder name of corresponding package name, and the `ggplot2` package is the first one in the list. The content of `ggplot2` is structured within the folder. Following is the screenshot of the files within the `ggplot2` folder:
 
-> ![`ggplot2` package directory structure](ggplot2.png){width=70%}
+> ![](ggplot2.png){width=70%}
 
 All packages are structured in the same way but with different content in these files. The code of a package is stored in the `R` directory, and the datasets are in the `data` directory. Other files and directories contain documentations, license, citation, etc. 
 
@@ -205,7 +220,7 @@ Because R interpreter starts with only a minimum set of packages imported, if yo
 
 ### Get help from the documentations
 
-You can get help from two types of documentations, tutorial (vignette) and reference manual. A tutorial helps a beginner to quickly get started using the package, but a reference manual lists all the details about the code and datasets included in the package for a more experienced user to look up. 
+You can get help from two types of documentations, tutorial (vignette) and reference manual. A tutorial helps a beginner to quickly get started using the package, whereas a reference manual lists all the details about the code and datasets included in the package for a more experienced user to look up. 
 
 You can get both tutorial and manual either using RStudio or online. 
 
@@ -251,13 +266,15 @@ Documentations are usually very helpful, but also keep in mind that Google is al
 
 R Markdown is a markup language for formatting an analysis report written in R, which allows you to embed your R analysis code into a document explaining your analysis. 
 
-The R package [`knitr`](https://yihui.name/knitr/) converts R Markdown files into generate easy-to-read report in HTML, PDF, or Word format. 
+The R package [`knitr`](https://yihui.name/knitr/) converts R Markdown files into an easy-to-read report in HTML, PDF, or Word format. 
 
 To start using R Markdown in RStudio:
 
-1. Click menu `File -> New File ->` **`R Markdown`**. Then, you will be prompted by a wndow to fill in some relevant parameters. In the `Default Output Format:` option, select [`HTML`](https://en.wikipedia.org/wiki/HTML) (important), which is the standard markup language for creating web pages. It worth taking time to read the explanations of each option. After clicking `OK`, a new R Markdown file will show up in a pane of RStudio. 
+1. Click menu `File -> New File ->` **`R Markdown`**. Then, you will be prompted by a wndow to fill in some relevant parameters. In the `Default Output Format:` option, select [`HTML`](https://en.wikipedia.org/wiki/HTML) (**important**), which is the standard markup language for creating web pages. It worth taking time to read the explanations of each option. After clicking `OK`, a new R Markdown file will show up in a pane of RStudio. 
 
 2. Click the `Knit` option at the top of the Markdown file pane. Then, you will be prompted to save the R Markdown file. If you hit `Knit` for the first time, you will be prompted to install several packages that are required to run the "knitting" process. Install them. 
+
+> ![](knitRmd.png)
 
 3. Give the file a name such as `test` and save it anywhere you prefer. Then, you will see an `R Markdown` tab show up in the `Console` pane, and it starts running. When running, `knitr` executes all R code and generates an HTML report. After it is done, a new window containing the generated HTML report will show up. The report file will also be stored in the same directory as the R Markdown file. 
 
@@ -267,9 +284,13 @@ We will expore the features of R Markdown in the next section.
 
 ## R basic operations
 
-In this section, we will go through the basics of R programming language by analyzing a simple and fake biological dataset. 
+In this section, we will go through the basics of R programming language by analyzing a simple and fake biological dataset. The dataset is stored in the file `cell_exp_proliferation.csv` within the lab 1 handout. You can open it with a text editor or Excel.
 
-The dataset is collected in an experiment to study the correlation between the expression level of a gene and the proliferation rate of a cell line. In the hypothesis, this gene is able to decrease the proliferation rate of the cells. This dataset includes the expression levels of the gene in wild type, knock down, and overexpressed cells and their proliferation rates. Each condition has 10 biological replicates.
+The dataset is collected in an experiment to study the correlation between the expression level of a gene and the proliferation rate of a cell line. In the hypothesis, this gene is able to decrease the proliferation rate of the cells. This dataset includes the expression levels of the gene in wild type, knock down, and overexpressed cells and their proliferation rates. Each condition has 10 biological replicates. Following is the data contained in `cell_exp_proliferation.csv`.
+
+```{r, echo = FALSE}
+knitr::kable(read.csv('cell_exp_proliferation.csv', stringsAsFactors = F))
+```
 
 This analysis includes the following steps:
 
@@ -281,8 +302,8 @@ This analysis includes the following steps:
 
 4. Analyze the loaded dataset:
     + Correlation between expression level and proliferation rate.
-    + Compare expression level between conditions.
-    + Compare proliferation rate between conditions. 
+    + Compare expression levels between conditions.
+    + Compare proliferation rates between conditions. 
 
 5. Output plots and tables.
 
@@ -290,13 +311,11 @@ This analysis includes the following steps:
 
 ### Create an R project
 
-**ACTION**: Create a new `R project`: Click menu `File -> New Project -> Existing Directory ->` select the directory of lab 1 handout as the project working directory (**very important**) `->` create. 
+**ACTION**: Create a new `R project`: Click menu `File -> New Project -> Existing Directory ->` select the directory of lab 1 and 2 handout, which contains `cell_exp_proliferation.csv`, as the project working directory (**very important**) `->` create. 
 
 An `R project` is a session of RStudio, and the `working directory` is the directory where R interpreter starts running.
 
 **ACTION**: After the project is created, type `dir()` and hit "enter" in your `Console` tab, you should see `"cell_exp_proliferation.csv"` included in the output together with some other files. The function `dir()` lists all files under the working directory of R. 
-
-The file named `cell_exp_proliferation.csv` is the dataset that we are going to analyze. 
 
 ### Create an R Markdown file in the project
 
@@ -330,13 +349,11 @@ cat(paste0("```{r Your Code Chunk Name, yourCodeChunkParameters=yourParamterValu
 
 Only code in the code chunks will be executed. Everything outside code chunks will be formated by `knitr` as plain text. 
 
-A **important** behavior of `knitr` is that when knitting an R Markdown file (after clicking `Knit`), `knitr` starts a brand **new** R interpreter and evaluates all code chunks from beginning to the end. As a result, `knitr` will not be able to access the variables in the `console` R interpreter environment. 
-
 **ACTION**: Delete everything below this chunk, and we are going to create our own analysis R Markdown file. 
 
 ### Load dataset into R environment
 
-**ACTION**: Add a level 1 header to notify the start of the data loading section by adding the following text:
+**ACTION**: Add a level 1 header below the `setup` code chunk to notify the start of the data loading section by adding the following text:
 
 ```
 # Load dataset into R environment
@@ -357,7 +374,7 @@ cat(paste0("```{r load dataset}\n",
            "```"))
 ```
 
-The dataset is stored in a file named `cell_exp_proliferation.csv` under the same directory as the handout. A comma separated values (CSV) format is commonly used to store a spreadsheet in plain text. CSV file can be opened by text editor, Excel, and RStudio. The units of proliferation rate and expression level are both arbitrary.
+The dataset is stored in a file named `cell_exp_proliferation.csv` under the same directory as the handout. A comma separated values (CSV) format is commonly used to store a table in plain text. CSV file can be opened by text editor, Excel, and RStudio. The units of proliferation rate and expression level are both arbitrary.
 
 Each row is a biological replicate. The columns are the proliferation rate, expression level, and condition. 
 
@@ -365,23 +382,37 @@ In this code chunk, we loaded `cell_exp_proliferation.csv` as a `dataframe` into
 
 #### R environment
 
-An `R environment` is associated with each R interpreter session, and it includes all variables that you can access in that R interpreter session. Recall that when an R interpreter session started, only a minimum set of packages are imported into its environment. 
+An `R environment` is associated with each R interpreter session, and it includes all variables that you can access in that R interpreter session. 
 
-In the code chunk above, after the interpreter executes `exp_prolif_df <- read.csv("cell_exp_proliferation.csv", stringsAsFactors=FALSE)`, its environment will have an additional variable named `exp_prolif_df`. Then, we can print that variable in that interpreter session. 
+A **important** behavior of `knitr` is that when knitting an R Markdown file (after clicking `Knit`), `knitr` starts a brand **new** R interpreter session and evaluates all code chunks from beginning to the end. As a result, `knitr` will not be able to access the variables in the `console` R interpreter environment. 
+
+> ![](Renv.png)
+
+In the above figure, the R interpreter console session *cannot* access the variable `myVariable` in the `knitr` session, vice versa. 
+
+In the code chunk above, after the interpreter executes `exp_prolif_df <- read.csv("cell_exp_proliferation.csv", stringsAsFactors=FALSE)`, its environment will have an additional variable named `exp_prolif_df`. Then, we can print the values stored in that variable in that interpreter session. 
 
 However, you cannot print `exp_prolif_df` in your console session even after knitting the current document, because `knitr` starts a new session when `knitting` an document. 
 
-Similarly, if you import a library in an interpreter session, all code and datasets included in its associated R environment, and you can use the imported code and datasets in that interpreter session. However, if you quit the current interpreter session and starts a new one, you will need to import that package again before using its code and datasets.
+Similarly, if you import a library in an interpreter session, all code and datasets will be imported to its associated R environment, and you can use the imported code and datasets in that interpreter session. However, if you quit the current interpreter session and starts a new one, you will need to import that package again before using its code and datasets. Recall that when an R interpreter session started, only a minimum set of packages are imported into its environment.
 
-In addition to the functions and datasets, an R environment also keeps track of many system parameters such as the library location, and the most important one is the **current working directory**. You might wonder why it is very important to create the R project and R Markdown files in the lab handout directory, and the reason is that the locations of the R project and R Markdown file are the current working directory of the `Console` R interpreter session and `knitr` interpreter session respectively. 
+In addition to the functions and datasets, an R environment also keeps track of many system parameters such as the library location, and the most important one is the **current working directory (CWD)**. You might wonder why it is very important to create the R project and R Markdown files in the lab handout directory, and the reason is that the locations of the R project and R Markdown file are the CWDs of the `Console` R interpreter session and `knitr` interpreter session respectively. 
 
-If your **current working directory** does not include `cell_exp_proliferation.csv`, you will receive an error when running `exp_prolif_df <- read.csv("cell_exp_proliferation.csv", stringsAsFactors=FALSE)`, because R interpreter cannot find the file `cell_exp_proliferation.csv`. 
+If your **CWD** does not include `cell_exp_proliferation.csv`, you will receive an error when running `exp_prolif_df <- read.csv("cell_exp_proliferation.csv", stringsAsFactors=FALSE)`, because R interpreter cannot find the file `cell_exp_proliferation.csv`. 
 
-You can change your **current working directory** (CWD) by clicking menu `Session -> Set Working Directory -> Choose Directory`. 
+You can change your CWD by clicking menu `Session -> Set Working Directory -> Choose Directory`. 
 
 #### File path
 
-The locations of files on your computer are specified by their paths. Following are some examples on Windows, Mac, and Linux.
+The locations of files on your computer are specified by their **paths**. 
+
+A path describes the exact method to find your file. For example, if you want to find a file named `myFile.txt` under a directory called `myDirectory` under C disk directory in Windows, you need to open C disk and open `myDirectory`, and you will see `myFile.txt`. The path of this file is `C:\myDirectory\myFile.txt` .
+
+> ![](simplePath.png)
+
+Paths separate different files (folder is a special kind file) that you need to open by `/` in MacOS/Linux and by `\` in Windows. 
+
+Following are some example paths on Windows, Mac, and Linux.
 
 * Windows path of a file named `very_important_file.txt` under the C disk directory: 
 ```
@@ -413,34 +444,33 @@ C:\outdated_files\not_important_file.txt
 /home/yourUserName/Documents/outdated_files/not_important_file.txt
 ```
 
-A path describes the exact method to find your file. For example if you want to find the `not_important_file.txt`:
+The way how `knitr` R interpreter finds `cell_exp_proliferation.csv` is through a path **relative** to CWD. `read.csv("cell_exp_proliferation.csv")` asks R interpreter to find `cell_exp_proliferation.csv` under CWD. You can check your CWD path by typing `getwd()` in `Console` tab and hit "enter". If a path is specified without `/` on MacOS/Linux or `DiskLetter:\` on Windows, it will be prepended with the path of CWD to form an **absolute** path, and R interpreter will further look up that absolute path. If the file specified by the absolute path does not exist, an error message will be prompted stating that the file is not found. 
 
-* Windows: open C disk `->` open directory `outdated_files`. 
+Following is an example of how R **failed** to find `cell_exp_proliferation.csv`:
 
-* Mac: open finder `->` open `Documents` directory `->` open directory `outdated_files`.
-
-* Linux: similar to Mac. 
-
-The way how `knitr` R interpreter finds `cell_exp_proliferation.csv` is through a path **relative** to CWD. `read.csv("cell_exp_proliferation.csv")` asks R interpreter to find `cell_exp_proliferation.csv` under CWD. You can check your CWD path by typing `getwd()` in `Console` tab and hit "enter". If a path is specified without `/` (Mac/linux) `DiskLetter:\` (Windows), it will be prepended with the path of CWD to form an **absolute** path, and R interpreter will further look up the absolute path. If the absolute path does not exist, an error message will be prompted stating that the file is not found. 
-
-Following is an example of how R failed to find `cell_exp_proliferation.csv`:
-
-* Absolute path of `cell_exp_proliferation.csv`: `/home/youUserName/Documents/lab1/cell_exp_proliferation.csv`.
-* CWD path of an R interpreter session: `/home/youUserName/Documents/someOtherDirectory`.
+* CWD path of an R interpreter session: `/home/youUserName/Documents/someOtherDirectory`, and this directory does **not** contain the file `cell_exp_proliferation.csv`.
 * Relative path R tries to find when we running `read.csv("cell_exp_proliferation.csv")` on the R session: `cell_exp_proliferation.csv`.
 * Absolute path R tries to find when we running `read.csv("cell_exp_proliferation.csv")` on the R session: `/home/youUserName/Documents/someOtherDirectory/cell_exp_proliferation.csv`.
 * Because `/home/youUserName/Documents/someOtherDirectory/cell_exp_proliferation.csv` does not exist, an error message will be prompted. 
 
-There are two exceptoinal relative paths:
+
+There are two special cases of relative paths:
+
 * `.` refers to the CWD.
 * `..` refers the directory at the immediate upper level of CWD.
 
-For example, when current working directory is `/home/youUserName/Documents/someOtherDirectory`:
+For example, when CWD is `/home/youUserName/Documents/someOtherDirectory`:
 
 * The absolute path of `.` is the same as CWD: `/home/youUserName/Documents/someOtherDirectory`
 * The absolute path of `..` is the immediate upper level directory of CWD: `/home/youUserName/Documents`
 * The absolute path of `../someOtherDirectory` is the same as CWD. 
 * The absolute path of `./.` is the same as CWD. 
+
+**Important** note on specifying a path in R on Windows: 
+
+If you are running R interpreter on Windows, and you specified a path using a string, you have to use two backslashes `\\` in an R string for one backslash `\` in its corresponding path. For example, the absolute path of a file is `C:\aFile.txt`, and the R string to represent this path is `"C:\\aFile.txt"`. This is because R treats backslash `\` as a special character in string, so we have to use `\\` to represent the real character `\` in R strings. There are many rules listed in the following website, <https://stat.ethz.ch/R-manual/R-devel/library/base/html/Quotes.html> . You do not have to read this now. Use this website as a reference. 
+
+Alternatively, replace `\` with `/` in the R string representing path, i.e. `"C:/aFile.txt"`, will also work. This is one of the *ad hoc* but convenient features in R programming language. See the following post fore more details, <https://stackoverflow.com/a/14335218/4638182> . 
 
 ### Analyze the loaded dataset
 
@@ -489,7 +519,7 @@ cat(paste0("```{r plot linear correlation}\n",
 In this code chunk, we imported `ggplot2` and created a scatter plot using it. We will talk more about making plots using `ggplot2` in later lab sessions. The code is explained line by line as the following:
 
 * `lin_cor_plot <- ggplot(data = exp_prolif_df, mapping = aes(x = Proliferation.Rate, y = Expression.Level))`:
-    + Note that a code expression can be written in multiple lines following certain rules. 
+    + Note that a code expression can be written in multiple lines following certain rules. The three most commonly used rules are **1)** change line after a comma "`,`" to specify more parameters in a function call, **2)** change line after an operator such as `+`, **3)** change line after `{` when defining a function and writing a loop.
     + `lin_cor_plot <- ggplot()`: The function `ggplot()` is called to make a new plot and store that plot in variable `lin_cor_plot`.
     + `data = exp_prolif_df`, specifies that the dataset we are plotting is variable `exp_prolif_df`.
     + `mapping = aes(x = Proliferation.Rate, y = Expression.Level)` specifies that we want to plot the column `Proliferation.Rate` in x-axis and the column `Expression.Level` in the y-axis. 
@@ -560,7 +590,7 @@ cat(paste0("```{r plot gene exp}\n",
 
 **ACTION**: Knit the document by clicking `Knit`. 
 
-Each box refers to a condition, and the dots are the measurements stacked into bins. 
+Each box in the plot refers to a condition, and the dots are the measured expression levels stacked into bins. 
 
 Code explanation:
 
@@ -608,9 +638,7 @@ We first selected the expression levels of the three conditions using three diff
 
 * `kd_exp <- subset(exp_prolif_df, Condition == 'Knock Down', select = 'Expression.Level', drop = TRUE)`: This line of code used the function `subset()`. Check the documentation of `subset` to look for more details. 
 
-* `oe_exp <- filter(exp_prolif_df, Condition == 'Overexpression') %>% pull(Expression.Level)`: This line of code used the package `dplyr`. Go to <http://dplyr.tidyverse.org/index.html> for more details. 
-
-The operator `%>%`, which is defined in the package `dplyr`, passes the return value of previous expression into the parameter of the next function call. For example, `"Hello World!" %>% print()` is equivalent to `print("Hello World")`. The main purpose of introducing the operator `%>%` is to improve the readability of R code. 
+* `oe_exp <- filter(exp_prolif_df, Condition == 'Overexpression') %>% pull(Expression.Level)`: This line of code used the package `dplyr`. Go to <http://dplyr.tidyverse.org/index.html> for more details. The operator `%>%`, which is defined in the package `dplyr`, passes the return value of previous expression into the parameter of the next function call. For example, `"Hello World!" %>% print()` is equivalent to `print("Hello World")`. The main purpose of introducing the operator `%>%` is to make R code easier to read. 
 
 Then, we used t-test to test for the differences of expression level between conditions. 
 
@@ -619,7 +647,7 @@ Then, we used t-test to test for the differences of expression level between con
     + `alternative = 'l'`: alternative hypothesis of this test is that the mean of `wt_exp` is less than `oe_exp`.
     + Look at the documentataion of `t.test` for more details. 
 
-When performing t-test, we selected the expression levels and stored them into differrent variables. This procedure belongs to "data manipulation".
+When performing t-test, we selected the expression levels and stored them into differrent variables. This procedure belongs to "data manipulation". Followiwng is a brief introduction to data manipulation, and we are going to cover more of it in future lab sessions. 
 
 ##### Data manipulation
 
@@ -633,7 +661,7 @@ There are basically 3 ways of data manipulation:
 
 * Reshape: change the "design" of a table. There are two types of table "design", "wide" and "long" format. One format can be "reshaped" into another using packages like [`reshape2`](https://cran.rstudio.com/web/packages/reshape2/index.html) and [`tidyr`](https://cran.r-project.org/web/packages/tidyr/index.html). 
     
-    + "Wide" table:
+    + "Wide" table: this "design" exploits the relationship between your data, where the expression level of same set of genes are measured in three cell lines. With this relationship, you do not need to create three individual tables with only one gene or one cell line in each table. You can think of this design as "relational" format, which is not an exact technical term. 
 
         |geneName | expressionInCellLineA| expressionInCellLineB| expressionInCellLineC|
         |:--------|---------------------:|---------------------:|---------------------:|
@@ -641,7 +669,7 @@ There are basically 3 ways of data manipulation:
         |GeneB    |                     5|                     5|                    20|
         |GeneC    |                    10|                    15|                    30|  
     
-    + "Long" table:
+    + "Long" table: this "design" intends to make a "dictionary" of the data points (expression levels). If you want to look up for the expression level of `GeneA` in cell line A, find the rows with `geneName` column containing value `GeneA`, and then find the row with `cellLine` column containing value `expressionInCellLineA`. Then, you find the value you want. You can think of this design as "key-value store" format, which is also not an exact technical term. The "key" refers to the unique identifier of a data point, and "value" refers to the value of that data point.
 
         |geneName |cellLine              | expressionLevel|
         |:--------|:---------------------|---------------:|
@@ -655,14 +683,13 @@ There are basically 3 ways of data manipulation:
         |GeneB    |expressionInCellLineC |              20|
         |GeneC    |expressionInCellLineC |              30|
     
-    + melt/gather/stack: wide format `->` long format.
-    + dcast/spread/unstack: long format `->` wide format. 
-    
-An analysis might be more easily done if the data is in either wide or long format. For more details, check this introduction to the R package `reshape2`, <http://seananderson.ca/2013/10/19/reshape.html> .
+    + melt/gather/stack: Convert wide format to long format.
+    + dcast/spread/unstack: Convert long format to wide format. 
+    + An analysis might be more easily done if the data is in either wide or long format. For more details, check this introduction to the R package `reshape2`, <http://seananderson.ca/2013/10/19/reshape.html> .
 
 #### Test cell proliferation rate differences
 
-**NOTE**: I encrouage you to write the code chunks of this section yourself before using the code we provide below, because this analysis is the same as the previous section on expression level analysis.
+**NOTE**: I **strongly** encrouage you to write the headers and code chunks of this section yourself before using the code we provide below, because this analysis is the same as the previous section on expression level analysis. **Hint**: You can make a copy the previous section and change all parameters or variable names related to expression level into proliferation rate. 
 
 **ACTION**: Add a level 2 header to notify the start of proliferation rate comprisons:
 
@@ -768,29 +795,49 @@ You should see a CSV file named `exp_prolif_stats.csv` generated in your CWD. Yo
 
 This concludes our data analysis. 
 
+## Advantages of using R for data analysis comparing to Excel
+
+There are many reasons why you might want to use R for your data analysis rather than Excel, and I will only compare their reproducibility, efficiency, and feasibility. There are definitely disadvantages of using R as well, such as time consuming to learn, but I will not elaborate on them 
+
+R Markdown analysis is much easier to be reproduced, because the same analysis can be done by anyone, including yourself after several months, with the R Markdown file and dataset by clicking `Knit`, and they are guaranteed to have the same results as yours. However, if someone wants to reproduce your data analysis using Excel, that person needs to click and type through the whole analysis, and errors might be introduced during analysis, which might fail that person to reproduce your results.  
+
+Using R Markdown is also more efficient than Excel:
+
+* There are numerous ready-to-run R packages for you to use when analyzing your data. However, when using Excel, you might need to type a a lot of complifated formulas. 
+
+* When using R Markdown, you can write the analysis report during analysis, and everything will be formatted by `Knitr`. However, when using Excel, you need to write your report in Word or some other tools, which takes some time for formatting your tables and plots. 
+
+* When using R Markdown, you can try out your random analysis idea fairly quickly.
+
+* Using R Markdown, you can validate the correctness of you analysis more easily, because the code are written sequencially. However, when using Excel, the order of your operations cannot be easily inferred from the spreadsheets, and you might have to go through each entry to look for your formula. 
+
+When analyzing some datasets, it is simply not feasible to use Excel. When the the size of data you are analyzing is more than 500MB, which is not very uncommon in biological data analysis, it might take several miniutes for simply one operation in Excel, such as open, save, copy, paste, and delete. When using R, the same operations are much faster. There are also performance limits of R, but it is more rarely to reach those limits. When you reach the performence limits of R, it will be almost impossible to do the same analysis in Excel. 
+
 # Optional
 
 The optional topics will only be discussed in the lab session if it ends too early. The topics are selected by the TAs to help you better understand programming and statistics. If you are not interested in any optional topic, you can safely ignore it. 
 
 ## Run Linux operating system on a virtual machine
 
-In this section, we will discuss the pros and cons of using Linux operating system. If you are interested, we are going to create a virtual machine on your computer to run Linux. Don't worry, we are not going to ask you to erase all your data on your hard drive. 
+In this section, we will discuss the pros and cons of using Linux operating system. If you are interested, we are going to create a virtual machine on your computer to run Linux. Don't worry, we are not going to ask you to erase all data on your hard drive. 
 
-Linux operating system is developed based on the Unix operating system, so as the Mac OS. Following is the pedigree of Unix based operating system downloaded from <https://en.wikipedia.org/wiki/MacOS>:
+Linux operating system is developed based on the Unix operating system, so as the Mac OS. Following is the pedigree of Unix based operating system. Image credit: <https://en.wikipedia.org/wiki/MacOS>:
 
-> ![Unix based operating system](unixSystems.png)
+> ![](unixSystems.png)
 
 On the other hand, Microsoft Windows is not based on Unix. 
 
-### Unix based operating system is better for programming in the biological field
+### Unix based operating systems are better for programming in the biological field
 
 You might wonder what is the difference between Linux, Mac OS, and Windows, because they all look the same. Even when you program using an IDE, such as RStudio, things might look the same to you as well. Thus, why bother switching to Linux. 
 
 Firstly, it is not very easy to run some bioinformatics tools on Windows. For example, a popular aligner [STAR](https://github.com/alexdobin/STAR/tree/master/bin) only provides ready-to-run executable files for Linux and Mac OS. If you would like to run it on Windows, you need to compile the executable from source code, which is sometimes very difficult. 
 
-In addition, `bash` script, <https://en.wikipedia.org/wiki/Bash_(Unix_shell)>, is very popular among bioinformaticians to do some simple data analysis, but it can only be easily run on Unix based systems. You might find answers to your programming questions written in `bash` script. 
+> ![](starBin.png)
 
-Most importantly but might not be very familiar to you, the high performance computing servers or clusters are mostly running Linux operating system. If you want to use these resources, you need to learn `bash` script. 
+In addition, `bash` script, <https://en.wikipedia.org/wiki/Bash_(Unix_shell)>, is very popular among bioinformaticians to do some simple data analysis, but it can only be easily run on Unix based systems. You might find answers to your programming questions written in `bash` script, such as the following one on BioStars <https://www.biostars.org/p/193471/>. The answers are all bash scripts. 
+
+Most importantly but might not be very familiar to you, the high performance computing servers or clusters are mostly running Linux operating system. If you want to use these resources, you need to learn `bash` script. It is also very necessary to be able to use these resources in some cases. For example, you have 50 human RNA-Seq raw data set from your sequencer, which is about 250GB of data, and you want to align them back to the reference genome. It might take days even weeks to complete this on your own computer. However, if you run them parallelly on a server or cluster using 50 high performance CPUs and a large amount of memory, it can be done within several hours. 
 
 Following is a list of a few general advantages and disadvantages of Unix based systems, 
 
@@ -803,9 +850,8 @@ Following is a list of a few general advantages and disadvantages of Unix based 
 * Disadvantages:
     - It is easier to wreck your system by a mistake, and it will be very time consuming or impossible to recover. 
     - Have to learn a lot of things to get started. 
-    - Takes some time to get familiar with. 
 
-We can easily prevent wrecking our real operating system by using a virtual machine. If you mistakenly wrecked the virtual machine, just delete everything in it and create a new one. 
+We can easily prevent wrecking our real operating system by using a virtual machine. If you mistakenly wrecked the virtual machine, just delete everything in it and create a new one. Therefore, if you have already been using a Unix based operating system, you can still benefit from running another one on virtual machine. 
 
 ### Run Linux on virtual machine
 
@@ -813,7 +859,7 @@ A virtual machine is a guest operating system (OS) running on the host OS throug
 
 > ![](vm.png)
 
-There are many VMM applications, and the most popular ones are costly [VMware products](https://www.vmware.com/products/personal-desktop-virtualization.html) and free [VirtualBox](https://www.virtualbox.org/).
+There are many VMM applications, and the most popular ones are the costly [VMware products](https://www.vmware.com/products/personal-desktop-virtualization.html) and the free [VirtualBox](https://www.virtualbox.org/).
 
 Following are the instructions to use VirtualBox for running Linux as a virtual machine:
 
@@ -846,7 +892,7 @@ Following are the instructions to use VirtualBox for running Linux as a virtual 
 > ![](vmhdalloc.png)
 
 10. Choose the location of the guest virtual machine to be stored.
-11. Change the size of the virtual hard disk to 20-50GB depending on the free space on your computer. Click `Create`. 
+11. Change the size of the virtual hard disk to 20-50GB depending on the free space of your computer. Click `Create`. 
 
 > ![](vmhdsize.png)
 
@@ -854,7 +900,7 @@ Following are the instructions to use VirtualBox for running Linux as a virtual 
 
 > ![](vmsetup.png)
 
-13. Selected the newly created virtual machine and click `Settings`.
+13. Select the newly created virtual machine and click `Settings`.
 
 > ![](vmsettings.png)
 
@@ -888,13 +934,13 @@ Following are the instructions to use VirtualBox for running Linux as a virtual 
 
 24. Once the installation is done, click `Restart Now`. Similarly, this will only restart the virtual machine but not your real machine. 
 
-24. When you see the instruction to `remove the installation medium`, remove the Ubuntu image from the virtual optic drive. Similar to steps 13 - 17. By default, VirtualBox should have removed the image. 
+24. When you see the instruction to `remove the installation medium and restart`, remove the Ubuntu image from the virtual optic drive similarly as steps 13 - 17. By default, VirtualBox should have removed the image. Restart. **Troubleshoot**: if your virtual machine stucks at a black scree with a few white dots, click menu `Machine -> Reset -> confirm reset`. Wait for a while, and hopefully you will see the log in screen. If it does not work, try delete the created virtual machine and redo the guest OS installation steps started from step 5.  
 
 25. Enter the password to log in. After this step, your virtual machine is up and running. 
 
-**Note**: The following steps are optional, which allows you to copy and paste text between host and guest. This is usually a very useful feature. 
+**Note**: The following steps are optional but recommended, which allows you to copy and paste text between host and guest. This is usually a very useful feature. 
 
-26. Click the window running the virtual machine. 
+26. Click the menu `Device` in the window running the virtual machine. 
 
 27. Click `Install guest additions CD image...`. You should see a disk show up in your virtual machine and click `Run`. Then type in the password you set up for your **virtual machine** to authenticate. 
 
@@ -911,11 +957,8 @@ Following are the instructions to use VirtualBox for running Linux as a virtual 
 31. Try copy some text on your host machine and paste to your guest machine `Firefox` browser. It should work if everything went well. I have tested it on both `Mac OS 10.12.6 (16G29)` and `Windows 10`. **Trouble shoot**: If this does not work, try restart virtual box. 
 
 
-Enjoy!
 
 
 
 
-
-
-
+# References
