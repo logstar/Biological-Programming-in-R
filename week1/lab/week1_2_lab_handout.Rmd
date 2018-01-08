@@ -1,13 +1,13 @@
 ---
 title: "Week 1&2 Lab Handout"
-author: "Yuanchao Zhang"
+author: "Yuanchao Zhang, Deanne Taylor, and Joe Dybas"
 date: "1/3/2018"
 output:
   html_document:
     fig_caption: yes
-    number_sections: yes
+    number_sections: no
     toc: yes
-    toc_depth: 3
+    toc_depth: 4
   pdf_document:
     toc: yes
     toc_depth: '3'
@@ -18,7 +18,7 @@ nocite: |
   @Bioconductor2017, @Spreadkeyvaluepair, |
   @BestrmarkdownexampleMarkdownexample2018, @OracleVMVirtualBox, |
   @BioconductorInstall, @alexdobinSTARRNAseqaligner2018, @Pathcomputing2017, |
-  @Unix2018, @BashUnixshell2017, @HTML2017, @Markdown2018
+  @Unix2018, @BashUnixshell2017, @HTML2017, @Markdown2018, @wickham_advanced_2014a
 ---
 
 ```{r setup, include=FALSE}
@@ -32,7 +32,7 @@ There are two main sections in this handout, required and optional.
 * The required section covers the topics listed in the syllabus. 
 * The optional section covers some other useful topics in case the lab session ends too early. 
 
-In the required section, we are going to set up R and RStudio on your computer. Learn how to use R packages and create R Markdown files. Then, we are going to go through the basics of R programming by analyzing a simple biological data set. Finally, we conclude the required section by discussing the advantages of using R for data analysis comparing to Excel. 
+In the required section, we are going to set up R and RStudio on your computer. After getting R up and running, we will briefly go through the basic syntax and data types of R programming language. Then, we are going to learn how to use R packages and create R Markdown files. Then, we are going to go through the basics of R programming by analyzing a simple biological data set. Finally, we conclude the required section by discussing the advantages of using R for data analysis comparing to Excel. 
 
 In the optional section, we are going to run Linux operating system on a virtual machine. 
 
@@ -85,6 +85,8 @@ Even though this line of code is simple, there are actually many things happened
     + Takes in code expression. 
     + Executes the code expression. When execution is done, prompt `> ` again and ready for the next code expression. However, if one or more variables are created or updated, the interpreter will remember them.
 
+> ![](rInterpreterLoop.png)
+
 3. You typed in `print("Hello World!")` and "enter" in the R interpreter.
 
 4. When R interpreter sees the "enter", it checks your code before the "enter". If you wonder why this is necessary, try type `print("Hello World!"` and "enter". Note that the `)` is missing at the end. Then, at the next line with the prompt `+ `, type `)` and "enter". The `)` in the second line completes the code expression, and the R interpreter starts executing the code expression. 
@@ -99,6 +101,609 @@ Even though this line of code is simple, there are actually many things happened
     + When the evaluation loop suspends, type in `print("Hello World!")` and "enter". 
     + When the evaluation loop suspends, hit "esc". 
 
+## R basic syntax and data types
+
+In this section, we are going to briefly go through the basic syntax and data types of R programming language.
+
+Syntax:
+
+* Arithmetic operations
+* Variables
+* Functions
+* Logical operations
+* if-else statement
+* Loop
+
+Data types:
+
+* Vectors
+* Factors
+* Matrices
+* Data frames
+
+### Syntax
+
+#### Arithmetic operations
+
+You can use R interpreter as a calculator.
+
+Note: `#` starts a comment, `#` and everything afterwards within the same line are not going to be executed. 
+
+```{r arithmatic, eval=TRUE}
+1 + 1
+2 * 3 # Calculate 2 times 3
+5 / 9 # Calculate 5 divided by 9
+5 %/% 9 # Calculate 5 divide by 9 using integer division
+2 ^ 3 # Calculate 2 to the 3rd
+log(8, 2) # Calculate log, base 2, of 8.
+10 %% 2 # (x modulo y)
+
+
+# Following is some advanced stuff, aware of them is enough
+1 / 0 # Result is `Inf’, which means positive infinity
+-1 / 0 # Result is `-Inf’, which means negative infinity
+0 / 0 # Result is `NaN’, which means not a number
+```
+
+#### Variables
+
+Most of the times, we want to keep the results of some code expressions and use them somewhere else.
+
+```{r variables, eval=TRUE}
+# variable1 keeps the result of 25 * 25.
+# "<-" is the convention for assigning value to a variable.
+# I recommend you to not use "=" for variable assignments.
+variable1 <- 25 * 25
+
+# This prints out the value in variable1
+variable1
+
+# variable2 keeps the result of variable1 * 25, i.e. 25 * 25 * 25.
+variable2 <- variable1 * 25 
+variable2
+
+# variable1 is updated to 25 * 25 / 25
+variable1 <- variable1 / 25
+variable1
+
+# Advanced
+# Although = can also be used, = is mostly used in specifying
+# parameters in a function.
+var3 = 3 # Not good in R coding convention, but will work.
+var3
+
+var3 * 5
+
+log(2, base = 3) # "base = 3" is good in R coding convention.
+```
+
+#### Functions
+
+Motivation: keep some analysis procedures somewhere for later usage. Sometimes you may find writing R code is tedious because of a lot of copy and paste.
+
+```{r functions anti-pattern, eval=TRUE}
+# Want to do the same transformation for 3 different variables
+var1 <- 10
+var2 <- 20
+var3 <- 30
+
+# **Anti-pattern**: code without using functions
+var1 <- ((var1 * 20 + 5) / (30 * var1)) ^ 2 * var1 * 3 + 200 # Just to make the code complicated
+var1
+# Copy the code and paste 2 times and change var1 to var2 or var3
+var2 <- ((var2 * 20 + 5) / (30 * var2)) ^ 2 * var2 * 3 + 200
+var2
+
+var3 <- ((var3 * 20 + 5) / (30 * var3)) ^ 2 * var3 * 3 + 200
+var3
+```
+
+Although this does not look too bad, things may get much worse in real analysis, because we need to think about everything that needs to be changed. Thinking about this is stressful and error prone.
+
+However, we can rewrite the code using a function to make it simpler.
+
+```{r functions, eval=TRUE}
+var1 <- 10
+var2 <- 20
+var3 <- 30
+
+veryComplexTransformation <- function(var) {
+  result <- ((var * 20 + 5) / (30 * var)) ^ 2 * var * 3 + 200
+  return(result)
+}
+
+# This line calls the function by using var1 as "positional argument", where
+# R interpreter use the value in var1 as the argument var in the function
+var1 <- veryComplexTransformation(var1)
+var1
+
+# This line calls the function by specifying the argument using "key-value" 
+# format. The key is the argument name "var" defined in the function, and 
+# the value is "var2" provided by us.
+var2 <- veryComplexTransformation(var = var2)
+var2
+
+var3 <- veryComplexTransformation(var = var3)
+var3
+```
+
+Although we still need to copy and paste, it is easier to figure out where needs to be changed.
+
+#### Logical operations
+
+Sometimes we want to check a "statement" is either true or false. This is mostly used together with if-else statement and loop introduced in the next two sections. 
+
+```{r logical ops}
+var1 <- 10
+var2 <- 20
+
+!TRUE           # !: logical NOT. 
+!FALSE
+# "!" is usually read as bang in logical operations.
+
+TRUE & FALSE    # &: logical AND
+TRUE | FALSE    # |: logical or
+
+var1 == var2    # ==: test whether the value of var1 is EQUAL to the value of var2
+# **IMPORTANT**: "var1 == var2" (test equality) is different from 
+# "var1 = var2" (variable assignment)
+
+var1 != var2    # !=: test whether the value of var1 is NOT EQUAL to the value of var2
+
+var1 < var2     # <: test whether the value of var1 is LESS THAN the value of var2
+var1 <= var2    # <=: test whether the value of var1 is LESS THAN OR EQUAL TO the value of var2
+
+var1 > var2     # >: test whether the value of var1 is GREATER THAN the value of var2
+var1 >= var2    # >=: test whether the value of var1 is GREATER THAN OR EQUAL TO the value of var2
+
+# Advanced
+# Define var3 as a numerical vector containing 10 and 15.
+var3 <- c(10, 15)
+
+var1 %in% var3  # %in%: test whether the value of var1 is CONTAINED IN the value of var2
+var2 %in% var3
+
+# Special values
+is.na(NA)
+
+is.nan(NaN)
+
+is.infinite(-Inf)
+is.infinite(Inf)
+```
+
+#### if-else statement
+
+Sometimes we want to perform different procedures on different cases. 
+
+```{r if else}
+var1 <- 10
+var2 <- -10
+var3 <- 0
+
+getAbsoluteValue <- function(var) {
+  if (var > 0) {
+    return(var)
+  } else if (var == 0) {
+    # This case is redundant, which is intended to show the complete syntax.
+    # This case can be merged with the previous case to form "var >= 0"
+    return(var)
+  } else {
+    return(-var)
+  }
+}
+
+getAbsoluteValue(var1)
+
+getAbsoluteValue(var2)
+
+getAbsoluteValue(var3)
+```
+
+#### Loops
+
+Sometimes we want to repeat a procedure for certain amount of times.
+
+```{r loop}
+var1 <- 10
+var2 <- 9
+
+# Use a for-loop to calculate a value * 10
+times10ForLoop <- function(var) {
+  varTimes10 <- 0
+  
+  for (i in c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)) {
+    # do this for 10 times
+    varTimes10 <- varTimes10 + var
+  }
+  
+  return(varTimes10)
+}
+times10ForLoop(var1)
+times10ForLoop(var2)
+
+# Use a while-loop to calculate a value * 10
+times10WhileLoop <- function(var) {
+  varTimes10 <- 0
+  numberOfLoopLeft <- 10
+
+  while (numberOfLoopLeft > 0) {
+    numberOfLoopLeft <- numberOfLoopLeft - 1
+    varTimes10 <- varTimes10 + var
+  }  
+  
+  return(varTimes10)
+}
+times10WhileLoop(var1)
+times10WhileLoop(var2)
+```
+
+### Data Types
+
+#### Vectors
+
+Sometimes we want to store multiple values in one single variable rather than multiple individual ones. The easiest way is to store all values in a vector variable, and you can access each of them through that vector variable. 
+
+Vectors are a basic data type in R. Most everything you will be operating on in R is a vector. To create a vector in R, one way is to use the '`c`' function, which stands for 'combine'. 
+
+To create a vector and access values in it:
+
+```{r create vector}
+myvec <- c(10,20,30)
+myvec
+
+# This access the first value in the vector. 
+# The "1" within [] is the index.
+# Indexing is explained for more details in the data frame section.
+myvec[1]
+
+myvec[3]
+
+# You can also select two values to make a new vector
+myvec[c(1, 2)]
+```
+
+However, you will **not** be able to do this without the combine function. (note the missing '`c`' in front of the parenthesis!)
+
+```{r create vec wrong syntax, error=TRUE}
+myvec <- (1,3,4,5)
+```
+
+In R programming language, there is no such thing as a 'naked' value, such as a single number or a single character, which means a single value is also wrapped in a vector. For example, `x <- 5` assigns a vector of length 1, which is equivalent to `x <- c(5)`.
+
+Operations on vectors are performed on all elements:
+
+```{r vector ops, error=TRUE}
+myvec <- c(1, 2, 3)
+myvec + 5
+myvec == 2
+myvec %in% c(1, 5, 10)
+```
+
+Although vectors can contain multiple values, each vector can only contain values in the same type. The following section explains the types of vectors. 
+
+#### Vector types
+
+Vector types are: "logical", "integer", "numeric" (also synonym "double"), "complex", "character" and "raw".
+
+```{r vector types}
+myLogicalVec <- c(TRUE, FALSE, TRUE)
+myLogicalVec
+
+myIntegerVec <- c(1, 2, 3)
+myIntegerVec
+
+myNumericVec <- c(1.1, 2.2, 3.3)
+myNumericVec
+
+myComplexVec <- c(complex(real = 1, imaginary = 1), 
+                  complex(real = 2, imaginary = 2),
+                  complex(real = 3, imaginary = 3))
+myComplexVec
+
+myCharacterVec <- c('1', '2', '3')
+myCharacterVec
+
+myRawVec <- c(as.raw(1), as.raw(2), as.raw(3))
+myRawVec
+```
+
+The three most common vector types are "integer", "numeric" and "character".
+
+**Importantly**, vectors are "strictly typed". That is, a vector is only allowed to contain values of one type. 
+
+This behavior of R vectors has **important** consequences, where the type of a vector might be changed after inserting another value of different type without any notification to you. Following is a typical case: if you try to insert a character such as "Hi" into a numeric vector, it will change the entire vector into a character vector. Your numbers will be "coerced" into characters without any notification. 
+
+```{r vec coersion}
+myNumericVec <- c(1, 2, 3)
+myNumericVec
+
+# You can "concatenate" vectors using the function c() as well.
+# Recall that a single value is also a vector.
+myNewVec <- c(myNumericVec, "Hi")
+myNewVec
+# Note that the previous number 1, 2, and 3 not become strings "1", "2", and "3", 
+# i.e. they are now in character type
+```
+
+Some frustrating errors can happen that way, where your calculations are not working because your vector is a character not a number --  which is why you need the function `class()` to help you figure out what you're working with. R cannot do numerical calculations on a character vector.
+
+```{r data type examples, error=TRUE}
+# character vector
+# Note that a string in R can be defined by either " or ', 
+# i.e. "a" is equivalent to 'a'.
+myCharVec <- c("a", 'b', 'c')
+myCharVec
+
+class(myCharVec) # class of an R object
+
+# number vector
+myNumVec <- c(1, 2, 3, 4, 5, 6)
+myNumVec
+class(myNumVec)
+
+# fast way to generate a number vector
+myNumSpanVec <- c(1:16)
+myNumSpanVec
+
+# combine two numeric vectors
+myNewVec1 <- c(myNumVec, c(7, 8, 9))
+myNewVec1
+class(myNewVec1)
+
+# try combine a character vector and a numeric vector
+myNewVec2 <- c(myNumVec, c("7", "8", "9"))
+myNewVec2
+class(myNewVec2)
+
+myNewVec2 * 2
+```
+
+
+#### Factors
+
+The `factor` data type is designed to encode categorical values into numerical values, which is often used to perform certain statistical analysis in R, such as classification. We will discuss the use cases of factors in later sessions. For now, you only need to be aware of the difference between a factor and a character typed vector.
+
+An important note on the factor type is that when reading files into R environment, the default behavior for is to turn all character columns into factors, which can be turned off by specifying `stringsAsFactors=FALSE`. 
+Following shows the difference between a factor and a character. We use the function `str()` to display the "structure" of the value inside a variable. 
+
+In the following example, we have a factor of length 10 that only held three different types of items "red", "blue", "green". Factors represent those three different types as 'levels', the levels being ("blue", "green", "red") here in alphabetical order. 
+
+```{r Factors, error=TRUE}
+myCharVec <- c("red", "blue", "red", "green", "red", "blue", "blue", 
+               "red", "green", "green")
+str(myCharVec)
+
+# now let's turn myfactordata into a factor.
+myFactor <- factor(myCharVec) 
+str(myFactor)
+
+myFactor
+myFactor[2]
+str(myFactor[2])
+
+# Lists all levels of a factor
+levels(myFactor)
+
+# You will only receive a warning message by doing arithmatic operations on 
+# factors, because they are inherently numbers. 
+myFactor + 1
+
+# You will receive an error by doing arithmatic operations on character typed 
+# vectors
+myCharVec + 1
+
+as.numeric(myFactor)
+as.numeric(myCharVec)
+
+c(myFactor, 10)
+c(myCharVec, 10)
+
+c(myFactor, 'red')
+c(myCharVec, 'red')
+
+c(myFactor, 'someOtherColor')
+c(myCharVec, 'someOtherColor')
+
+```
+
+#### Matrices
+
+Matrices are mostly used for performing linear algebra operations. If you simply want to store a table of values into a variable, the data type `dataframe` introduced in the next section might be more appropriate, because it offers more "table-like" features than matrices. 
+
+Matrices are strongly typed arrays values, which means that the values in one matrix can only have one type. Vectors can be coerced into matrices. Many R functions require matrices and will not accept data frames. We will be discussing matrices throughout the course, so we will simply introduce them here.
+
+```{r matrices}
+# matrices are arrays of a single type (either number, or character...)
+myMatByCol <- matrix(c(1:16), nrow=4, ncol=4)
+myMatByCol
+
+# another way to arrange a matrix.
+myMatByRow<-matrix(c(1:16), nrow=4, ncol=4, byrow=T)
+myMatByRow
+
+# matrix multiplication
+# Note that the operator %*% is used to perform matrix multiplication
+myMatByCol %*% myMatByCol
+
+# Elementwise matrix multiplication using operator *
+myMatByCol * myMatByCol
+```
+
+#### Data Frames
+
+We use `data frames` to represent tables of values. Data frames are better suited for representing tables because they allow columns to have different types. 
+
+A Data frame can be considered as an ordered list of vectors. Each column in a dataframe is a vector, and must have the same length as every other vector in the data frame. 
+
+In the following code example, we are going to create a data frame to represent the clinical response of patients to different treatments.
+
+```{r Data frames}
+
+# Create vectors of values in different types
+
+name <- c("John Smith", "Jane Doe", "Mary Johnson")
+treatmentAResponse <- c(5, 16, 3)
+treatmentBResponse <- c('good', 'bad', 'bad')
+
+# combine these into a data frame with each row is a patient
+# stringsAsFactors = F is used to suppress automatic conversion of strings into
+# factors. 
+myDf1 <- data.frame("Name" = name, "Treatment A Response" = treatmentAResponse,
+                   "Treatment B Response" = treatmentBResponse, 
+                   stringsAsFactors = F)
+myDf1
+
+# creating a data frame with no labels
+myDf2 <- data.frame(name, treatmentAResponse, treatmentBResponse, 
+                    stringsAsFactors = F)
+myDf2
+
+# create the data in situ in the data frame.
+
+myDf3 <- data.frame(c("John Smith", "Jane Doe", "Mary Johnson"), 
+                    c(5, 16, 3), 
+                    c('good', 'bad', 'bad'),
+                    stringsAsFactors = F)
+myDf3
+# well that looks terrible!
+
+# let's add some actual names to those columns and rows
+
+colnames(myDf3)<-c("Name", "Treatment A Response", "Treatment B Response")
+rownames(myDf3)<-c("Patient 1", "Patient 2", "Patient 3")
+myDf3
+```
+
+The most commonly used operation on data frame is to pull out certain values by "indexing". We will introduce other methods of pulling out data in the last subsection. 
+
+Indexing is the method of selecting values in data frames by indices, and an index is vector indicating the locations of the selected values in a data frame. 
+
+The syntax of indexing is `myDataFrame[myRowIndex, myColumnIndex]`.
+
+There are four types of indices:
+
+* Number: which row or column by number, such as `c(1, 2, 3)`.
+* Logical: select a row or column or not select, such as `c(TRUE, FALSE)`. 
+* String: row or column name(s) to select, such as `c(“col1name”, “col2name”)`.
+* Blank: leave the index blank to imply selecting all rows or columns.
+
+##### Number indices
+
+```{r num index}
+myDf <- data.frame(name = c("John Smith", "Jane Doe", "Mary Johnson"), 
+                   treatmentAResponse = c(5, 16, 3), 
+                   treatmentBResponse = c('good', 'bad', 'bad'),
+                   stringsAsFactors = F)
+myDf
+
+# Select all 3 rows and columns
+myDf[1:3, 1:3]
+
+# Select the value in the first row and second column
+myDf[1, 2]
+
+# Select the value in the second row and first column
+myDf[2, 1]
+
+# Select the values in the first 2 rows and the second column
+myDf[1:2, 2]
+
+# Use negative numbers to remove certain rows or columns
+# Remove the first row and first column
+myDf[-1, -1]
+```
+
+##### Logical indices
+
+Logical indices are usually generated from a logical operation on the values.
+
+```{r bool index}
+myDf <- data.frame(name = c("John Smith", "Jane Doe", "Mary Johnson"), 
+                   treatmentAResponse = c(5, 16, 3), 
+                   treatmentBResponse = c('good', 'bad', 'bad'),
+                   stringsAsFactors = F)
+myDf
+
+# Select all 3 rows and columns
+myDf[c(TRUE, TRUE, TRUE), c(TRUE, TRUE, TRUE)]
+
+# Select the value in the first row and second column
+myDf[c(TRUE, FALSE, FALSE), c(FALSE, TRUE, FALSE)]
+
+# Select the value in the second row and first column
+myDf[c(FALSE, TRUE, FALSE), c(TRUE, FALSE, FALSE)]
+
+# Select the values in the first 2 rows and the second column
+myDf[c(TRUE, TRUE, FALSE), c(FALSE, TRUE, FALSE)]
+
+# Select all columns of patients with 'bad' response to treatment B
+myDf[myDf[1:3, 3] == 'bad', 1:3]
+```
+
+**Important**: an error prone behavior of logical index is *recycling*. 
+
+Recycling: when the logical index is shorter than the number of rows or columns, the logical index will be repeated until it reaches the end of rows or columns **without** any notification. 
+
+```{r bool recycling}
+# Row index TRUE is recycled into c(TRUE, TRUE, TRUE)
+myDf[TRUE, c(TRUE, TRUE, TRUE)]
+
+# Row index c(TRUE, FALSE) is recycled into c(TRUE, FALSE, TRUE)
+# Note that the first and tird rows are selected
+myDf[c(TRUE, FALSE), c(TRUE, TRUE, TRUE)]
+
+# Examples on vectors:
+myVec <- 1:20
+myVec
+
+myVec[c(TRUE, FALSE)]
+myVec[c(TRUE, FALSE, FALSE)]
+myVec[c(TRUE, FALSE, TRUE)]
+```
+
+##### String indices 
+
+String indices are similar to number indices but more robust after inserting more columns or rows. After inserting more columns or rows, the number indices of some values might change, but string indices should be the same. The default row names are a vector of string from 1 to n, and here is c("1", "2", "3"). 
+
+```{r string index}
+# Now we have a new A treatment, and the column number index 2 does not refer to
+# treatment B anymore. 
+myDf <- data.frame(name = c("John Smith", "Jane Doe", "Mary Johnson"), 
+                   treatmentAResponse = c(5, 16, 3), 
+                   treatmentNewAResponse = c(18, 25, 15),
+                   treatmentBResponse = c('good', 'bad', 'bad'),
+                   stringsAsFactors = F)
+myDf
+
+# Select all 4 rows and columns
+myDf[c("1", "2", "3"), c('name', 'treatmentAResponse', 'treatmentNewAResponse',
+                         'treatmentBResponse')]
+
+# Select the treatment B response of all three patients
+myDf[1:3, 'treatmentBResponse']
+```
+
+##### Blank indices
+
+If you left row index or column index as blank, it implies all rows or columns are selected.
+
+```{r blank ind}
+myDf <- data.frame(name = c("John Smith", "Jane Doe", "Mary Johnson"), 
+                   treatmentAResponse = c(5, 16, 3), 
+                   treatmentBResponse = c('good', 'bad', 'bad'),
+                   stringsAsFactors = F)
+myDf
+
+# Select all rows and columns
+myDf[,]
+
+# Select all rows and first column
+myDf[, 1]
+
+# Select the first row and all columns
+myDf[1, ]
+```
 
 ## Install and use `packages`
 
@@ -163,13 +768,13 @@ For both CRAN and Bioconductor packages, the installing process of a package inc
 1. Download the package from CRAN or Bioconductor to your computer.
 2. Set up downloaded package(s) in one or more locations on your computer. These locations are called the "library" of your R environment, which can be checked using function `.libPaths()`. 
 
-You might wonder why couldn't we just have one repository. Just list a few reasons:
+You might wonder why we couldn't just have one repository. Just list a few reasons:
 
-* CRAN and Bioconductor developer communities are distinct. From my impresion, the CRAN community focus more on general usage such as plotting and data manipulations, whereas the Bioconductor community focus more on analyzing a specific type of biological data. 
+* CRAN and Bioconductor developer communities are distinct. From my impression, the CRAN community focus more on general usage such as plotting and data manipulations, whereas the Bioconductor community focus more on analyzing a specific type of biological data. 
 
 * R packages are peer-reviewed by the community. A general purpose package developer might not be able to review a package specifically designed for biological data. 
 
-* Publishing rules of Bioconductor are more strict than CRAN, which guarentee certain minimum level of package quality. 
+* Publishing rules of Bioconductor are more strict than CRAN, which guarantee certain minimum level of package quality. 
 
 
 ### Use packages
@@ -196,7 +801,7 @@ ggplot(mpg, aes(displ, hwy, colour = class)) +
   geom_point()
 ```
 
-You might wonder why we still need to import a library after installing it. The intuition is an analogy to installing a software on your computer. After you install a software, such as RStudio, you might not want to open it and keep it constantly running at the backgorund after starting your computer, because that will slow down your computer and make your working space crowded. When R interpreter starts running, it only has a minimum set of data and functions defined, which is similar to a just started computer. If you want to use the R interpreter to do something else, you need to get those data and functions into your environment, which is similar to opening an application, such as a web browser, on your computer. 
+You might wonder why we still need to import a library after installing it. The intuition is an analogy to installing a software on your computer. After you install a software, such as RStudio, you might not want to open it and keep it constantly running at the background after starting your computer, because that will slow down your computer and make your working space crowded. When R interpreter starts running, it only has a minimum set of data and functions defined, which is similar to a just started computer. If you want to use the R interpreter to do something else, you need to get those data and functions into your environment, which is similar to opening an application, such as a web browser, on your computer. 
 
 However, this analogy does not explain the `packageName::functionName` syntax, and we need more details to understand what really happened. 
 
@@ -218,7 +823,7 @@ On the other hand, `packageName::functionName` does not load anything into your 
 
 Because R interpreter starts with only a minimum set of packages imported, if you want to use a function or dataset within a package that has not been imported, you can either import that package and use it directly afterwards, or use it through `::` operator. 
 
-### Get help from the documentations
+### Get help from documentations
 
 You can get help from two types of documentations, tutorial (vignette) and reference manual. A tutorial helps a beginner to quickly get started using the package, whereas a reference manual lists all the details about the code and datasets included in the package for a more experienced user to look up. 
 
@@ -270,7 +875,7 @@ The R package [`knitr`](https://yihui.name/knitr/) converts R Markdown files int
 
 To start using R Markdown in RStudio:
 
-1. Click menu `File -> New File ->` **`R Markdown`**. Then, you will be prompted by a wndow to fill in some relevant parameters. In the `Default Output Format:` option, select [`HTML`](https://en.wikipedia.org/wiki/HTML) (**important**), which is the standard markup language for creating web pages. It worth taking time to read the explanations of each option. After clicking `OK`, a new R Markdown file will show up in a pane of RStudio. 
+1. Click menu `File -> New File ->` **`R Markdown`**. Then, you will be prompted by a window to fill in some relevant parameters. In the `Default Output Format:` option, select [`HTML`](https://en.wikipedia.org/wiki/HTML) (**important**), which is the standard markup language for creating web pages. It worth taking time to read the explanations of each option. After clicking `OK`, a new R Markdown file will show up in a pane of RStudio. 
 
 2. Click the `Knit` option at the top of the Markdown file pane. Then, you will be prompted to save the R Markdown file. If you hit `Knit` for the first time, you will be prompted to install several packages that are required to run the "knitting" process. Install them. 
 
@@ -280,13 +885,13 @@ To start using R Markdown in RStudio:
 
 If you want to generate your report in PDF, you will need to install a extra tool on your computer outside of RStudio. This tool, [TeX](https://en.wikipedia.org/wiki/TeX), helps `knitr` to convert R Markdown into PDF. In order to get this tool, click the tiny triangle at the right side of `Knit` option and select `Knit to PDF`, and you will receive an error message in the R Markdown tab. Follow the instructions in the error message carefully to install the TeX distribution. 
 
-We will expore the features of R Markdown in the next section. 
+We will explore the features of R Markdown in the next section. 
 
 ## R basic operations
 
 In this section, we will go through the basics of R programming language by analyzing a simple and fake biological dataset. The dataset is stored in the file `cell_exp_proliferation.csv` within the lab 1 handout. You can open it with a text editor or Excel.
 
-The dataset is collected in an experiment to study the correlation between the expression level of a gene and the proliferation rate of a cell line. In the hypothesis, this gene is able to decrease the proliferation rate of the cells. This dataset includes the expression levels of the gene in wild type, knock down, and overexpressed cells and their proliferation rates. Each condition has 10 biological replicates. Following is the data contained in `cell_exp_proliferation.csv`.
+The dataset is collected in an experiment to study the correlation between the expression level of a gene and the proliferation rate of a cell line. In the hypothesis, this gene is able to decrease the proliferation rate of the cells. This dataset includes the expression levels of the gene in wild type, knock down, and over-expressed cells and their proliferation rates. Each condition has 10 biological replicates. Following is the data contained in `cell_exp_proliferation.csv`.
 
 ```{r, echo = FALSE}
 knitr::kable(read.csv('cell_exp_proliferation.csv', stringsAsFactors = F))
@@ -298,7 +903,7 @@ This analysis includes the following steps:
 
 2. Create an R Markdown file.
 
-3. Load the dataaset into R.
+3. Load the dataset into R.
 
 4. Analyze the loaded dataset:
     + Correlation between expression level and proliferation rate.
@@ -347,7 +952,7 @@ cat(paste0("```{r Your Code Chunk Name, yourCodeChunkParameters=yourParamterValu
            "\n```"))
 ```
 
-Only code in the code chunks will be executed. Everything outside code chunks will be formated by `knitr` as plain text. 
+Only code in the code chunks will be executed. Everything outside code chunks will be formatted by `knitr` as plain text. 
 
 **ACTION**: Delete everything below this chunk, and we are going to create our own analysis R Markdown file. 
 
@@ -484,7 +1089,7 @@ We are going to do the following two analyses:
 
 #### Check linear correlation
 
-**ACTION**: Add a level 1 header to notify the start of data anlysis section:
+**ACTION**: Add a level 1 header to notify the start of data analysis section:
 
 ```
 # Analyze the loaded dataset
@@ -566,7 +1171,7 @@ The **p-value** of the linear regression will be printed in the last line of the
 
 The purpose of this analysis is to validate that the gene is knocked down or overexpressed. 
 
-**ACTION**: Add a level 2 header to notify the start of expression level comprisons:
+**ACTION**: Add a level 2 header to notify the start of expression level comparisons:
 
 ```
 ## Compare gene expression levels between different conditions
@@ -630,10 +1235,10 @@ Code explanation:
 
 We first selected the expression levels of the three conditions using three different methods:
 
-* `wt_exp <- exp_prolif_df[exp_prolif_df$Condition == 'Wild Type', 'Expression.Level']`: This line of code used boolean and direct indexing. 
+* `wt_exp <- exp_prolif_df[exp_prolif_df$Condition == 'Wild Type', 'Expression.Level']`: This line of code used logical and string indexing. 
     + The syntax of indexing is: `myDataFrameOrMatrix[rowIndicesToSelect, columnIndicesToSelect]` .
-    + There are many types of indices, such as number, column name, and boolean. 
-    + `exp_prolif_df$Condition == 'Wild Type'`: boolean indexing. We want the rows of `exp_prolif_df` where the column `Condition` values are equal to the string `"Wild Type"`. `exp_prolif_df$Condition` selects the `Condition` column of `exp_prolif_df`.
+    + There are many types of indices, such as number, column name, and logical. For more details, refer to the data frame section of this handout.
+    + `exp_prolif_df$Condition == 'Wild Type'`: logical indexing. We want the rows of `exp_prolif_df` where the column `Condition` values are equal to the string `"Wild Type"`. `exp_prolif_df$Condition` selects the `Condition` column of `exp_prolif_df`.
     + `'Expression.Level'`: column name indexing. 
 
 * `kd_exp <- subset(exp_prolif_df, Condition == 'Knock Down', select = 'Expression.Level', drop = TRUE)`: This line of code used the function `subset()`. Check the documentation of `subset` to look for more details. 
@@ -645,9 +1250,9 @@ Then, we used t-test to test for the differences of expression level between con
 * `t.test(x = wt_exp, y = oe_exp, alternative = 'l')`
     + `x = wt_exp, y = oe_exp`: compare values in `wt_exp` and `oe_exp`. 
     + `alternative = 'l'`: alternative hypothesis of this test is that the mean of `wt_exp` is less than `oe_exp`.
-    + Look at the documentataion of `t.test` for more details. 
+    + Look at the documentation of `t.test` for more details. 
 
-When performing t-test, we selected the expression levels and stored them into differrent variables. This procedure belongs to "data manipulation". Followiwng is a brief introduction to data manipulation, and we are going to cover more of it in future lab sessions. 
+When performing t-test, we selected the expression levels and stored them into different variables. This procedure belongs to "data manipulation". Following is a brief introduction to data manipulation, and we are going to cover more of it in future lab sessions. 
 
 ##### Data manipulation
 
@@ -689,9 +1294,9 @@ There are basically 3 ways of data manipulation:
 
 #### Test cell proliferation rate differences
 
-**NOTE**: I **strongly** encrouage you to write the headers and code chunks of this section yourself before using the code we provide below, because this analysis is the same as the previous section on expression level analysis. **Hint**: You can make a copy the previous section and change all parameters or variable names related to expression level into proliferation rate. 
+**NOTE**: I **strongly** encourage you to write the headers and code chunks of this section yourself before using the code we provide below, because this analysis is the same as the previous section on expression level analysis. **Hint**: You can make a copy the previous section and change all parameters or variable names related to expression level into proliferation rate. 
 
-**ACTION**: Add a level 2 header to notify the start of proliferation rate comprisons:
+**ACTION**: Add a level 2 header to notify the start of proliferation rate comparisons:
 
 ```
 ## Compare proliferation rates between different conditions
@@ -803,15 +1408,15 @@ R Markdown analysis is much easier to be reproduced, because the same analysis c
 
 Using R Markdown is also more efficient than Excel:
 
-* There are numerous ready-to-run R packages for you to use when analyzing your data. However, when using Excel, you might need to type a a lot of complifated formulas. 
+* There are numerous ready-to-run R packages for you to use when analyzing your data. However, when using Excel, you might need to type a a lot of complicated formulas. 
 
 * When using R Markdown, you can write the analysis report during analysis, and everything will be formatted by `Knitr`. However, when using Excel, you need to write your report in Word or some other tools, which takes some time for formatting your tables and plots. 
 
 * When using R Markdown, you can try out your random analysis idea fairly quickly.
 
-* Using R Markdown, you can validate the correctness of you analysis more easily, because the code are written sequencially. However, when using Excel, the order of your operations cannot be easily inferred from the spreadsheets, and you might have to go through each entry to look for your formula. 
+* Using R Markdown, you can validate the correctness of you analysis more easily, because the code are written sequentially. However, when using Excel, the order of your operations cannot be easily inferred from the spreadsheets, and you might have to go through each entry to look for your formula. 
 
-When analyzing some datasets, it is simply not feasible to use Excel. When the the size of data you are analyzing is more than 500MB, which is not very uncommon in biological data analysis, it might take several miniutes for simply one operation in Excel, such as open, save, copy, paste, and delete. When using R, the same operations are much faster. There are also performance limits of R, but it is more rarely to reach those limits. When you reach the performence limits of R, it will be almost impossible to do the same analysis in Excel. 
+When analyzing some datasets, it is simply not feasible to use Excel. When the the size of data you are analyzing is more than 500MB, which is not very uncommon in biological data analysis, it might take several minutes for simply one operation in Excel, such as open, save, copy, paste, and delete. When using R, the same operations are much faster. There are also performance limits of R, but it is more rarely to reach those limits. When you reach the performance limits of R, it will be almost impossible to do the same analysis in Excel. 
 
 # Optional
 
@@ -837,7 +1442,7 @@ Firstly, it is not very easy to run some bioinformatics tools on Windows. For ex
 
 In addition, `bash` script, <https://en.wikipedia.org/wiki/Bash_(Unix_shell)>, is very popular among bioinformaticians to do some simple data analysis, but it can only be easily run on Unix based systems. You might find answers to your programming questions written in `bash` script, such as the following one on BioStars <https://www.biostars.org/p/193471/>. The answers are all bash scripts. 
 
-Most importantly but might not be very familiar to you, the high performance computing servers or clusters are mostly running Linux operating system. If you want to use these resources, you need to learn `bash` script. It is also very necessary to be able to use these resources in some cases. For example, you have 50 human RNA-Seq raw data set from your sequencer, which is about 250GB of data, and you want to align them back to the reference genome. It might take days even weeks to complete this on your own computer. However, if you run them parallelly on a server or cluster using 50 high performance CPUs and a large amount of memory, it can be done within several hours. 
+Most importantly but might not be very familiar to you, the high performance computing servers or clusters are mostly running Linux operating system. If you want to use these resources, you need to learn `bash` script. It is also very necessary to be able to use these resources in some cases. For example, you have 50 human RNA-Seq raw data set from your sequencer, which is about 250GB of data, and you want to align them back to the reference genome. It might take days even weeks to complete this on your own computer. However, if you run them parallel on a server or cluster using 50 high performance CPUs and a large amount of memory, it can be done within several hours. 
 
 Following is a list of a few general advantages and disadvantages of Unix based systems, 
 
@@ -934,7 +1539,7 @@ Following are the instructions to use VirtualBox for running Linux as a virtual 
 
 24. Once the installation is done, click `Restart Now`. Similarly, this will only restart the virtual machine but not your real machine. 
 
-24. When you see the instruction to `remove the installation medium and restart`, remove the Ubuntu image from the virtual optic drive similarly as steps 13 - 17. By default, VirtualBox should have removed the image. Restart. **Troubleshoot**: if your virtual machine stucks at a black scree with a few white dots, click menu `Machine -> Reset -> confirm reset`. Wait for a while, and hopefully you will see the log in screen. If it does not work, try delete the created virtual machine and redo the guest OS installation steps started from step 5.  
+24. When you see the instruction to `remove the installation medium and restart`, remove the Ubuntu image from the virtual optic drive similarly as steps 13 - 17. By default, VirtualBox should have removed the image. Restart. **Troubleshoot**: if your virtual machine stuck at a black scree with a few white dots, click menu `Machine -> Reset -> confirm reset`. Wait for a while, and hopefully you will see the log in screen. If it does not work, try delete the created virtual machine and redo the guest OS installation steps started from step 5.  
 
 25. Enter the password to log in. After this step, your virtual machine is up and running. 
 
@@ -956,9 +1561,5 @@ Following are the instructions to use VirtualBox for running Linux as a virtual 
 
 31. Try copy some text on your host machine and paste to your guest machine `Firefox` browser. It should work if everything went well. I have tested it on both `Mac OS 10.12.6 (16G29)` and `Windows 10`. **Trouble shoot**: If this does not work, try restart virtual box. 
 
-
-
-
-
-
 # References
+
