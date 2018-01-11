@@ -32,7 +32,7 @@ There are two main sections in this handout, required and optional.
 * The required section covers the topics listed in the syllabus. 
 * The optional section covers some other useful topics in case the lab session ends too early. 
 
-In the required section, we are going to set up R and RStudio on your computer. After getting R up and running, we will briefly go through the basic syntax and data types of R programming language. Then, we are going to learn how to use R packages and create R Markdown files. Then, we are going to go through the basics of R programming by analyzing a simple biological data set. Finally, we conclude the required section by discussing the advantages of using R for data analysis comparing to Excel. 
+In the required section, we are going to set up R and RStudio on your computer. After getting R up and running, we will briefly go through the basic syntax and data types of R programming language. Then, we are going to learn how to use R packages and create R Markdown files. Then, we are going to go through the basic operations of R programming by analyzing a simple biological dataset. Finally, we conclude the required section by discussing the advantages of using R for data analysis comparing to Excel. 
 
 In the optional section, we are going to run Linux operating system on a virtual machine. 
 
@@ -85,7 +85,7 @@ Even though this line of code is simple, there are actually many things happened
     + Takes in code expression. 
     + Executes the code expression. When execution is done, prompt `> ` again and ready for the next code expression. However, if one or more variables are created or updated, the interpreter will remember them.
 
-> ![](rInterpreterLoop.png)
+> ![R interpreter loop](rInterpreterLoop.png)
 
 3. You typed in `print("Hello World!")` and "enter" in the R interpreter.
 
@@ -125,7 +125,7 @@ Data types:
 
 #### Arithmetic operations
 
-You can use R interpreter as a calculator.
+We can use R interpreter as a calculator.
 
 Note: `#` starts a comment, `#` and everything afterwards within the same line are not going to be executed. 
 
@@ -138,8 +138,6 @@ Note: `#` starts a comment, `#` and everything afterwards within the same line a
 log(8, 2) # Calculate log, base 2, of 8.
 10 %% 2 # (x modulo y)
 
-
-# Following is some advanced stuff, aware of them is enough
 1 / 0 # Result is `Inf’, which means positive infinity
 -1 / 0 # Result is `-Inf’, which means negative infinity
 0 / 0 # Result is `NaN’, which means not a number
@@ -147,12 +145,12 @@ log(8, 2) # Calculate log, base 2, of 8.
 
 #### Variables
 
-Most of the times, we want to keep the results of some code expressions and use them somewhere else.
+Most of the times, we want to keep the results of some code expressions and use them later. In order to do this, we assign them into variables. 
 
 ```{r variables, eval=TRUE}
 # variable1 keeps the result of 25 * 25.
-# "<-" is the convention for assigning value to a variable.
-# I recommend you to not use "=" for variable assignments.
+# "<-" is the convention for assigning a value to a variable.
+# I recommend you NOT to use "=" for variable assignments.
 variable1 <- 25 * 25
 
 # This prints out the value in variable1
@@ -166,7 +164,6 @@ variable2
 variable1 <- variable1 / 25
 variable1
 
-# Advanced
 # Although = can also be used, = is mostly used in specifying
 # parameters in a function.
 var3 = 3 # Not good in R coding convention, but will work.
@@ -179,7 +176,9 @@ log(2, base = 3) # "base = 3" is good in R coding convention.
 
 #### Functions
 
-Motivation: keep some analysis procedures somewhere for later usage. Sometimes you may find writing R code is tedious because of a lot of copy and paste.
+Motivation: keep some analysis procedures somewhere for later usage. 
+
+Sometimes you may find writing R code is tedious because of a lot of copy and paste.
 
 ```{r functions anti-pattern, eval=TRUE}
 # Want to do the same transformation for 3 different variables
@@ -231,7 +230,7 @@ Although we still need to copy and paste, it is easier to figure out where needs
 
 #### Logical operations
 
-Sometimes we want to check a "statement" is either true or false. This is mostly used together with if-else statement and loop introduced in the next two sections. 
+Sometimes we want to check a "statement" is either true or false. This is commonly used together with if-else statements and loops introduced in the next two sections. 
 
 ```{r logical ops}
 var1 <- 10
@@ -239,7 +238,6 @@ var2 <- 20
 
 !TRUE           # !: logical NOT. 
 !FALSE
-# "!" is usually read as bang in logical operations.
 
 TRUE & FALSE    # &: logical AND
 TRUE | FALSE    # |: logical or
@@ -256,7 +254,6 @@ var1 <= var2    # <=: test whether the value of var1 is LESS THAN OR EQUAL TO th
 var1 > var2     # >: test whether the value of var1 is GREATER THAN the value of var2
 var1 >= var2    # >=: test whether the value of var1 is GREATER THAN OR EQUAL TO the value of var2
 
-# Advanced
 # Define var3 as a numerical vector containing 10 and 15.
 var3 <- c(10, 15)
 
@@ -344,12 +341,12 @@ times10WhileLoop(var2)
 
 Sometimes we want to store multiple values in one single variable rather than multiple individual ones. The easiest way is to store all values in a vector variable, and you can access each of them through that vector variable. 
 
-Vectors are a basic data type in R. Most everything you will be operating on in R is a vector. To create a vector in R, one way is to use the '`c`' function, which stands for 'combine'. 
+Vectors are a basic data type in R. Most everything you will be operating on in R is a vector. To create a vector in R, one way is to use the '`c()`' function, which stands for 'combine'. 
 
 To create a vector and access values in it:
 
 ```{r create vector}
-myvec <- c(10,20,30)
+myvec <- c(10, 20, 30)
 myvec
 
 # This access the first value in the vector. 
@@ -371,7 +368,7 @@ myvec <- (1,3,4,5)
 
 In R programming language, there is no such thing as a 'naked' value, such as a single number or a single character, which means a single value is also wrapped in a vector. For example, `x <- 5` assigns a vector of length 1, which is equivalent to `x <- c(5)`.
 
-Operations on vectors are performed on all elements:
+Operations on a vector are "*broadcast*" to each of its elements, which means performed on each its elements:
 
 ```{r vector ops, error=TRUE}
 myvec <- c(1, 2, 3)
@@ -412,7 +409,7 @@ The three most common vector types are "integer", "numeric" and "character".
 
 **Importantly**, vectors are "strictly typed". That is, a vector is only allowed to contain values of one type. 
 
-This behavior of R vectors has **important** consequences, where the type of a vector might be changed after inserting another value of different type without any notification to you. Following is a typical case: if you try to insert a character such as "Hi" into a numeric vector, it will change the entire vector into a character vector. Your numbers will be "coerced" into characters without any notification. 
+This behavior of R vectors has **important** consequences, where the type of a vector might be changed after inserting another value of different type without any notification to you. Following is a typical case: if you try to insert a string (or character typed vector) such as "Hi" into a numeric vector, it will change the entire vector into a character typed vector. Your numbers will be "coerced" into characters without any notification. 
 
 ```{r vec coersion}
 myNumericVec <- c(1, 2, 3)
@@ -422,11 +419,11 @@ myNumericVec
 # Recall that a single value is also a vector.
 myNewVec <- c(myNumericVec, "Hi")
 myNewVec
-# Note that the previous number 1, 2, and 3 not become strings "1", "2", and "3", 
+# Note that the previous number 1, 2, and 3 now become strings "1", "2", and "3", 
 # i.e. they are now in character type
 ```
 
-Some frustrating errors can happen that way, where your calculations are not working because your vector is a character not a number --  which is why you need the function `class()` to help you figure out what you're working with. R cannot do numerical calculations on a character vector.
+Some frustrating errors can happen that way, where your calculations are not working because your vector is a character but not a number --  which is why you need the function `class()` to help you figure out what you're working with. R cannot do numerical calculations on a character vector.
 
 ```{r data type examples, error=TRUE}
 # character vector
@@ -462,10 +459,11 @@ myNewVec2 * 2
 
 #### Factors
 
-The `factor` data type is designed to encode categorical values into numerical values, which is often used to perform certain statistical analysis in R, such as classification. We will discuss the use cases of factors in later sessions. For now, you only need to be aware of the difference between a factor and a character typed vector.
+The `factor` data type is designed to encode categorical values into numerical values, which is often used to perform certain statistical analysis in R, such as logistic regression. We will discuss the use cases of factors in later sessions. For now, you only need to be aware of the differences between a factor and a character typed vector.
 
-An important note on the factor type is that when reading files into R environment, the default behavior for is to turn all character columns into factors, which can be turned off by specifying `stringsAsFactors=FALSE`. 
-Following shows the difference between a factor and a character. We use the function `str()` to display the "structure" of the value inside a variable. 
+An important note on the factor type is that when reading files into R environment or defining a data frame, the default behavior is to turn all character columns into factors, which can be turned off by specifying `stringsAsFactors=FALSE`. This will be used in the following sections. 
+
+Following shows the differences between a factor and a character. We use the function `str()` to display the "structure" of the value inside a variable. 
 
 In the following example, we have a factor of length 10 that only held three different types of items "red", "blue", "green". Factors represent those three different types as 'levels', the levels being ("blue", "green", "red") here in alphabetical order. 
 
@@ -570,18 +568,22 @@ myDf3
 
 # let's add some actual names to those columns and rows
 
-colnames(myDf3)<-c("Name", "Treatment A Response", "Treatment B Response")
-rownames(myDf3)<-c("Patient 1", "Patient 2", "Patient 3")
+colnames(myDf3) <- c("Name", "Treatment A Response", "Treatment B Response")
+rownames(myDf3) <- c("Patient 1", "Patient 2", "Patient 3")
 myDf3
+
+# Let's print out the column and row names
+colnames(myDf3)
+rownames(myDf3)
 ```
 
 The most commonly used operation on data frame is to pull out certain values by "indexing". We will introduce other methods of pulling out data in the last subsection. 
 
-Indexing is the method of selecting values in data frames by indices, and an index is vector indicating the locations of the selected values in a data frame. 
+Indexing is the method of selecting values in data frames by indices, and an index is a vector indicating the locations of the selected values in a data frame. 
 
 The syntax of indexing is `myDataFrame[myRowIndex, myColumnIndex]`.
 
-There are four types of indices:
+There are mainly four types of indices:
 
 * Number: which row or column by number, such as `c(1, 2, 3)`.
 * Logical: select a row or column or not select, such as `c(TRUE, FALSE)`. 
@@ -676,6 +678,8 @@ myDf <- data.frame(name = c("John Smith", "Jane Doe", "Mary Johnson"),
                    stringsAsFactors = F)
 myDf
 
+rownames(myDf)
+
 # Select all 4 rows and columns
 myDf[c("1", "2", "3"), c('name', 'treatmentAResponse', 'treatmentNewAResponse',
                          'treatmentBResponse')]
@@ -741,7 +745,7 @@ If you are calling it for the first time, you might be prompted to select the mi
 
 #### Bioconductor
 
-To install from CRAN, run the following code:
+To install from Bioconductor, run the following code:
 
 ```{r install from Bioconductor, eval=FALSE}
 # source() is a function to run an R program. 
@@ -766,7 +770,7 @@ Note: `#` starts a comment, `#` and everything afterwards within the same line a
 For both CRAN and Bioconductor packages, the installing process of a package includes basically two steps:
 
 1. Download the package from CRAN or Bioconductor to your computer.
-2. Set up downloaded package(s) in one or more locations on your computer. These locations are called the "library" of your R environment, which can be checked using function `.libPaths()`. 
+2. Set up downloaded package(s) in one or more locations on your computer. These locations are called the "library" of your R environment, which can be checked using function `.libPaths()`. This will be further discussed in the next section about how to use packages. 
 
 You might wonder why we couldn't just have one repository. Just list a few reasons:
 
@@ -809,7 +813,7 @@ Recall that a package is a collection of code structured into a directory locate
 
 > ![](rlib.png){width=70%}
 
-Each folder is an installed package with the folder name of corresponding package name, and the `ggplot2` package is the first one in the list. The content of `ggplot2` is structured within the folder. Following is the screenshot of the files within the `ggplot2` folder:
+Each folder is an installed package with the folder name corresponding to the package name, and the `ggplot2` package is the first one in the list. The content of `ggplot2` is structured within the folder. Following is the screenshot of the files within the `ggplot2` folder:
 
 > ![](ggplot2.png){width=70%}
 
@@ -864,7 +868,7 @@ Google the package and go to either CRAN or Bioconductor depending on the packag
 
 The first documentation of DESeq2 on Bioconductor *Analyzing RNA-seq data with DESeq2* is the tutorial. 
 
-Documentations are usually very helpful, but also keep in mind that Google is also your best friend when learning programming. There are many helpful Q&As on [StackOverflow](https://stackoverflow.com/) and [Biostars](https://www.biostars.org/). StackOverflow community is focused on general programming and statistics, whereas Biostars community is focused on bioinformatics. 
+Documentations are usually very helpful, but also keep in mind that Google is your best friend when learning programming. There are many helpful Q&As on [StackOverflow](https://stackoverflow.com/) and [Biostars](https://www.biostars.org/). StackOverflow community is focused on general programming and statistics, whereas Biostars community is focused on bioinformatics. 
 
 
 ## R Markdown
@@ -883,13 +887,15 @@ To start using R Markdown in RStudio:
 
 3. Give the file a name such as `test` and save it anywhere you prefer. Then, you will see an `R Markdown` tab show up in the `Console` pane, and it starts running. When running, `knitr` executes all R code and generates an HTML report. After it is done, a new window containing the generated HTML report will show up. The report file will also be stored in the same directory as the R Markdown file. 
 
-If you want to generate your report in PDF, you will need to install a extra tool on your computer outside of RStudio. This tool, [TeX](https://en.wikipedia.org/wiki/TeX), helps `knitr` to convert R Markdown into PDF. In order to get this tool, click the tiny triangle at the right side of `Knit` option and select `Knit to PDF`, and you will receive an error message in the R Markdown tab. Follow the instructions in the error message carefully to install the TeX distribution. 
+If you want to generate your report in PDF, you will need to install an extra tool on your computer outside of RStudio. This tool, [TeX](https://en.wikipedia.org/wiki/TeX), helps `knitr` to convert R Markdown into PDF. In order to get this tool, click the tiny triangle at the right side of `Knit` option and select `Knit to PDF`, and you will receive an error message in the R Markdown tab. Follow the instructions in the error message carefully to install the TeX distribution. 
+
+> ![](knitToPdf.png)
 
 We will explore the features of R Markdown in the next section. 
 
 ## R basic operations
 
-In this section, we will go through the basics of R programming language by analyzing a simple and fake biological dataset. The dataset is stored in the file `cell_exp_proliferation.csv` within the lab 1 handout. You can open it with a text editor or Excel.
+In this section, we will go through the basic operations of R programming language by analyzing a simple and fake biological dataset. The dataset is stored in the file `cell_exp_proliferation.csv` within the lab 1 handout. You can open it with a text editor or Excel.
 
 The dataset is collected in an experiment to study the correlation between the expression level of a gene and the proliferation rate of a cell line. In the hypothesis, this gene is able to decrease the proliferation rate of the cells. This dataset includes the expression levels of the gene in wild type, knock down, and over-expressed cells and their proliferation rates. Each condition has 10 biological replicates. Following is the data contained in `cell_exp_proliferation.csv`.
 
