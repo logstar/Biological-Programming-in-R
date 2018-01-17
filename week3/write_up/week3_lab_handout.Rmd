@@ -1,0 +1,10 @@
+---
+title: "Week 3 Lab Handout"
+author: "Michelle Zajko and Yuanchao Zhang"
+date: "1/17/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
