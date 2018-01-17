@@ -1,0 +1,116 @@
+---
+title: "Lab 1 and 2"
+author: "Yuanchao Zhang"
+date: "1/8/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load dataset into R environment
+```{r load dataset}
+exp_prolif_df <- read.csv("cell_exp_proliferation.csv",
+                          stringsAsFactors=FALSE)
+
+exp_prolif_df
+```
+
+# Analyze the loaded dataset
+## Check linear correlation between gene expression level and cell proliferation rate
+
+```{r plot linear correlation}
+library(ggplot2)
+lin_cor_plot <- ggplot(data = exp_prolif_df,
+                       mapping = aes(x = Proliferation.Rate, 
+                                     y = Expression.Level)) +
+  geom_point(aes(color = Condition)) +
+  geom_smooth(method="lm", se = FALSE) +
+  labs(x = "Proliferation Rate", 
+       y = "Expression Level", 
+       color = "Condition")
+print(lin_cor_plot)
+```
+
+```{r print linear correlation stats}
+summary(lm(Expression.Level ~ Proliferation.Rate, 
+           data = exp_prolif_df))
+```
+
+
+## Compare gene expression levels between different conditions
+```{r plot gene exp}
+exp_boxplot <- ggplot(data = exp_prolif_df, 
+                      aes(x = Condition, y = Expression.Level, 
+                          color = Condition)) + 
+  geom_boxplot() +
+  geom_dotplot(aes(fill = Condition), binaxis='y', 
+               stackdir='center', binwidth = 1, dotsize = 0.75) +
+  labs(x = 'Condition', y = 'Expression Level')
+
+exp_boxplot
+```
+```{r test exp mean diff, message=FALSE}
+library(dplyr)
+wt_exp <- exp_prolif_df[exp_prolif_df$Condition == 'Wild Type', 
+                        'Expression.Level']
+kd_exp <- subset(exp_prolif_df, 
+                 Condition == 'Knock Down', 
+                 select = 'Expression.Level', drop = TRUE)
+oe_exp <- filter(exp_prolif_df, Condition == 'Overexpression') %>%
+  pull(Expression.Level)
+
+t.test(x = kd_exp, y = wt_exp, alternative = 'l')
+t.test(x = wt_exp, y = oe_exp, alternative = 'l')
+t.test(x = kd_exp, y = oe_exp, alternative = 'l')
+```
+
+
+## Compare proliferation rates between different conditions
+```{r plot proliferation rate}
+prolif_boxplot <- ggplot(data = exp_prolif_df, 
+                         aes(x = Condition, y = Proliferation.Rate, 
+                             color = Condition)) + 
+  geom_boxplot() +
+  geom_dotplot(aes(fill = Condition), binaxis='y', 
+               stackdir='center', binwidth = 1, dotsize = 0.75) +
+  labs(x = 'Condition', y = 'Proliferation Rate')
+
+prolif_boxplot
+```
+
+```{r test proliferation rate diff}
+wt_prolif <- exp_prolif_df[exp_prolif_df$Condition == 'Wild Type',
+                           'Proliferation.Rate']
+kd_prolif <- subset(exp_prolif_df, Condition == 'Knock Down', 
+                    select = 'Proliferation.Rate', drop = TRUE)
+oe_prolif <- filter(exp_prolif_df, Condition == 'Overexpression') %>% 
+  pull(Proliferation.Rate)
+
+t.test(x = kd_prolif, y = wt_prolif, alternative = 'g')
+t.test(x = wt_prolif, y = oe_prolif, alternative = 'g')
+t.test(x = kd_prolif, y = oe_prolif, alternative = 'g')
+```
+
+
+# Output results and plots
+```{r output plots, results='hide'}
+pdf('cell_prolif_exp_plots.pdf')
+lin_cor_plot
+exp_boxplot
+prolif_boxplot
+dev.off()
+```
+
+```{r output stats, results='hide'}
+exp_prolif_stats_df <- exp_prolif_df %>% 
+  group_by(Condition) %>% 
+  summarise(expLevelMean = mean(Expression.Level),
+            expLevelSd = sd(Expression.Level),
+            prolifRateMean = mean(Proliferation.Rate),
+            prolifRateSd = sd(Proliferation.Rate))
+
+write.csv(exp_prolif_stats_df, 'exp_prolif_stats.csv',
+          row.names = FALSE)
+```
