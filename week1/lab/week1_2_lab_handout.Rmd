@@ -680,7 +680,7 @@ myDf
 
 rownames(myDf)
 
-# Select all 4 rows and columns
+# Select all 3 rows and 4 columns
 myDf[c("1", "2", "3"), c('name', 'treatmentAResponse', 'treatmentNewAResponse',
                          'treatmentBResponse')]
 
