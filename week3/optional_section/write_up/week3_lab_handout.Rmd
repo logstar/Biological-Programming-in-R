@@ -1,10 +1,290 @@
 ---
-title: "Week 3 Lab Handout"
-author: "Michelle Zajko and Yuanchao Zhang"
+title: "Week 3 Lab Handout Optional Section"
+author: "Yuanchao Zhang"
 date: "1/17/2018"
-output: html_document
+output: 
+  html_document:
+    number_sections: no
+    toc: yes
+    toc_depth: 4
+bibliography: week3.bib
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+
+# Optional
+
+In the last week's optional section, we set up a Ubuntu 16.04 virtual machine using VirtualBox. In this week, we are going to install R and RStudio on the virtual machine. Then, we will learn how to use "terminal" to execute a program developed by others. Finally, we will introduce the basics of terminal. 
+
+Before we start, I would like to add a note on the usage of Ubuntu virtual machine about suspending and waking up.
+
+## Note on suspending and waking up Ubuntu virtual machine
+
+After suspending your Ubuntu virual machine, you might not be able to wake it up again by clicking or typing in the VirtualBox window. You will see a black screen like the following after suspending your virtual machine: 
+
+> ![](usus.png)
+
+In order to wake up the virtual machine, you can try to send "ACPI Shutdown" signal to it by clicking menu `Machine -> ACPI Shutdown (Host + U)` as following:
+
+> ![](sigsd.png)
+
+Hopefully, this will wake up the virtual machine. If you found your virtual machine Internet is disconnected, try suspend it and wake it up by sending `ACPI Shutdown`. If this does not reconnect your virtual machine, you might have to restart it. 
+
+In order to avoid these complexities, you can change the setting of your Ubuntu virtual machine such that it will never automatically suspend. Following are the instructions to do that:
+
+1. Open "System Settings":
+
+> ![](sysset.png)
+
+2. Choose "Brightness & Lock":
+
+> ![](bnl.png)
+
+3. Change "Turn screen off when inactive for: " as "Never". 
+
+> ![](never.png)
+
+
+## Install R and RStudio on Ubuntu 16.04
+
+### Instructions for installing R
+
+1. Select your ubuntu virtual machine in VirtualBox and start running it. 
+
+> ![](startvm.png)
+
+2. Log in to your virtual machine.
+
+3. Open "terminal" in your virtual machine. Terminal is a program to help you interact with your operating system by typing, which is similar to the console tab in RStudio. We will explain more about Terminal in following sections. Here, we are just going to install R and RStudio using it. 
+
+> ![](ot.png)
+
+4. Type `sudo apt-get update` and hit "return" in the terminal. Then, type in your virtual machine password and hit "return". `sudo` is a command to run the following instructions as superuser, which basically gives you the permission to change certain protected files. `apt-get update` updates the package information from the printed sources (repositories). These sources contains software packages for you to install easily. Be ***careful*** before running something with `sudo` at first, because it will allow the following command to do anything, such as allowing some others to control your machine. 
+
+> ![](update.png)
+
+5. Type `sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9` and hit "return" in the terminal. This line of command add a public key `E084DAB9` to your operating system as a trusted source of package. This key is provided by CRAN at <https://cran.r-project.org/bin/linux/ubuntu/>. Be careful when adding a key from internet, because it might not be a trusted source. 
+
+> ![](secapt.png)
+
+6. Type `sudo add-apt-repository 'deb [arch=amd64,i386] https://cran.rstudio.com/bin/linux/ubuntu xenial/'` and hit return. This add <https://cran.rstudio.com/bin/linux/ubuntu> as a source (repository) of packages. If you are nor running ubuntu **16.4**, you need to change `xenial/` to the version code of you system. 
+
+> ![](addrepo.png)
+
+7. Type `sudo apt-get update` again to update the package information. 
+
+> ![](updateAgain.png)
+
+8. Type `sudo apt-get install r-base` and hit return. This installs R on your virtual machine. 
+
+> ![](insR.png)
+
+9. Type `Y` and hit return. This confirms installation of R. 
+
+> ![](cins.png)
+
+10. Type `sudo apt-get install libcurl4-openssl-dev libxml2-dev` and hit return. This instals some libraries that you will need when installing packages in R.
+
+> ![](inslib.png)
+
+11. Type `R` and hit return. This runs an R interpreter session in your terminal. If you see the following image on your virtual machine, you already have R installed. 
+
+> ![](runR.png)
+
+12. If you want to exit R, type `ctrl+D` together. Type `n` and hit return to exit without saving current workspace.
+
+> ![](exitR.png)
+
+### Instructions to install RStudio
+
+1. Go to RStudio's website and download installer for ubuntu **16.04+**. If you are running a 32-bit ubuntu system. 
+
+> ![](dRStudio.png)
+
+2. Go to your downloads folder. Right click the downloaded file. Rename the downloaded file into `rstudio-xenial-amd64.deb`. Make sure that the file name is exactly `rstudio-xenial-amd64.deb`.
+
+> ![](rename.png)
+
+3. Open terminal and run `sudo apt-get install gdebi-core`. This installs `gdebi` utility, which will be used to install RStudio. 
+
+> ![](gdebi.png)
+
+4. Run `sudo gdebi -n ~/Downloads/rstudio-xenial-amd64.deb`. This uses `gdebi` to install RStudio. `-n` is an option of `gdebi`, which means we want to install the following file. `~/Downloads/rstudio-xenial-amd64.deb` is the path to the installer you downloaded. `~` in the path refers to your "home". 
+
+> ![](insrs.png)
+
+5. Open RStudio. Make sure there is no error. 
+
+> ![](openrs.png)
+
+6. You should see the familiar RStudio interface. 
+
+> ![](rstudio.png)
+
+
+7. Install CRAN and Bioconductor packages as described in the required section of lab 1 handout. 
+
+
+## Execute a program in terminal
+
+When you want to analyze a "raw" dataset, such as the sequencing reads generated by your server, you usually can find some software developed by others to perform your analysis. There are basically three ways to run that software on your computer or server: 
+
+1. Directly run a Linux binary file provided by the software developers. This is very easy. You just need to download the binary file and execute it. 
+
+2. Compile the source code of the software into a binary file on your computer, and then execute the compiled binary file as the first method. This can much more difficult. Therefore, always look for a binary file before starting to compile the source code. 
+
+3. "Install" the software using [Conda](https://conda.io/docs/index.html), a package manager. This is always the best option if available. 
+
+In this section, we will introduce all three methods by installing a popular RNA-Seq aligner `STAR` [@dobin_star:_2013] as an example. 
+
+### Directly run a Linux binary file
+
+If you go to the GitHub page of STAR, <https://github.com/alexdobin/STAR>, you will see a web-page look like the following screenshot. The files of this software are listed in the upper rectangle of the following image. The text below it is a short introduction of this software, which is the formated content of `README.md` in the file list. If you go through the `README.md` carefully, it surprisingly does *not* show you how to run their software (checked on Jan 17, 2018). What makes things more confusing is that the page showed you how to compile from the source code. You might think it is necessary to compile their source code and then start doing it. 
+
+> ![](star.png)
+
+However, you can find their binary files under the `bin` directory. Go to `bin -> Linux_x86_64_static -> STAR`. Then, download the file to the `Downloads` folder. 
+
+> ![](downloadStar.png)
+
+Make sure that there is a file called STAR under the `Download` folder.
+
+> ![](checkStar.png)
+
+Then, open your terminal run `chmod +x ~/Downloads/STAR` and `~/Downloads/STAR --version`. You shold see the following output in your terminal:
+
+> ![](runStar.png)
+
+- `chmod +x ~/Downloads/STAR` gives execution permission (`+x`) to the downloaded file `~/Downloads/STAR`. After executing this line, `STAR` becomes executable, and it can be called as a binary executable file. Most of the times, you only need to know `chmod +x` gives a file execution permission. If you are interested in other file permissions, you can look at <http://linuxcommand.org/lc3_lts0090.php>.
+
+- `~/Downloads/STAR --version` executes the file `~/Downloads/STAR` with an option `--version`. `--version` option asks the `STAR` binary to print out its version. 
+
+There are more options that you can provide when executing `STAR`. You can look up those options in their manual or the help message of the binary file. To get the help message, run the software without any option, the binary file will print out a (very long) help message. Multiple options are separated by spaces. 
+
+If you want to run some other software using this method, look for the `bin` or `binary` directory or link in the website of that software. If you are lucky, you can find a binary to run. 
+
+### Compile binary executable file from source code
+
+This section only shows how compiling source code can be difficult, so you do not need to follow the instructions. 
+
+Let's following the instructions on the `STAR` GitHub page to compile the source. 
+
+> ![](compileIns.png)
+
+It first asks us to run the following commands in the terminal:
+
+```
+# Get latest STAR source from releases
+wget https://github.com/alexdobin/STAR/archive/2.5.3a.tar.gz
+tar -xzf 2.5.3a.tar.gz
+cd STAR-2.5.3a
+```
+
+Then, we do not need to use the alternative approach.
+
+Then, run the following:
+
+```
+# Build STAR
+make STAR
+```
+
+It gives us an error as following:
+
+> ![](compileErr.png)
+
+Then, we figure out that we need to change our current directory to `source` before running `make STAR`. We change the current drectory using the command `cd`, and we will talk more about commands in later lab sessions.
+
+```
+cd source
+make STAR
+```
+
+It worked this time, and a `STAR` binary executable file is generated in the current directory. You can execute it by running `./STAR --version`. 
+
+Even though we encountered one error in the compiling process, this is actually much easier than many other software. Sometimes, you need to do the following things before getting the binary file:
+
+- Install other required software. This can lead to other troubles. 
+
+- Change compiler parameters. This is the most difficult situation, because you need to understand the basics of a C/C++ compiler. It usually takes a full semester course to learn how a C/C++ compiler works. If you do not have good understanding of a C/C++ compiler, you may or may not be lucky enough to have all parameters set correctly. 
+
+- Handle weird erros given by the compiling process. The errors might depend on your operating system or some other software. For example, the compiling process might require you to have a certain software with version `>= 3.x.x`, but you only have it under version `2.x.x`, so you have to upgrade it. 
+
+To conclude this sectoin, remember: only compile source code when there is no other option available. Most of the times, you will have other options available on Linux. 
+
+### Install the software using Conda
+
+[Conda](https://conda.io/docs/index.html) is a software for managing other software/packages, such as installing, uninstalling, upgrading, and downgrading. 
+
+However, we still need to install Conda. Go to <https://conda.io/miniconda.html> on your virtual machine to download the 64-bit Python 3.6 Linux installer. 
+
+> ![](dnconda.png)
+
+After downloading the installer, make sure that its file name is called `Miniconda3-latest-Linux-x86_64.sh`. If not, you might have downloaded the wrong installer. If you are sure that you downloaded the correct one, rename it to `Miniconda3-latest-Linux-x86_64.sh`. 
+
+Following is the instructions to install `Conda`:
+
+1. Open your terminal and run: `chmod +x Downloads/Miniconda3-latest-Linux-x86_64.sh` and `~/Downloads/Miniconda3-latest-Linux-x86_64.sh` .
+
+> ![](insConda.png)
+
+2. Hit `enter` to continue. 
+
+> ![](ce.png)
+
+3. When you see the `Lincense Agreement` as the following screen shot, hit `q` on your keyboard. 
+
+> ![](cl.png)
+
+4. Then, type `yes` and hit return to aggree with the license terms. 
+
+> ![](ca.png)
+
+5. Hit "enter" to continue. This sets the installation directory to `/home/yourUsername/miniconda3`.
+
+> ![](cp.png)
+
+6. **VERY IMPORTANT**: Type `yes` and hit `return`. This enables "terminal" to find the installed conda and other packages installed through conda. 
+
+> ![](csp.png)
+
+7. Troubleshooting: If you mistakenly hit `return` before typing `yes`, its default is `no`, and you can execute the following command **exactly** to fix it: `echo "export PATH=\"$HOME/miniconda3/bin:\$PATH\"" >> .bashrc` . **Important**: make sure that you have `>>` rather than a single `>`. This fix assumes that you followed the step 5. If you specified another path for installing conda in the step 5, change `$HOME/miniconda3` in the command to the absolute path you specified. We will explain how this fix works in later lab sessions. 
+
+> ![](msp.png)
+
+8. Quit and start terminal again. 
+
+9. Run `conda --version`. You should see the following response:
+
+> ![](cc.png)
+
+Now, you have conda installed on your virtual machine. You might feel that this is even more complicated than compiling STAR from the source code. However, you will reap the benefits of installing `conda` when you want to install some other software. 
+
+Next, we install STAR using conda. Run the following code in terminal: 
+
+```
+conda config --add channels conda-forge
+conda config --add channels bioconda
+conda install star
+```
+
+The first two lines add two channels, i.e. software/package repositories, to conda. You only need to do this once. The third line installs `STAR`. 
+
+Type `y` and hit return to confirm installation. 
+
+> ![](confirmStar.png)
+
+Run the installed `STAR` by typing `STAR --version` and hit return. Note that you do not need `~/Downloads` at the beginning of `STAR`, because it is now "installed". We will explain the details in later lab sessions. 
+
+> ![](runInstalledStar.png)
+
+Once you have conda setup, you can install most bioinformatics tools by running `conda install softwareName`. This is extremely helpful when you are setting up an environment on a remote server.
+
+## Basics of terminal
+
+
+
+# Reference
