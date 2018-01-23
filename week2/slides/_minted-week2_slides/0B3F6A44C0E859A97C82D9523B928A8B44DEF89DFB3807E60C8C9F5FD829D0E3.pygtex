@@ -1,0 +1,17 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+ad.test\PYG{p}{(}normdata\PYGZus{}nortest\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  Anderson\PYGZhy{}Darling normality test}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} data:  normdata\PYGZus{}nortest}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} A = 0.38284, p\PYGZhy{}value = 0.3912}
+ad.test\PYG{p}{(}\PYG{l+m}{1}\PYG{o}{:}\PYG{l+m}{1000}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  Anderson\PYGZhy{}Darling normality test}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} data:  1:1000}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} A = 11.085, p\PYGZhy{}value \PYGZlt{} 2.2e\PYGZhy{}16}
+
+\PYG{c+c1}{\PYGZsh{} Smaller p\PYGZhy{}value indicates significant deviation from normal}
+\PYG{c+c1}{\PYGZsh{} distribution.}
+\end{Verbatim}

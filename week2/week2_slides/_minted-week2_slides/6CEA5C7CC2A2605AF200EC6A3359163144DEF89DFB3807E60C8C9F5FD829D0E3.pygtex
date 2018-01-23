@@ -1,0 +1,19 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+nortest\PYGZus{}points \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+m}{100}
+normdata\PYGZus{}nortest \PYG{o}{\PYGZlt{}\PYGZhy{}} rnorm\PYG{p}{(}nortest\PYGZus{}points\PYG{p}{)}
+shapiro.test\PYG{p}{(}normdata\PYGZus{}nortest\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  Shapiro\PYGZhy{}Wilk normality test}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} data:  normdata\PYGZus{}nortest}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} W = 0.97583, p\PYGZhy{}value = 0.06271}
+shapiro.test\PYG{p}{(}\PYG{l+m}{1}\PYG{o}{:}\PYG{l+m}{1000}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  Shapiro\PYGZhy{}Wilk normality test}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} data:  1:1000}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} W = 0.95481, p\PYGZhy{}value \PYGZlt{} 2.2e\PYGZhy{}16}
+
+\PYG{c+c1}{\PYGZsh{} Smaller p\PYGZhy{}value indicates significant deviation from normal}
+\PYG{c+c1}{\PYGZsh{} distribution.}
+\end{Verbatim}

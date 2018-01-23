@@ -1,0 +1,14 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+hs \PYG{o}{=} \PYG{l+m}{30}  \PYG{c+c1}{\PYGZsh{} second study patient proportion}
+p0 \PYG{o}{=} \PYG{l+m}{0.1}  \PYG{c+c1}{\PYGZsh{} TCGA LUAD proportion}
+n2 \PYG{o}{=} \PYG{l+m}{200}  \PYG{c+c1}{\PYGZsh{} second study sample size}
+z\PYGZus{}twotail \PYG{o}{=} \PYG{p}{(}hs\PYG{o}{/}n2 \PYG{o}{\PYGZhy{}} p0\PYG{p}{)}\PYG{o}{/}\PYG{k+kp}{sqrt}\PYG{p}{(}p0 \PYG{o}{*} \PYG{p}{(}\PYG{l+m}{1} \PYG{o}{\PYGZhy{}} p0\PYG{p}{)}\PYG{o}{/}n\PYG{p}{)}
+pval\PYGZus{}z\PYGZus{}twotail \PYG{o}{=} \PYG{l+m}{2} \PYG{o}{*} pnorm\PYG{p}{(}z\PYGZus{}twotail\PYG{p}{,} lower.tail \PYG{o}{=} \PYG{k+kc}{FALSE}\PYG{p}{)}
+pval\PYGZus{}z\PYGZus{}twotail
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} [1] 0.01842213}
+
+proptest\PYGZus{}twotail \PYG{o}{\PYGZlt{}\PYGZhy{}} prop.test\PYG{p}{(}hs\PYG{p}{,} n2\PYG{p}{,} p \PYG{o}{=} p0\PYG{p}{,} correct \PYG{o}{=} \PYG{k+kc}{FALSE}\PYG{p}{,}
+                              alternative \PYG{o}{=} \PYG{l+s}{\PYGZdq{}two.sided\PYGZdq{}}\PYG{p}{)}
+proptest\PYGZus{}twotail\PYG{o}{\PYGZdl{}}p.value
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} [1] 0.01842213}
+\end{Verbatim}

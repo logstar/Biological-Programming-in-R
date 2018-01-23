@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+qqnorm\PYG{p}{(}tcga\PYGZus{}luad\PYG{o}{\PYGZdl{}}cigarettes\PYGZus{}per\PYGZus{}day\PYG{p}{,}
+       pch\PYG{o}{=}\PYG{l+m}{16}\PYG{p}{,} cex\PYG{o}{=}\PYG{l+m}{0.5}\PYG{p}{,} main\PYG{o}{=}\PYG{l+s}{\PYGZdq{}TCGA\PYGZhy{}LUAD: Cigarettes per Day\PYGZdq{}}\PYG{p}{)}
+qqline\PYG{p}{(}tcga\PYGZus{}luad\PYG{o}{\PYGZdl{}}cigarettes\PYGZus{}per\PYGZus{}day\PYG{p}{,} col\PYG{o}{=}\PYG{l+m}{3}\PYG{p}{)}
+\end{Verbatim}

@@ -1,0 +1,13 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+ggplot\PYG{p}{(}data \PYG{o}{=} \PYG{k+kt}{data.frame}\PYG{p}{(}x \PYG{o}{=} sample\PYGZus{}average\PYGZus{}vector\PYG{p}{),}
+       mapping \PYG{o}{=} aes\PYG{p}{(}x \PYG{o}{=} x\PYG{p}{))} \PYG{o}{+}
+  geom\PYGZus{}histogram\PYG{p}{(}mapping \PYG{o}{=} aes\PYG{p}{(}y \PYG{o}{=} \PYG{l+m}{..}density..\PYG{p}{),}
+                 alpha \PYG{o}{=} \PYG{l+m}{0.4}\PYG{p}{)} \PYG{o}{+}
+  geom\PYGZus{}density\PYG{p}{(}mapping \PYG{o}{=} aes\PYG{p}{(}color \PYG{o}{=} \PYG{l+s}{\PYGZsq{}Sample Ave. Dens.\PYGZsq{}}\PYG{p}{))} \PYG{o}{+}
+  stat\PYGZus{}function\PYG{p}{(}fun \PYG{o}{=} dnorm\PYG{p}{,}
+                args \PYG{o}{=} \PYG{k+kt}{list}\PYG{p}{(}mean\PYG{o}{=}clt\PYGZus{}norm\PYGZus{}mean\PYG{p}{,}
+                            sd\PYG{o}{=}clt\PYGZus{}norm\PYGZus{}sd\PYG{p}{),}
+                aes\PYG{p}{(}colour \PYG{o}{=} \PYG{l+s}{\PYGZsq{}CLT Norm. Dens.\PYGZsq{}}\PYG{p}{))} \PYG{o}{+}
+  labs\PYG{p}{(}x \PYG{o}{=} \PYG{l+s}{\PYGZsq{}Sample Average\PYGZsq{}}\PYG{p}{,} y \PYG{o}{=} \PYG{l+s}{\PYGZsq{}Density\PYGZsq{}}\PYG{p}{)} \PYG{o}{+}
+  ggtitle\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Central Limit Theorem Simulation\PYGZdq{}}\PYG{p}{)}
+\end{Verbatim}

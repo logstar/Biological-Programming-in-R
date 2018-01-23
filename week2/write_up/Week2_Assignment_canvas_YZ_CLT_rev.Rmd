@@ -1,0 +1,496 @@
+---
+title: "Course Content and Assignment 2 for Biom612 (Week 2)"
+author: "Deanne Taylor, Pichai Raman, Joe Dybas, with some edits by Yuanchao Zhang"
+date: "Jan 22nd, 2018"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '3'
+  pdf_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+  word_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+# Starting Up
+
+Packages to install this week:
+
+* ggplot2 (CRAN)
+* nortest (CRAN)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(knitr)
+library(ggplot2)
+library(nortest)
+
+```
+
+
+Load data from last week:
+
+```{r load data}
+
+tcga_luad <- read.csv("TCGA_LUAD_clinical.csv",  na.string="NA", 
+                      stringsAsFactors=FALSE, row.names=1)
+
+```
+
+# The Normal Distribution
+
+R provides several functions to allow you to generate normal distributions, for testing and for statistical use. 
+
+The Normal package in stats give several functions useful for utilizing statistics and observations from a normal distribution.  
+
+The four functions included with the normal distribution are:
+
+* `dnorm(x, mean = 0, sd = 1, log = FALSE)`
+* `pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)`
+* `qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)`
+* `rnorm(n, mean = 0, sd = 1)`
+
+Note that all the default parameters for these functions assume the standard distribution ($\sigma=1,  \mu=0$)
+
+We will cover each of these functions in the lab below.
+
+
+## `rnorm()`: generating normal distribution data
+
+You can use the help facility and type "`?rnorm`" to start reading about the Normal methods in the stats package.
+
+Let's generate a normal distribution using `rnorm()`. 
+
+```{r rnorm}
+# A little trick to save your original graphing configuration as a variable "opar" 
+# so you can return to the original native configuration before you changed the 
+# par()ameters of the graphing window.
+# no.readonly = TRUE specifies that we do not want read only parameters. 
+opar <- par(no.readonly = TRUE)
+
+# Split your graphing window into a 2x2 (row,column). 
+# You may need to open up your plotting window a bit wider.
+par(mfrow=c(2, 2)) 
+
+# Let's build a random distribution with 1000 points total. 
+
+# The default mean for rnorm is 0 and the and the standard deviation is 1. 
+
+# Pull observations from the standard normal distribution
+normdata <- rnorm(10, mean=0, sd=1) 
+hist(normdata)
+mean(normdata)
+sd(normdata)
+
+# Re-run the lines above three more times to fill up your 2x2.  
+# Something should be obvious to the eye in the histogram and in what you expect 
+# from the mean and standard deviation.
+
+# At the end of your run, reload the naive parameters you saved, to reset your 
+# graphics window, if you don't you'll be stuck with a 2x2 divide until you 
+# remove all plots from your plot window.
+hist(normdata)
+par(opar)
+
+# Now, a graph will only contain a single plot.
+hist(normdata)
+```
+
+Now, in the chunk above, increase the number of random variables in the normal distribution to 100, then 1000. Run each four times.
+
+How does this change the mean and the standard deviation from what you expect? 
+
+## Central Limit Theorem
+
+Central limit theorem:
+
+Let ${X_1, X_2, ..., X_n}$ be a sequence of identically distributed (i.i.d.) random variables with mean $E \left[{X_i}\right] = \mu$ and finite variance $Var \left({X_i}\right) = \sigma^2$ . 
+Define $$\displaystyle S_n = \frac{1}{n} \sum_i X_i$$  Then, as $n \to \infty$, $$\displaystyle S_n \xrightarrow {\mathcal{D}} \mathcal{N} \left({\mu,\sigma^2/n}\right)$$
+
+Central limit theorem is difficult to prove algebraically, but it is quite easy to demonstrate with simulation.
+
+Simulation procedure:
+
+1. Let ${X_1, X_2, ..., X_n}$ be a sequence of i.i.d. uniformly distributed random variables.
+2. Calculate sample everage $S_n$.
+3. Repeat m times.
+4. Plot the empirical PDF of $S_n$ and normal PDF stated by the theorem.
+
+
+```{r Central Limit theorem test}
+
+# Let X1, X2, ..., X10 be a sequence of i.i.d. random variables uniformly 
+# distributed from 0 to 1.
+runif(n = 10, min = 0, max = 1)
+
+# We use "replicate"" to build a vector of length "number_of_samples" by repeatedly 
+# executing the following expression surrounded by {}. 
+# In the expression, we sum the binomial sampling of "rolls" times. 
+number_of_samples <- 5000
+size_of_each_sample <- 5000
+unif_min <- 0
+unif_max <- 100
+# Calculate the uniform distribution mean and variance using equations from
+# https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)
+unif_mean <- (unif_max - unif_min) / 2
+unif_sd <- (((unif_max - unif_min) ^ 2) / 12) ^ 0.5
+clt_norm_mean <- unif_mean
+clt_norm_sd <- unif_sd / (size_of_each_sample ^ 0.5)
+
+
+sample_average_vector <- replicate(number_of_samples, {
+  mean(runif(n = size_of_each_sample, min = unif_min, max = unif_max))
+})
+
+ggplot(data = data.frame(x = sample_average_vector), mapping = aes(x = x)) +
+  geom_histogram(mapping = aes(y = ..density..), alpha = 0.4) +
+  geom_density(mapping = aes(color = 'Sample Ave. Dens.')) +
+  stat_function(fun = dnorm, 
+                # Parameters of the normal distribution specified by the central
+                # limit theorem. 
+                args = list(mean=clt_norm_mean, 
+                            sd=clt_norm_sd), 
+                aes(colour = 'CLT Norm. Dens.')) + 
+  labs(x = 'Sample Average', y = 'Density') + 
+  ggtitle("Central Limit Theorem Simulation")
+
+
+
+# Feel free to change the "number_of_samples" and "size_of_each_sample" of the simulation. 
+
+```
+
+
+# Testing for normality
+
+Important to do, as many statistical tests require that data being tested is normally distributed.
+
+## Plotting data, Quantile-quantile plots.
+
+```{r tcga-luad normality tests}
+quantile(0:10, probs=seq(0, 1, 0.1))
+# First test a qq-plot on a truly normal distribution
+num_points <- 30
+normdata2 <- rnorm(num_points)
+
+# Let's use qplot to generate a histogram using qqplots. More on qqplots2 next week.
+qplot(normdata2) + 
+  geom_histogram() + 
+  theme_bw() + 
+  ggtitle(paste("rnorm (", num_points, ")", sep=""))
+
+# Ignore any binwidth errors today.
+
+# Let's look at this distribution in normdata2 versus an idealized 
+# normal distribution (theoretical quantiles)
+
+qqnorm(normdata2, pch=16, cex=0.5, main=paste("Generated using rnorm(", num_points, ")", sep=""))
+qqline(normdata2, col=3)
+
+# Increase the number of num_points to a much higher number. What do you observe?
+
+# Let's use real data: Plotting the distributions from TCGA-LUAD from Week 1.
+
+# Cigarettes per day.
+# mean and sd:
+
+luad_cpd_sd <- sd(tcga_luad$cigarettes_per_day, na.rm=TRUE)
+luad_cpd_mean <- mean(tcga_luad$cigarettes_per_day, na.rm=TRUE)
+
+#Using ggplot2, graphing the cigarettes per day -- first with the histogram, 
+# then overlay a blue normal approximation, then a red empirical density plot 
+# (same data as histogram). Note that each call to ggplot2 is separated by 
+# a "+" sign.  (Ignore warnings on non-finite values that come out -- this is 
+# normal for columns with missing data.)
+
+qplot(x = cigarettes_per_day, xlim=c(-5, 10), data = tcga_luad, geom = "blank") +  
+  geom_histogram(aes(y = ..density..), alpha = 0.4) +
+  geom_line(aes(y = ..density.., colour = 'Empirical'),stat = 'density') +  
+  stat_function(fun = dnorm, args = list(mean=luad_cpd_mean, sd=luad_cpd_sd), 
+                aes(colour = 'Normal Approx'))  + 
+  scale_colour_manual(name = 'Density', values = c('red', 'blue')) + 
+  theme(legend.position = c(0.85, 0.85))+ ggtitle("TCGA LUAD: Cigarettes Per Day")
+
+# Repeat this for years_smoked below:
+luad_ys_sd <- sd(tcga_luad$years_smoked, na.rm=TRUE)
+luad_ys_mean <- mean(tcga_luad$years_smoked, na.rm=TRUE)
+
+qplot(x = years_smoked, data = tcga_luad, xlim=c(-10,70), geom = "blank") + 
+  geom_histogram(aes(y = ..density..), alpha = 0.4) +
+  geom_line(aes(y = ..density.., colour = 'Empirical'),stat = 'density') +  
+  stat_function(fun = dnorm, args = list(mean=luad_ys_mean, sd=luad_ys_sd), 
+                aes(colour = 'Normal Approx')) + 
+  scale_colour_manual(name = 'Density', values = c('red', 'blue')) + 
+  theme(legend.position = c(0.85, 0.85)) + ggtitle("TCGA LUAD: Years Smoked")
+
+
+# So basically both of these plots make the data look like they might be normal 
+# based on just the general distribution (blue ideal versus red empirical 
+# densities). Another helpful plot is the qqplot, where the approximate normal 
+# distribution is on the x-axis "Theoretical Quantiles" and the y-axis shows the 
+# actual data organized by distribution as "Sample Quantiles".
+
+qqnorm(tcga_luad$cigarettes_per_day, pch=16, cex=0.5, main="TCGA-LUAD: Cigarettes per Day")
+
+# Now add a line approximating a linear "fit" to the majority of the data:
+
+qqline(tcga_luad$cigarettes_per_day, col=3)
+
+# Interpret the interesting shape of the points above the line -- check out 
+# the cigarettes_per_day histogram. 
+
+qqnorm(tcga_luad$years_smoked, pch=16,cex=0.5, main="TCGA-LUAD: Years smoked")
+qqline(tcga_luad$years_smoked, col=3) # adds a trendline
+
+```
+
+In the qqplots (`qqnorm`), you can now clearly note that the cigarettes per day distribution deviates quite a bit from normal whereas the "years smoked" distribution is probably more normally distributed. You can tell this by how far the sample and theoretical quantiles deviate from one-another (as evidenced by how far off the line they are). However, even if you see some points far off the line they are NOT outliers. A qqplot does not determine outliers! There are other methods for that, which we will discuss later in the semester.
+
+## Statistical tests of normality
+
+Plots are all well and good, but what is the statistical evidence for deviations from normality?
+
+The next thing you may do is  perform a statistical test to measure the deviation from normal.
+
+At this point you will download the package '`nortest`'  so you can run some of tests in this package. Then it is quite straightforward to run the test.
+
+```{r testing for normality}
+
+#Testing the theoretical normal distribution
+
+nortest_points <- 100
+normdata_nortest <- rnorm(nortest_points)
+
+#Sharpio-Wilk test:
+shapiro.test(normdata_nortest)
+shapiro.test(1:1000)
+
+#Let's run the Anderson-darling test on normal data:
+ad.test(normdata_nortest) 
+ad.test(1:1000)
+
+
+shapiro.test(tcga_luad$cigarettes_per_day)
+shapiro.test(tcga_luad$years_smoked)
+```
+
+This test verifies what was gleaned from the QQ-plot.
+
+## One-sample tests of proportion
+
+As we learned in the lecture, the null hypothesis of a one-sided test of proportion can be rejected if z significantly differs from z0 in the chosen tail, where z0 is z-value obtained from the $100 * (1 − \alpha)$ percentile of the standard normal distribution.  
+
+Let's take an example:
+
+Suppose we are studying 'heavy smokers' -- people who smoke more than 5 cigarettes per day.
+
+Suppose we observe that a proportion -- approximately 10% -- of patients from the TCGA lung adenocarcinoma study smoked more than 5 cigarettes per day. 
+
+A new study is performed where 22 out of 200 patients smoked more than 5 cigarettes per day. We would like to check if this group of patients has a statistically greater proportion of heavy smokers compared to the TCGA study.
+
+At the $\alpha=.05$ significance level, what is the strength of the evidence that the proportion of heavy smokers in the new study ($p$) is greater than the proportion of heavy smokers in the TCGA lung adenocarcinoma study ($p_{0}$)?  This is a right-tailed test (see Table 2.3 from your assigned reading in Sabo and Boone), so to reject the null hypothesis, we will test if  $z \ge z_{0}$ (value of z greater than the critical value, $z_0$)
+
+```{r OSTP and Zscore}
+# What is the critical value of Z for an alpha of 0.05?
+# See also sections 2.6.1 and 2.7 in Sabo and Boone
+
+# ONE TAILED TEST: Greater Than.
+alpha <- 0.05 
+z0 <- qnorm(1-alpha) #critical value on one tail. 
+print(z0)  # What is it?
+
+# What is the test statistic (z) for proportion #2? 
+prop2 <- 22 / 200     # second study patient proportion 
+p0 <- .10           # TCGA LUAD proportion
+n <- 200            # second study sample size
+
+# eq 2.2 in Sabo/Boone:
+z <- (prop2 - p0) / sqrt(p0 * (1 - p0) / n) 
+print(z)
+
+# Note that when prop2 goes lower, say 13/200, z is negative. What does this mean? 
+# Does this impact your interpretation at all?
+
+# Do we support the null hypothesis that the second study has a significantly 
+# greater number of heavy smokers given an alpha of 0.05? If the null hypothesis
+# is upheld, then TRUE, if not, then FALSE.
+z >= z0 
+
+# Change the numbers, now. Move to proportions in the new study being (say) 18/200, 
+# 20/200, 50/200...is it what you expect?
+```
+
+Our other alternative is to use a $\chi^2$ based proportion test built into R, called `prop.test()`. It does not use the same methods as the z statistic (equation 2.2 in Sabo and Boone). We discuss $\chi^2$ statistics later in the semester.
+
+```{r proptest}
+
+# See sections 2.6.1 and 2.7 in Sabo and Boone for this background.
+
+alpha <- 0.05 
+z0 <- qnorm(1-alpha) 
+print(z0)     #critical value we're testing against.
+
+# What is our test statistic (z) for our test? 
+hs <- 22     # second study heavy smokers
+p0 <- .10           # TCGA LUAD proportion
+n2 <- 200           #Number of tests
+
+# no Yates correction, select for p>=p0 
+propresult <- prop.test(hs, n2, p=p0, correct=FALSE, alternative="greater") 
+
+print(propresult)
+
+# Comparing prop.test to z-score method.
+Xstat <- propresult$statistic[[1]] # X-statistic 
+print(sqrt(Xstat)) #for comparison to z
+# Is prop.test's X-squared statistics close to the z-statisic? 
+z = (hs / n2 - p0) / sqrt(p0 * (1 - p0) / n2)
+print(abs(z))
+```
+
+
+```{r OSTP pvalue}
+
+#See sections 2.6.1 and 2.7 in Sabo and Boone for this background.
+
+hs <- 22     # second study heavy smokers
+p0 <- .10    # TCGA LUAD proportion
+n2 <- 200    # Number of tests
+
+propresult <- prop.test(hs, n2, p=p0, correct=FALSE, alternative="greater") #no Yates correction
+
+print(propresult)
+
+# Comparing prop.test to z-score method.
+Xstat <- propresult$statistic[[1]] # X-statistic 
+print(sqrt(Xstat)) #for comparison to z
+# Is prop.test's X-squared statistics close to the z-statisic? 
+z = (hs / n2 - p0) / sqrt(p0 * (1 - p0) / n2)
+print(abs(z))
+
+# Probability of difference (of rejecting the null hypothesis) can be calculated 
+# with a p-value derived from the Z-score. We use the pnorm() function. 
+# However, in pnorm(), avoid any problems with the sign of the z-score we use 
+# the negative absolute value of the z-score.
+
+# See Figure 3 in the Week 2 Course Notes for the relationship between 
+# the Z score and the normal distribution, and where alpha=0.05, z=1.96
+
+# In the case of a one-sided test:
+pvalue_z_onesided <- pnorm(-abs(z))
+pvalue_z_onesided
+# and from the prop.test:
+propresult$p.value
+# both are identical, though prop.test does use a different method.
+```
+
+
+```{r Z statistic two-tailed}
+
+# This is the Z-statistic test for the two-tailed case.
+
+alpha <- 0.05 
+z0 <- qnorm(1 - alpha / 2) 
+print(z0)     #critical value we're testing against.
+
+# TWO-TAILED TEST for Z statistic
+
+hs <- 30           # second study patient proportion 
+p0 <- .10          # TCGA LUAD proportion
+n2 <- 200          # second study sample size
+
+# eq 2.2 in Sabo/Boone:
+z_twotail <- (hs / n2 - p0) / sqrt(p0 * (1 - p0) / n) 
+
+abs(z_twotail) <= z0 # false==reject null of no difference
+
+# Two-tailed p-value: must multiply the equivalent single-tail probability by 2.
+# This p-value is 1-P where P is the probability that the null can be rejected. 
+# Thus the smaller the p-value, the greater the probability of rejecting the null.
+
+pval_z_twotail <- 2 * pnorm(z_twotail, lower.tail=FALSE) 
+# pvalue from the two-tailed z-score analysis:
+pval_z_twotail
+
+proptest_twotail <- prop.test(hs, n2, p=p0, correct=FALSE, alternative="two.sided") #no Yates correction
+# pvalue from the two-tail proptest analysis:
+proptest_twotail$p.value
+```
+
+##dnorm(): the probability density function on a normal distribution.
+
+Recall that the dnorm() function:
+
+`dnorm(x, mean = 0, sd = 1, log = FALSE)`
+
+is one of the functions included in R. The dnorm() function can be thought of an easy way to access the height of the normal curve at any point (x) along the curve.  
+
+This represents the probability density function (PDF), which represents the likelihood that the value of a random variable would equal that sample. Here, we calculate the PDF based on the z-score.
+
+The variable '`x`' in the dnorm() function is a z-score. Recall that 99% of the data is contained within the boundaries of {-2.58$\sigma$, 2.58$\sigma$} which equates to z-values of $\pm$2.58. 
+
+More on PDFs in coming lectures. For now, on the normal distribution, the PDF has a simple interpretation.
+
+```{r dnorm() evidence}
+
+# Let's create a range of z-scores to test.
+z_score_range <- seq(-4, 4, by = .2) # Range of zscores to test using seq()
+
+# Calculate the height of the curve at each location. 
+# These results are equivalent to the height of the density curve (or histogram) 
+# at each position. This also is equivalent of the "probabilty density" at that point. 
+den_zscores<-dnorm(z_score_range) 
+
+# We plot without the axis, so we can put in tickmarks with equivalent z-scores on the density function. 
+plot(den_zscores, type = "l", main = "PDF on the Standard Normal Distribution", 
+     xlab= "Z-score", ylab="Density", xaxt="n") 
+
+#in order of the sigma scores.
+den_zscore_sigmas<-c(dnorm(4), dnorm(3), dnorm(2), dnorm(1), dnorm(0), dnorm(1), 
+                     dnorm(2), dnorm(3), dnorm(4)) 
+
+den_score_labels<-c(-4, -3, -2, -1, 0, 1, 2, 3, 4) #labels
+
+#axis(1)
+axis(1, at=which(den_zscores %in% den_zscore_sigmas), labels=den_score_labels)
+```
+
+
+
+
+
+
+
+
+# Assignment 2 {-}
+
+Create a new R Markdown file for submitting this assignment. You should submit both your knit file in HTML and the original Rmd file to the Week 1 homework submission link in CANVAS. This homework is due 1/29/18 at 11:59 PM (evening).
+
+For this assignment, you will be Using the TCGA data provided for you in the Week 2 Module:
+
+- TCGA_LUAD
+- TCGA_HNSC
+- TCGA_SCKM
+
+For this assignment, please produce the markdown file and your knit file (pdf, html or doc), by submitting your files in the Assignment 2 link in the Week 2 Module.
+
+Using the TCGA data, please answer the following:
+
+## Question 1:{-} 
+
+Using Q-Q plots and tests for normality, determine if the height of patients from the TCGA_LIHC data set are normally distributed. 
+
+## Question 2 {-}
+
+For patients smoking more than 40 years, is the proportion of TCGA_HNSC patients significantly different than the proportion from the TCGA_LUAD population?  Show your calculations with comments.
+
+## Question 3 {-}
+
+What is the probability that the null model on a normal distribution can explain the difference in proportions between patients with height greater than 170 in the TCGA_SKCM data and TCGA_LIHC? 
+
+## Question 4 {-}  
+

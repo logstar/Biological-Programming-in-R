@@ -1,0 +1,7 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+quantile\PYG{p}{(}\PYG{l+m}{0}\PYG{o}{:}\PYG{l+m}{10}\PYG{p}{,} probs\PYG{o}{=}\PYG{k+kp}{seq}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,} \PYG{l+m}{1}\PYG{p}{,} \PYG{l+m}{0.1}\PYG{p}{))}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}   0\PYGZpc{}  10\PYGZpc{}  20\PYGZpc{}  30\PYGZpc{}  40\PYGZpc{}  50\PYGZpc{}  60\PYGZpc{}  70\PYGZpc{}  80\PYGZpc{}  90\PYGZpc{} 100\PYGZpc{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}    0    1    2    3    4    5    6    7    8    9   10}
+qqnorm\PYG{p}{(}\PYG{l+m}{0}\PYG{o}{:}\PYG{l+m}{10}\PYG{p}{,} ylim \PYG{o}{=} \PYG{k+kt}{c}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,}\PYG{l+m}{10}\PYG{p}{))}
+qqline\PYG{p}{(}\PYG{l+m}{0}\PYG{o}{:}\PYG{l+m}{10}\PYG{p}{,} ylim \PYG{o}{=} \PYG{k+kt}{c}\PYG{p}{(}\PYG{l+m}{0}\PYG{p}{,}\PYG{l+m}{10}\PYG{p}{))}
+\end{Verbatim}

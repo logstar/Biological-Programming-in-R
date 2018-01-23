@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Plotting parameters have been set to old ones}
+\PYG{c+c1}{\PYGZsh{} in `opar\PYGZsq{}}
+hist\PYG{p}{(}normdata\PYG{p}{)}
+\end{Verbatim}

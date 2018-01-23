@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+num\PYGZus{}points \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+m}{30}
+normdata2 \PYG{o}{\PYGZlt{}\PYGZhy{}} rnorm\PYG{p}{(}num\PYGZus{}points\PYG{p}{)}
+
+qplot\PYG{p}{(}normdata2\PYG{p}{)} \PYG{o}{+}
+  geom\PYGZus{}histogram\PYG{p}{()} \PYG{o}{+}
+  theme\PYGZus{}bw\PYG{p}{()} \PYG{o}{+}
+  ggtitle\PYG{p}{(}\PYG{k+kp}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}rnorm (\PYGZdq{}}\PYG{p}{,} num\PYGZus{}points\PYG{p}{,} \PYG{l+s}{\PYGZdq{})\PYGZdq{}}\PYG{p}{,} sep\PYG{o}{=}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{))}
+\end{Verbatim}

@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kp}{mean}\PYG{p}{(}normdata\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} [1] \PYGZhy{}0.1397156}
+sd\PYG{p}{(}normdata\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} [1] 0.5693181}
+\end{Verbatim}

@@ -1,0 +1,6 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+qqnorm\PYG{p}{(}normdata2\PYG{p}{,} pch\PYG{o}{=}\PYG{l+m}{16}\PYG{p}{,} cex\PYG{o}{=}\PYG{l+m}{0.5}\PYG{p}{,}
+       main\PYG{o}{=}\PYG{k+kp}{paste}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Generated using rnorm(\PYGZdq{}}\PYG{p}{,}
+                  num\PYGZus{}points\PYG{p}{,} \PYG{l+s}{\PYGZdq{})\PYGZdq{}}\PYG{p}{,} sep\PYG{o}{=}\PYG{l+s}{\PYGZdq{}\PYGZdq{}}\PYG{p}{))}
+qqline\PYG{p}{(}normdata2\PYG{p}{,} col\PYG{o}{=}\PYG{l+m}{3}\PYG{p}{)}
+\end{Verbatim}

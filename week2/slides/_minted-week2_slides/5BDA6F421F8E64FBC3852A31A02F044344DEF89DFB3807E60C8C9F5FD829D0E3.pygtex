@@ -1,0 +1,10 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Let X1, X2, ..., X10 be a sequence of i.i.d.}
+\PYG{c+c1}{\PYGZsh{} random variables uniformly distributed}
+\PYG{c+c1}{\PYGZsh{} from 0 to 1.}
+runif\PYG{p}{(}n \PYG{o}{=} \PYG{l+m}{10}\PYG{p}{,} min \PYG{o}{=} \PYG{l+m}{0}\PYG{p}{,} max \PYG{o}{=} \PYG{l+m}{1}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  [1]  0.89804708 0.85956656 0.63841285}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  [4]  0.59958342 0.68575572 0.28295208}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  [7]  0.42904749 0.15577247 0.26559273}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  [10] 0.01854827}
+\end{Verbatim}

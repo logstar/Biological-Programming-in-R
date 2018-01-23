@@ -1,0 +1,8 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+opar \PYG{o}{\PYGZlt{}\PYGZhy{}} par\PYG{p}{(}no.readonly \PYG{o}{=} \PYG{k+kc}{TRUE}\PYG{p}{)}
+par\PYG{p}{(}mfrow\PYG{o}{=}\PYG{k+kt}{c}\PYG{p}{(}\PYG{l+m}{2}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{))}
+normdata \PYG{o}{\PYGZlt{}\PYGZhy{}} rnorm\PYG{p}{(}\PYG{l+m}{10}\PYG{p}{,} mean\PYG{o}{=}\PYG{l+m}{0}\PYG{p}{,} sd\PYG{o}{=}\PYG{l+m}{1}\PYG{p}{)}
+hist\PYG{p}{(}normdata\PYG{p}{)}
+hist\PYG{p}{(}normdata\PYG{p}{)}
+par\PYG{p}{(}opar\PYG{p}{)}
+\end{Verbatim}

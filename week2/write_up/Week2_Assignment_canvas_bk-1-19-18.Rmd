@@ -1,0 +1,239 @@
+---
+title: "Course Content and Assignment 2 for Biom612 (Week 2)"
+author: "Deanne Taylor, Pichai Raman, Joe Dybas, with some edits by Yuanchao Zhang"
+date: "Jan 22nd, 2018"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '3'
+  pdf_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+  word_document:
+    toc: yes
+    toc_depth: '3'
+---
+##Starting Up
+
+Packages to install this week:
+
+* ggplot2 (CRAN)
+* nortest (CRAN)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(knitr)
+library(ggplot2)
+library(nortest)
+
+```
+
+
+Load data from last week:
+
+```{r load data}
+
+tcga_luad<-read.csv("TCGA_LUAD_clinical.csv",  na.string="NA", stringsAsFactors=FALSE, row.names=1)
+
+```
+
+#The Normal Distribution
+
+R provides several functions to allow you to generate normal distributions, for testing and for statistical use.  You can use the help facility and type "?rnorm" to start reading about the Normal methods in the stats package.
+
+Let's generate a normal distribution using rnorm(). 
+
+```{r rnorm}
+
+opar<-par() #A little trick to save your original graphing configuration as a variable "opar" so you can return to the original native configuration before you changed the par()ameters of the graphing window
+
+par(mfrow=c(2,2)) #split your graphing window into a 2x2 (row,column). You may need to open up your plotting window a bit wider.
+
+#let's build a random distribution with 1000 points total. 
+
+#The default mean for rnorm is 0 and the and the standard deviation is 1. 
+
+normdata<-rnorm(10)
+hist(normdata)
+mean(normdata)
+sd(normdata)
+
+#re-run the lines above three more times to fill up your 2x2.  Something should be obvious to the eye in the histogram and in what you expect from the mean and standard deviation.
+
+#At the end of your run, reload the naive parameters  you saved, to reset your graphics window, if you don't you'll be stuck with a 2x2 divide until you remove all plots from your plot window.
+opar
+par(opar)
+
+```
+
+Now, in the chunk above, increase the number of random variables in the normal distribution to 100, then 1000. Run each four times.
+
+How does this change the mean and the standard deviation from what you expect?
+
+## Central Limit Theorem example
+
+Let's generate a set of random trials using the sample() function (?sample):
+
+```{r Central Limit theorem test}
+
+CLtheo_test<-c()
+limit<-50
+rolls=100
+
+for(n in c(1:limit)){
+ CLtheo_test<- append(CLtheo_test, sum(sample(c(1,0), rolls, replace=TRUE)))  
+}
+
+hist(CLtheo_test)
+
+#Feel free to change the limit of the simulation,  or the number of "rolls" of the "dice" and see how it changes your simulation.
+
+```
+
+# Testing for normality
+
+Important to do, as many statistical tests require that data being tested is normally distributed.
+
+
+## Plotting data, Quantile-quantile plots.
+
+```{r tcga-luad normality tests}
+
+#First test a qq-plot on a truly normal distribution
+num_points<-30
+normdata2<-rnorm(num_points)
+#let's use qplot to generate a histogram using qqplots.More on qqplots2 next week.
+
+qplot(normdata2) + geom_histogram() + theme_bw() + ggtitle(paste("rnorm (", num_points, ")", sep=""))
+#ignore any binwidth errors today.
+
+#Let's look at this distribution in normdata2 versus an idealized normal distribution (theoretical quantiles)
+
+qqnorm(normdata2,pch=16,cex=0.5, main=paste("Generated using rnorm(", num_points, ")", sep=""))
+qqline(normdata2, col=3)
+
+#Increase the number of num_points to a much higher number. What do you observe?
+
+#Let's use real data: Plotting the distributions from TCGA-LUAD from Week 1.
+
+#Let's first plot Cigarettes per day.
+#mean and sd:
+
+luad_cpd_sd<-sd(tcga_luad$cigarettes_per_day, na.rm=TRUE)
+luad_cpd_mean<-mean(tcga_luad$cigarettes_per_day, na.rm=TRUE)
+
+#Using ggplot2, graphing the cigarettes per day -- first with the histogram, then overlay a blue normal approximation, then a red empirical density plot (same data as histogram). Note that each call to ggplot2 is separated by a "+" sign.  (Ignore warnings on non-finite values that come out -- this is normal for columns with missing data.)
+
+qplot(x = cigarettes_per_day, xlim=c(-5,10), data = tcga_luad, geom = "blank") +  
+geom_histogram(aes(y = ..density..), alpha = 0.4) +
+geom_line(aes(y = ..density.., colour = 'Empirical'),stat = 'density') +  
+stat_function(fun = dnorm, args = list(mean=luad_cpd_mean, sd=luad_cpd_sd), aes(colour = 'Normal Approx'))  + scale_colour_manual(name = 'Density', values = c('red', 'blue')) + theme(legend.position = c(0.85, 0.85))+ ggtitle("TCGA LUAD: Cigarettes Per Day")
+
+#Repeat this for years_smoked below:
+luad_ys_sd<-sd(tcga_luad$years_smoked, na.rm=TRUE)
+luad_ys_mean<-mean(tcga_luad$years_smoked, na.rm=TRUE)
+
+qplot(x = years_smoked, data = tcga_luad, xlim=c(-10,70), geom = "blank") +  geom_histogram(aes(y = ..density..), alpha = 0.4) +
+geom_line(aes(y = ..density.., colour = 'Empirical'),stat = 'density') +  
+stat_function(fun = dnorm, args = list(mean=luad_ys_mean, sd=luad_ys_sd), aes(colour = 'Normal Approx'))  + scale_colour_manual(name = 'Density', values = c('red', 'blue')) + theme(legend.position = c(0.85, 0.85)) + ggtitle("TCGA LUAD: Years Smoked")
+
+
+
+#So basically both of them look like a little "like" they might be normal based on just the general distribution (blue versus red densities). Another helpful plot is the qqplot, where the approximate normal distribution is on the x-axis "Theoretical Quantiles" and the y-axis shows the actual data organized by distribution as "Sample Quantiles".
+
+qqnorm(tcga_luad$cigarettes_per_day,pch=16,cex=0.5, main="TCGA-LUAD: Cigarettes per Day")
+
+#now add a line approximating a linear "fit" to the majority of the data:
+
+qqline(tcga_luad$cigarettes_per_day, col=3)
+
+#Interpret the interesting shape of the points above the line -- check out the cigarettes_per_day histogram. 
+
+qqnorm(tcga_luad$years_smoked, pch=16,cex=0.5, main="TCGA-LUAD: Years smoked")
+qqline(tcga_luad$years_smoked, col=3) #adds a trendline
+
+
+```
+
+In the qqplots (qqnorm), you can now clearly note that the cigarettes per day distribution deviates quite a bit from normal whereas the "years smoked"" distribution is probably more normally distributed. You can tell this by how far the sample and theoretical quantiles deviate from one-another (as evidenced by how far off the line they are). However, even if you see some points far off the line they are NOT outliers. A qqplot does not determine outliers! There are other methods for that, which we will discuss later in the semester.
+
+## Statistical tests of normality
+
+Plots are all well and good, but what is the statistical evidence for deviations from normality?
+
+The next thing you may do is  perform a statistical test to measure the deviation from normal.
+
+At this point you will download the package 'nortest'  so you can run some of tests in this package. Then it is quite straightforward to run the test
+
+```{r testing for normality}
+
+#Testing the theoretical normal distribution
+
+nortest_points<-100
+normdata_nortest<-rnorm(nortest_points)
+
+#Sharpio-Wilk test:
+shapiro.test(normdata_nortest)
+
+#Let's run the Anderson-darling test on normal data:
+ad.test(normdata_nortest) 
+
+shapiro.test(tcga_luad$cigarettes_per_day)
+shapiro.test(tcga_luad$years_smoked)
+
+```
+
+This test verifies what was gleaned from the QQ-plot.
+
+##One-sample tests of proportion
+
+As we learned in the lecture, the null hypothesis of a one-sided test of proportion can be rejected if z significantly differs from z0 in the chosen tail, where z0 is z-value obtained from the 100 * (1 − $\alpha$) percentile of the standard normal distribution.  
+
+Let's take an example:
+
+Suppose we are studying 'heavy smokers' -- people who smoke more than 5 cigarettes per day.
+
+Suppose we observe that a proportion -- approximately 10% --  of patients from the TCGA lung adenocarcinoma study smoked more than 5 cigarettes per day. 
+
+A new study is performed where 13 out of 200 patients smoked more than 5 cigarettes per day. We are concerned that this group of patients has a greater proportion of heavy smokers.
+
+At the $\alpha$=.05 significance level, what is the strength of the evidence that  that the proportion of heavy smokers in the new study ($p$) is greater than the proportion of heavy smokers in the TCGA lung adenocarcinoma study ($p_{0}$) ?  To reject the hypothesis, we will test if  $p \le p_{0}$
+
+```{r OSTP}
+#What is the critical value of Z for an alpha of 0.05?
+alpha = 0.05 
+z0 = qnorm(1-alpha) 
+print(z0)               # critical value 
+
+#What is our test statistic (z) for our test? 
+proportion = 13/200     # second study patient proportion 
+p0 = .10                # TCGA LUAD proportion
+N = 200                 # second study sample size 
+z = (proportion - p0)/sqrt(p0 * (1 - p0)/N) 
+print(z)
+
+#For our question, we ask,  is z <= z0, meaning, is the proportion of heavy smokers in the new study less than or equal to those in the TCGA study?
+
+z<=z0 #compare with a simple boolean.
+
+#Change the numbers, now. Move to proportions in the new study being (say) 5/200, 18/200, 50/200...
+
+```
+
+
+
+
+# Assignment 2 {-}
+
+Create a new R Markdown file for submitting this assignment. You should submit both your knit file in HTML and the original Rmd file to the Week 1 homework submission link in CANVAS. This homework is due 1/29/18 at 11:59 PM (evening).
+
+## Question 1: Reading assignment question {-}
+
+## Question 2 {-}
+
+## Question 3 {-}
+
+## Question 4 {-}  
+

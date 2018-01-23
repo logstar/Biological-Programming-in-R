@@ -1,0 +1,14 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+pwr.p.test\PYG{p}{(}h \PYG{o}{=} ES.h\PYG{p}{(}p1 \PYG{o}{=} \PYG{l+m}{0.75}\PYG{p}{,} p2 \PYG{o}{=} \PYG{l+m}{0.5}\PYG{p}{),} sig.level \PYG{o}{=} \PYG{l+m}{0.05}\PYG{p}{,}
+           n \PYG{o}{=} \PYG{k+kc}{NULL}\PYG{p}{,} power \PYG{o}{=} \PYG{l+m}{0.8}\PYG{p}{,}
+           alternative \PYG{o}{=} \PYG{l+s}{\PYGZdq{}greater\PYGZdq{}}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}      proportion power calculation for binomial distribution}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}      (arcsine transformation)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}               h = 0.5235988}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}               n = 22.55126}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}       sig.level = 0.05}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}           power = 0.8}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}     alternative = greater}
+\end{Verbatim}

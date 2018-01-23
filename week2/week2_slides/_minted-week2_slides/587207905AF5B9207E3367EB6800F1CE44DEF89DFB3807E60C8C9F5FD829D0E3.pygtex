@@ -1,0 +1,7 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+install.packages\PYG{p}{(}\PYG{l+s}{\PYGZsq{}nortest\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{} You do not need to run this if you already}
+\PYG{c+c1}{\PYGZsh{} installed `ggplot2\PYGZsq{}}
+install.packages\PYG{p}{(}\PYG{l+s}{\PYGZsq{}ggplot2\PYGZsq{}}\PYG{p}{)}
+\end{Verbatim}

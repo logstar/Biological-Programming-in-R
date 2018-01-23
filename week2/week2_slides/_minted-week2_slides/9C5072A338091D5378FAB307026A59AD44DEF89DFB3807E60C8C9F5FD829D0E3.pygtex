@@ -1,0 +1,21 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+luad\PYGZus{}cpd\PYGZus{}sd \PYG{o}{\PYGZlt{}\PYGZhy{}} sd\PYG{p}{(}tcga\PYGZus{}luad\PYG{o}{\PYGZdl{}}cigarettes\PYGZus{}per\PYGZus{}day\PYG{p}{,}
+                  na.rm\PYG{o}{=}\PYG{k+kc}{TRUE}\PYG{p}{)}
+luad\PYGZus{}cpd\PYGZus{}mean \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{k+kp}{mean}\PYG{p}{(}tcga\PYGZus{}luad\PYG{o}{\PYGZdl{}}cigarettes\PYGZus{}per\PYGZus{}day\PYG{p}{,}
+                      na.rm\PYG{o}{=}\PYG{k+kc}{TRUE}\PYG{p}{)}
+
+qplot\PYG{p}{(}x \PYG{o}{=} cigarettes\PYGZus{}per\PYGZus{}day\PYG{p}{,} xlim\PYG{o}{=}\PYG{k+kt}{c}\PYG{p}{(}\PYG{l+m}{\PYGZhy{}5}\PYG{p}{,} \PYG{l+m}{10}\PYG{p}{),}
+      data \PYG{o}{=} tcga\PYGZus{}luad\PYG{p}{,} geom \PYG{o}{=} \PYG{l+s}{\PYGZdq{}blank\PYGZdq{}}\PYG{p}{)} \PYG{o}{+}
+  geom\PYGZus{}histogram\PYG{p}{(}aes\PYG{p}{(}y \PYG{o}{=} \PYG{l+m}{..}density..\PYG{p}{),}
+                 alpha \PYG{o}{=} \PYG{l+m}{0.4}\PYG{p}{)} \PYG{o}{+}
+  geom\PYGZus{}line\PYG{p}{(}aes\PYG{p}{(}y \PYG{o}{=} \PYG{l+m}{..}density..\PYG{p}{,} colour \PYG{o}{=} \PYG{l+s}{\PYGZsq{}Empirical\PYGZsq{}}\PYG{p}{),}
+            stat \PYG{o}{=} \PYG{l+s}{\PYGZsq{}density\PYGZsq{}}\PYG{p}{)} \PYG{o}{+}
+  stat\PYGZus{}function\PYG{p}{(}fun \PYG{o}{=} dnorm\PYG{p}{,}
+                args \PYG{o}{=} \PYG{k+kt}{list}\PYG{p}{(}mean\PYG{o}{=}luad\PYGZus{}cpd\PYGZus{}mean\PYG{p}{,}
+                            sd\PYG{o}{=}luad\PYGZus{}cpd\PYGZus{}sd\PYG{p}{),}
+                aes\PYG{p}{(}colour \PYG{o}{=} \PYG{l+s}{\PYGZsq{}Normal Approx\PYGZsq{}}\PYG{p}{))}  \PYG{o}{+}
+  scale\PYGZus{}colour\PYGZus{}manual\PYG{p}{(}name \PYG{o}{=} \PYG{l+s}{\PYGZsq{}Density\PYGZsq{}}\PYG{p}{,}
+                      values \PYG{o}{=} \PYG{k+kt}{c}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}red\PYGZsq{}}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}blue\PYGZsq{}}\PYG{p}{))} \PYG{o}{+}
+  theme\PYG{p}{(}legend.position \PYG{o}{=} \PYG{k+kt}{c}\PYG{p}{(}\PYG{l+m}{0.85}\PYG{p}{,} \PYG{l+m}{0.85}\PYG{p}{))} \PYG{o}{+}
+  ggtitle\PYG{p}{(}\PYG{l+s}{\PYGZdq{}TCGA LUAD: Cigarettes Per Day\PYGZdq{}}\PYG{p}{)}
+\end{Verbatim}
