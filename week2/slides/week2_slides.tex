@@ -2,7 +2,7 @@
 
 % draft will print out comment
 % final will hide all comment
-\usepackage[final]{pdfcomment}
+\usepackage[draft]{pdfcomment}
 \usepackage{xspace}
 \usepackage{appendixnumberbeamer}
 \usepackage{xcolor}
@@ -679,6 +679,7 @@ seq0to10_qqnormplot$y
 
 \tikzoverlay[text width=50mm] at (55mm, 25mm) {
 \includegraphics[width=50mm, keepaspectratio]{seq0to10qq}
+\pdfnote{From the code, we do not need to do anything with y. We only need to calculate x, which are the estimated quantiles of standard normal distribution. }
 };
 
 

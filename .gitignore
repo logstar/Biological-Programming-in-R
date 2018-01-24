@@ -6,3 +6,10 @@
 *.Rproj
 *.zip
 releases/
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
