@@ -510,6 +510,9 @@ sample_average_vector <- replicate(number_of_samples, {
                frame=lines,
                bgcolor=codegray,
                framesep=1mm]{R}
+clt_norm_mean <- unif_mean
+clt_norm_sd <- unif_sd / (size_of_each_sample ^ 0.5)
+
 ggplot(data = data.frame(x = sample_average_vector), 
        mapping = aes(x = x)) +
   geom_histogram(mapping = aes(y = ..density..), 

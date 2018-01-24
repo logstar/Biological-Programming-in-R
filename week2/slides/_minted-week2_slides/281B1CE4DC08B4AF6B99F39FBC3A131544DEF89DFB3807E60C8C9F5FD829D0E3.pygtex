@@ -1,4 +1,7 @@
 \begin{Verbatim}[commandchars=\\\{\}]
+clt\PYGZus{}norm\PYGZus{}mean \PYG{o}{\PYGZlt{}\PYGZhy{}} unif\PYGZus{}mean
+clt\PYGZus{}norm\PYGZus{}sd \PYG{o}{\PYGZlt{}\PYGZhy{}} unif\PYGZus{}sd \PYG{o}{/} \PYG{p}{(}size\PYGZus{}of\PYGZus{}each\PYGZus{}sample \PYG{o}{\PYGZca{}} \PYG{l+m}{0.5}\PYG{p}{)}
+
 ggplot\PYG{p}{(}data \PYG{o}{=} \PYG{k+kt}{data.frame}\PYG{p}{(}x \PYG{o}{=} sample\PYGZus{}average\PYGZus{}vector\PYG{p}{),}
        mapping \PYG{o}{=} aes\PYG{p}{(}x \PYG{o}{=} x\PYG{p}{))} \PYG{o}{+}
   geom\PYGZus{}histogram\PYG{p}{(}mapping \PYG{o}{=} aes\PYG{p}{(}y \PYG{o}{=} \PYG{l+m}{..}density..\PYG{p}{),}
