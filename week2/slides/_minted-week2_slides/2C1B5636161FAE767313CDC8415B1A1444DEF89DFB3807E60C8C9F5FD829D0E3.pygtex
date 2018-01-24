@@ -1,0 +1,13 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+getAnywhere\PYG{p}{(}qqnorm.default\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} ...}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}     x \PYGZlt{}\PYGZhy{} qnorm(ppoints(n))[order(order(y))]}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} ...}
+seq0to10\PYGZus{}qqnormplot \PYG{o}{\PYGZlt{}\PYGZhy{}} qqnorm\PYG{p}{(}\PYG{l+m}{0}\PYG{o}{:}\PYG{l+m}{10}\PYG{p}{)}
+seq0to10\PYGZus{}qqnormplot\PYG{o}{\PYGZdl{}}x
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} [1] \PYGZhy{}1.69 \PYGZhy{}1.10 \PYGZhy{}0.75 \PYGZhy{}0.47 \PYGZhy{}0.23  0.00}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} [7]  0.23  0.47  0.75  1.10  1.69}
+seq0to10\PYGZus{}qqnormplot\PYG{o}{\PYGZdl{}}y
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} [1]  0  1  2  3  4  5}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} [6]  6  7  8  9 10}
+\end{Verbatim}
