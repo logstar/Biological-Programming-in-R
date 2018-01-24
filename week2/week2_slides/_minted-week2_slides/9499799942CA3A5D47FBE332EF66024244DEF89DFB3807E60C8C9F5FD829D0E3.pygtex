@@ -1,8 +1,0 @@
-\begin{Verbatim}[commandchars=\\\{\}]
-normdata \PYG{o}{\PYGZlt{}\PYGZhy{}} rnorm\PYG{p}{(}\PYG{l+m}{1000000}\PYG{p}{,} mean\PYG{o}{=}\PYG{l+m}{0}\PYG{p}{,} sd\PYG{o}{=}\PYG{l+m}{1}\PYG{p}{)}
-\PYG{k+kp}{mean}\PYG{p}{(}normdata\PYG{p}{)}
-\PYG{c+c1}{\PYGZsh{}\PYGZsh{} [1] \PYGZhy{}9.904492e\PYGZhy{}05}
-sd\PYG{p}{(}normdata\PYG{p}{)}
-\PYG{c+c1}{\PYGZsh{}\PYGZsh{} [1] 1.000252}
-hist\PYG{p}{(}normdata\PYG{p}{)}
-\end{Verbatim}

@@ -1,8 +1,0 @@
-\begin{Verbatim}[commandchars=\\\{\}]
-shapiro.test\PYG{p}{(}tcga\PYGZus{}luad\PYG{o}{\PYGZdl{}}cigarettes\PYGZus{}per\PYGZus{}day\PYG{p}{)}
-\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
-\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  Shapiro\PYGZhy{}Wilk normality test}
-\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
-\PYG{c+c1}{\PYGZsh{}\PYGZsh{} data:  tcga\PYGZus{}luad\PYGZdl{}cigarettes\PYGZus{}per\PYGZus{}day}
-\PYG{c+c1}{\PYGZsh{}\PYGZsh{} W = 0.90998, p\PYGZhy{}value = 9.873e\PYGZhy{}14}
-\end{Verbatim}
