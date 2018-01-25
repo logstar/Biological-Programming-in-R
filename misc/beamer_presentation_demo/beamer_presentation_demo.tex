@@ -1,0 +1,24 @@
+\documentclass[12pt, t]{beamer}
+
+% draft will print out comment
+% final will hide all comment
+\usepackage[draft]{pdfcomment}
+\newcommand{\pdfnote}[1]{\marginnote{\pdfcomment[icon=note]{#1}}}
+
+\usetheme{default}
+\title{Demo of osx-presentation}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Demo of notes}
+This is the content of slide. 
+\pdfnote{My presentation notes. }
+\end{frame}
+
+\begin{frame}{Another slide to show the next slide feature}
+\end{frame}
+
+\end{document}
