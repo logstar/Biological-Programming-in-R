@@ -1,0 +1,603 @@
+---
+title: "BIOM612 Week 5 Lab Handout"
+author: "Ammar Naqvi and Yuanchao Zhang"
+date: "2/7/2018"
+output: 
+  html_document:
+    toc: yes
+    toc_depth: '3'
+    number_sections: true
+bibliography: week5.bib
+csl: ieee.csl
+link-citations: true
+nocite: |
+  @_contingency_2018, @_fisher_2018a, @_comparing_, |
+  @_chisquared_2018, @_comparing_a, @agresti_survey_1992, @_hypergeometric_2018, |
+  @_cartesian_2017a, @_hypergeometric_2018a, @_hypothesis_, @_exact_2017, |
+  @_hypergeometric_
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+In this week's lab, we are going to practice with several statistical methods for comparing two samples. These methods can be split into two categories based on their goals:
+
+- Compare two proportions of two samples: Pearson’s Chi-square test, Fisher’s Exact test, and McNemar’s test. 
+
+- Compare two distributions of two samples: Kolmogorov-Smirnov test and quantile-quantile plot.
+
+We are going to go through an overview of these methods and practice with each of them individually. 
+
+# Overview of statistically comparing two-sample proportions
+
+## One-sample versus two-sample statistical methods
+
+The guideline of choosing one-sample or two-sample statistical methods is trivial. When you have two samples, use two-sample method. When you have only one-sample, use one-sample method. 
+
+However, the mathematical differences between one-sample and two-sample statistical methods are not very obvious, in a sense that you cannot directly apply one-sample methods to two-sample situations to obtain identical results, and vice versa. You might have already noticed this in the homework 2, where we asked you to compare the proportions of one sample to another sample using one-sample test of proportion. If you use one-sample proportion test, you will obtain a different results from using two-sample proportion test. Even when you use the same one-sample proportion test but take different samples as constant, you obtain different results. 
+
+Following is an example of the different results of one-sample and two-sample proportion tests. 
+
+```{r one-sample vs two-smample proportion test, warning=FALSE}
+# Say we have the following (contingency) table
+disease_smoke_tbl <- data.frame('disease' = c(10, 5), 'healthy' = c(1000, 100))
+rownames(disease_smoke_tbl) <- c('non-smoke', 'smoke')
+
+disease_smoke_tbl
+
+# Then, we compare the disease proportions of smoke and non-smoke people.
+
+# Null hypothesis H_0: p = p0. 
+# - p is the diease proportion of one condition, non-smoke or smoke. 
+# - p0 is the disease proportion of the other condition, and we take 
+#   p0 as constant to perform one-sample proportion test. 
+
+# If we use the disease proportion of smoke as p0:
+prop.test(x = disease_smoke_tbl['non-smoke', 'disease'], n = sum(disease_smoke_tbl['non-smoke',]),
+          p = disease_smoke_tbl['smoke', 'disease'] / sum(disease_smoke_tbl['smoke', ]),
+          alternative = 'two.sided', correct = F)
+
+# If we use the disease proportion of non-smoke as p0:
+prop.test(x = disease_smoke_tbl['smoke', 'disease'], n = sum(disease_smoke_tbl['smoke',]),
+          p = disease_smoke_tbl['non-smoke', 'disease'] / sum(disease_smoke_tbl['non-smoke', ]),
+          alternative = 'two.sided', correct = F)
+
+# If we use two-sample proportion test
+prop.test(x = as.matrix(disease_smoke_tbl), alternative = 'two.sided', correct = F)
+```
+
+We will go through some differences between one-sample and two-sample statistical methods in slightly more details.
+
+### To think about
+
+1. If we run two-sample proportion test without `as.matrix()`, i.e. `prop.test(x = disease_smoke_tbl, alternative = 'two.sided', correct = F)`, what will happen? Is the message given by R helpful? The different R behavior with or without `as.matrix()` is generally becuase R treats matrix and dataframe differently. If you are not sure about which one to use, read the documentation carefully and generate fake data for testing. 
+
+## 2 x 2 contingency table
+
+Like "coin flip" is a pedagogical example of basic probability theory, 2 by 2 contingency table is the general scenario of two-sample proportion tests. In the above example, `disease_smoke_tbl` is a 2 x 2 contingency table. To make it conform to statistical convention by adding "total" column and row:
+
+```{r}
+# sc represents statistical convention
+sc_disease_smoke_tbl <- disease_smoke_tbl
+sc_disease_smoke_tbl$total = rowSums(sc_disease_smoke_tbl)
+sc_disease_smoke_tbl <- rbind(sc_disease_smoke_tbl, colSums(sc_disease_smoke_tbl))
+rownames(sc_disease_smoke_tbl)[3] <- 'total'
+sc_disease_smoke_tbl
+```
+
+Most of R two-sample proportion test functions takes in the 2 x 2 contingency table **without** the "total" column and row as input. For example, in the example above, `prop.test()` takes the contingency table `disease_smoke_tbl` as input for two-sample proportion test. 
+
+One thing you have to be sure about is which proportions are tested. For example, in the above example of two-sample proportion test, the disease proportions of smoke and non-smoke are tested for equality, because `prop 1 = 0.00990099 = 10 / (1000 + 10)` and `prop 2 = 0.04761905 = 5 / (100 + 5)` are shown in the result. 
+
+Imagine that you are implementing a test procedure of two-sample proportions, there are multiple ways to obtain two proportions for testing. Still using the previous example, in addition to comparing the disease proportion of smoke or non-smoke conditions, we can also compare:
+
+- non-disease proportions of smoke and non-smoke conditions
+
+- smoke proportions of disease and healthy conditions
+
+- non-smoke proportions of disease and healthy conditions
+
+If you are the programmer, it is probably a good idea to choose one type of comparison and leave the table formating problem to the users, assuming that the users know what they are doing. 
+
+In addition to "manually" generating the 2 x 2 contingency table as above, you can automatically generate the table from a "raw" dataset of measurements. In the above example, it could be a table of two columns, disease and smoke.
+
+```{r}
+# df is the shorthand for data frame.
+disease_smoke_raw_df <- data.frame(disease = c(rep('yes', 15), rep('no', 1100)),
+                                   smoke = c(rep('yes', 5), rep('no', 10),
+                                             rep('yes', 100), rep('no', 1000)),
+                                   stringsAsFactors = F)
+head(disease_smoke_raw_df)
+
+# Then, we prepare replace yes or no with more informative values.
+# disease column:
+# - yes -> disease
+# - no  -> non-disease
+# 
+# smoke column
+# - yes -> smoke
+# - no  -> non-smoke
+informative_ds_raw_df <- data.frame(
+  disease = sapply(disease_smoke_raw_df$disease, function(x) {
+    if (x == 'yes') {
+      return('disease')
+    } else if (x == 'no') {
+      return('non-disease')
+    } else {
+      stop(paste("Unkown disease condition", x))
+    }
+  }), 
+  smoke = sapply(disease_smoke_raw_df$smoke, function(x) {
+    if (x == 'yes') {
+      return('smoke')
+    } else if (x == 'no') {
+      return('non-smoke')
+    } else {
+      stop(paste("Unkown smoke condition", x))
+    }
+  })
+)
+
+# Generate contingency table
+ds_2x2_tbl <- table(informative_ds_raw_df$smoke, informative_ds_raw_df$disease)
+ds_2x2_tbl
+```
+
+Even though there are more lines of code in the "automatic" method, it is less error prone than the manual method. In addition, if you obtained more raw data entries, i.e. more participants of this study, you do not need to do any extra work for generating the 2 x 2 contingency table.  
+
+Mathematically or statistically, "a contingency table is a type of table in a matrix format that displays the (multivariate) frequency distribution of the variables", copied from Wikipedia. The variables in the quote refer to random variables, and the frequency distribution is the frequency of observations. 
+
+In the above example, the randome variables are $\{X_1, X_2, ..., X_n\}$ denoting whether a participant has disease or not, and $\{Y_1, Y_2, ..., Y_n\}$ denoting whether a participant smokes or not. $X_i$ and $Y_i$ are paired, i.e. they refer to the same participant. In the context, it is obvious that a participant can either has the disease or not, and a participant can either smoke or not smoke. This dichotomy implies they follow Bernoulli distributions. 
+
+The frequency distribution in the quote refers to the four number entries in the 2 x 2 table, which lists the number of observations of paired $X_i$ and $Y_i$. 
+
+### To think about
+
+1. Generate a 2 x 2 contingency table using both manual and automatic methods mentioned. You can use your imagination for the conditions. 
+
+2. In the automatic method, if we do not transform "yes" or "no" to different values, what will we get when calling `table(disease_smoke_raw_df)`? After getting result of `table(disease_smoke_raw_df)`, how to change it into the same format as `table(informative_ds_raw_df)`? Are you confident about the change you made without manually look at the raw data? 
+
+3. When generating 2 x 2 contingency tables of random variables with more than 2 possible values, you would need to dichotomize (a special case of discretize) $> 2$ possible values into 2 possible values. 1) Generate a raw data table with two columns "height" and "disease". The "height" column can take multiple possible numerical values in the unit of "cm", and "disease" column can take "yes" or "no". 2) Generate a 2 x 2 contingency table by dichotomizing "height", i.e. set a cut point of all values to get $h \le h_{\text{cut}}$ and $h > h_{\text{cut}}$. 
+
+## General idea of statistical tests for two-sample proportions
+
+This subsection mighe be too abstract, so you can skim over and come back after reading the sections of concrete two-sample proportion tests.
+
+To mathematically formalize the problem stated in two-sample proportion test:
+
+We have two proportions $p_1$ and $p_2$ calculated from the 2 x 2 contingency table. The null hypothesis $H_0$ is $p_1 = p_2$. The alternative hypothesis $H_1$ is $p_1 \neq p_2$ for two-tailed test. 
+
+Denote the four entries of the 2 x 2 contingency table as $n_{1,1}$, $n_{1,2}$, $n_{2,1}$, and $n_{2, 2}$. Then, we have $p_1 = \frac{n_{1,1}}{n_{1,1} + n_{1,2}}$, and $p_2 = \frac{n_{2,1}}{n_{2,1} + n_{2,2}}$. 
+
+Because the proportions are actually functions of frequencies ($n_{i, j}$), the goal of designing a statistical test of two-sample proportions is to derive a test statistic $T = u(n_{1,1}, n_{1,2}, n_{2,1}, n_{2, 2})$ that measures the difference between $p_1$ and $p_2$, where $u$ is a function of $n_{1,1}$, $n_{1,2}$, $n_{2,1}$, and $n_{2, 2}$. Meanwhile, $T$ also defines a random variable following certain probability distribution. 
+
+Then, we can use $T$ and its distribution to perform the critical region procedure or p-value procedure. In order to perform the confidence interval procedure, some extra algera is usually necessary. 
+
+Although there are multiple "frequentist procedures" of hypothesis testing, mostly critical region procedure, p-value procedure, and confidence interval procedure, they are inherently the same algebra with different interpretations.
+
+# Pearson’s Chi-square test
+
+In 1900, Pearson published a paper on $\chi^2$ test [@f.r.s_criterion_1900, @_chisquared_2018]. Although there are multiple variations of $\chi^2$ test, we use the function `chisq.test()` in R to perform the $\chi^2$ test practically. 
+
+```{r, warning=F}
+# Print the 2x2 table again
+ds_2x2_tbl
+
+# Perform chi square test
+chisq.test(ds_2x2_tbl, correct = F)
+
+# Compare to prop.test
+prop.test(x = as.matrix(disease_smoke_tbl), alternative = 'two.sided', correct = F)
+```
+
+The `X-squared` and `p-value` of `chisq.test()` and `prop.test()` are identical. However, unlike the `prop.test`, `chisq.test` results does not list the null and alternative hypotheses. In order to understand what we did using `chisq.test`, we have to read the documentation of `chisq.test`. 
+
+## Null and alternative hypotheses
+
+In the *Details* section of `chisq.test` section, the second paragraph answers our question about the null hypothesis:
+
+> If x is a matrix with at least two rows and columns, it is taken as a two-dimensional contingency table: the entries of x must be non-negative integers. Otherwise, x and y must be vectors or factors of the same length; cases with missing values are removed, the objects are coerced to factors, and the contingency table is computed from these. Then Pearson's chi-squared test is performed of the **null hypothesis that the joint distribution of the cell counts in a 2-dimensional contingency table is the product of the row and column marginals**.
+
+The "row and column marginals" refer to the "marginal proportions", i.e. row and column sums divided by the sum of all entries. Use our previous example,
+
+```{r}
+# This lists the number and marginal **sums**
+sc_disease_smoke_tbl
+
+# This lists the proportion and marginal **proportions**
+sc_disease_smoke_tbl / sc_disease_smoke_tbl['total', 'total']
+
+```
+
+The product of the marginal proportions of a pair of row and column seems to be not very meaningful, but it is related to the definition of joint distribution of two random variables. In 2x2 contingency table, the rows represent the outcomes of a random variable, and the columns represent the outcomes of another random variable. In the above example, the rows represent the outcomes of the random variable of whether a participant smokes or not, and the columns represent the outcomes of the random variable of whether a participant has the disease or not. The four number entries are the frequency distribution of these two random variables. If we assume that the population marginal proportions are equal to the sample marginal proportions, the product of each pair of row and column marginal proportions refers to the proportion of that pair of outcomes when the two random variablse are **independent**. 
+
+Following is an example of the joint distribution of 2 independent random variables from wikipedia [@_joint_2017]:
+
+> We are drawing red and blue balls from an urn. Suppose each of two urns contains twice as many red balls as blue balls, and no others, and suppose one ball is randomly selected from each urn, with the two draws independent of each other. The probability of drawing a red ball from either of the urns is 2/3, and the probability of drawing a blue ball is 1/3. We can present the joint probability distribution as the following table:
+
+            A=Red               A=Blue              P(B)
+-------   ---------------     ---------------     ----------
+B=Red     (2/3)(2/3)=4/9      (1/3)(2/3)=2/9      4/9+2/9=2/3
+B=Blue    (2/3)(1/3)=2/9      (1/3)(1/3)=1/9	    2/9+1/9=1/3
+P(A)      4/9+2/9=2/3         2/9+1/9=1/3	
+
+The 4 entries in the middle are the joint probability of two independent random variables. 
+
+If we generalize, the joint probability of random variables A and B is $\Pr(A \cap B)$. When A and B are independent, often denoted as $A \perp B$, $\Pr(A \cap B) = \Pr(A) \Pr(B)$. 
+
+Understanding this, we obtained our null and alternative hypotheses of $\chi^2$ test [@_chisquare_]:
+
+- $H_0$: In the population, the two categorical variables are independent.
+
+- $H_a$: In the population, two categorical variables are dependent.
+
+
+## Test statistic
+
+Then, we explore the test statistic of the Pearson's $\chi^2$ test. Intuitively, if $H_0$ is true, i.e. two random variables are independent, we can calculate the expected counts using their joint empirical probability distribution. Then, we define the difference between the expected counts under independent condition and the real observed counts as a function, and the function defines a random variable following the $\chi^2$ distribution. 
+
+Denote the observed counts of the contingency table as $o_{i,j}$, where $i$ is the row index and $j$ is column index. Similarly, denote the expected counts as $e_{i,j}$, and the joint probability of two random variables as $p_{i, j}$. Let the sample size as $n$, which is the sum of 4 entries in a 2x2 contingency table. 
+
+The table of observed counts of two random variablse A and B:
+
+      A=1       A=2
+---  ---------  ----------
+B=1  $o_{1,1}$  $o_{1,2}$
+B=2  $o_{2,1}$  $o_{2,2}$
+
+If the null hypothesis is true, we have 
+
+$$p_{i, j} = p_i \cdot p_j = \frac{\text{row } i \text{ total}}{n} \cdot \frac{\text{column } j \text{ total}}{n}$$ 
+Further, we have
+
+$$e_{i,j} = p_{i, j} * n = \text{row } i \text{ total} \cdot \frac{\text{column } j \text{ total}}{n}$$
+
+Then, we define the test statistic
+
+$$X^{2} = \sum(o_{i,j} - e_{i, j})^{2} / e_{i, j}$$
+
+With the assumption that $n$ is large in the $\chi^2$ test, $X^2$ follows $\chi^2$ distribution with (number of rows - 1) (number of columns - 1) degrees of freedom. The proof is out of the scope of this course. 
+
+Now, let's plug in our data:
+
+```{r, warning=F}
+ds_2x2_tbl
+n <- sum(ds_2x2_tbl)
+
+p11 <- rowSums(ds_2x2_tbl)[1] / n * colSums(ds_2x2_tbl)[1] / n
+p12 <- rowSums(ds_2x2_tbl)[1] / n * colSums(ds_2x2_tbl)[2] / n
+p21 <- rowSums(ds_2x2_tbl)[2] / n * colSums(ds_2x2_tbl)[1] / n
+p22 <- rowSums(ds_2x2_tbl)[2] / n * colSums(ds_2x2_tbl)[2] / n
+
+e11 <- p11 * n
+e12 <- p12 * n
+e21 <- p21 * n
+e22 <- p22 * n
+
+x2_helper <- function(o, e) {
+  return((o - e)^2 / e)
+}
+
+x2 <- x2_helper(ds_2x2_tbl[1, 1], e11) + 
+      x2_helper(ds_2x2_tbl[1, 2], e12) + 
+      x2_helper(ds_2x2_tbl[2, 1], e21) + 
+      x2_helper(ds_2x2_tbl[2, 2], e22)
+names(x2) <- 'x_square'
+x2
+
+# This is identical to the result of chisq.test
+chisq.test(ds_2x2_tbl, correct = F)$statistic
+```
+
+We leave the last step for you as a "To think about" questoin, which is to apply critical region or p-value procedures on the test statistic of our data. 
+
+## To think about
+
+1. Rearrange the `ds_2x2_tbl` table in at least two different ways, such as making "smoke" as the first row and non-disease as the first column, and then perform two-tailed $\chi^2$ test. Are the p-values same as the original one? Why? Hint: check how $X^2$ is calculated. 
+
+2. How to simplify the code our manual $\chi^2$ test procedure? Hint: use vectors.
+
+3. How to apply critical region or p-value procedures on the $\chi^2$ test statistic of `ds_2x2_tbl`? Hint: plot the probability density function, and then use `pchisq`. 
+
+4. If you answered question 4 correctly, you might notice that the p-value is actually not timed by 2 when performing 2-tailed `chisq.test`. Why $\chi^2$ test does not offer you the option to perform 2-tailed test? Hint: check this post <https://stats.stackexchange.com/questions/22347/is-chi-squared-always-a-one-sided-test>. 
+
+# Fisher’s Exact test
+
+In 1922, Fisher published the Fisher's exact test procedure in a paper with the title "On the Interpretation of $\chi^2$ from Contingency Tables, and the Calculation of P" [@fisher_interpretation_1922, @_fisher_2018a].
+
+Let's start with applying the Fisher's exact test in R:
+
+```{r, warning=F}
+ds_2x2_tbl
+
+# Apply Fisher's exact test
+fisher.test(ds_2x2_tbl, alternative='two.sided')
+
+# Compare to chi-square test
+chisq.test(ds_2x2_tbl, correct = F)
+```
+
+The p-values of Fisher's exact test and $\chi^2$ test are different, because they are calculated from two different mathematical (or statistical) procedures. When performing Fisher's exact test, we calculate the exact p-value rather than approximate it to some other distribution. This is the reason why the name of the test has the word "exact" in it. 
+
+The p-value of $\chi^2$ test is an approximate p-value. Because its test statistic $X^2$ converges to $\chi^2$ distribution when $n$ is large (approaches infinity mathematically), the exact probability distribution of $X^2$ is approximated by the $\chi^2$ distribution given any finite $n$. It is unclear to me whether you can derive the exact probability distribution of the $X^2$ or not, but this question is beyond the scope of this course. 
+
+## Null and alternative hypotheses
+
+First, let's define the $H_0$ and $H_1$. From the results of `fisher.test()`, we have "`alternative hypothesis: true odds ratio is not equal to 1`". The odds ratio here is the maximum likelihood estimate of population odds ratio using the observed data. 
+
+**Unconditional** estimate of population odds and odds ratio:
+
+- The odds of participants with disease who do not smoke: $10 / 1000 = 0.01$.
+- The odds of participants without disease who do smoke: $5 / 100 = 0.05$. 
+- The odds ratio estimate: $0.01 / 0.05 = 0.2$ 
+
+However, the odds ratio is slightly different from the results of `fisher.test()` that is `0.2005146`. This is because `fisher.test()` estimate the odds ratio using a maximum likelihood estimate (MLE) method. The specific MLE method is out of the scope of this course, but you can check *Hauck 1984* if you are interested [@hauck_comparative_1984]. 
+
+Both conditional and unconditional methods are valid, and they probably will give similar estimated values. 
+
+With the odds ratio ($OR$) defined, we can state our null and alternative hypotheses:
+
+- $H_0$: $OR = 1$.
+
+- $H_1$: $OR \neq 1$. 
+
+To make $H_0$ and $H_1$ more intuitive, we need to make some deductions of $OR = 1$. If the $OR = 1$, the two odds are the same, which implies that two random variables are independent. The proof is also out of the scope of this course, but you can check the following link for a general proof if you are interested, <https://www.statlect.com/fundamentals-of-probability/independent-random-variables>. 
+
+Then, we can rewrite our null and alternative hypotheses to be the same as the $\chi^2$ test:
+
+- $H_0$: In the population, the two categorical variables are independent.
+
+- $H_a$: In the population, two categorical variables are dependent.
+
+
+## Test statistic
+
+Then, we work on the test statistic of Fisher’s Exact test. 
+
+We use the same notation as the $\chi^2$ test section:
+
+Denote the observed counts of the contingency table as $o_{i,j}$, where $i$ is the row index and $j$ is column index. Let the sample size as $n$, which is the sum of 4 entries in a 2x2 contingency table. 
+
+The table of observed counts of two random variablse A and B:
+
+                   Y=1                              Y=0                            Marginal Total
+----------------  --------------------             -------------------            -----------------------
+X=1               $o_{1,1}$                        $o_{1,2}$                        $o_{1,1} + o_{1,2} = n_{1,*}$
+X=0               $o_{2,1}$                        $o_{2,2}$                        $o_{2,1} + o_{2,2} = n_{2,*}$
+Marginal total    $o_{1,1} + o_{2,1} = n_{*,1}$    $o_{1,2} + o_{2,2} = n_{*,2}$
+
+Then, we define our test statistic 
+
+$$p = \frac{{o_{1,1} + o_{1,2} \choose o_{1,1}} {o_{2,1} + o_{2,2} \choose o_{2,1}} }
+           {n \choose o_{1,1} + o_{2, 1}}$$
+
+
+If the null hypothesis is true, the test statistic $p$ defines a hypergeometric distribution of a random variable $O_{1,1}$, and the probability of observing $o_{1,1}$ is equal to $p$. 
+
+For those of you who are interested in the underlying mathematics of the test statistic, following is an **optional** and not-very-rigorous proof of this statement. 
+
+*Proof.* The rows represent a random variable $X$ following Bernoulli distribution with unknown parameter $p_X$. Similarly, the columns represent a random variable $Y$ following Bernoulli distribution with unknown parameter $p_y$.
+
+Since we have the sample size as $n$, we have $n$ independent and identically distributed (i.i.d.) random variables $\{X_1, X_2, ..., X_n\}$ of $Bern(p_x)$. Similarly,  we have $n$ i.i.d. random variables $\{Y_1, Y_2, ..., Y_n\}$ of $Bern(p_Y)$. Note that the assumption that $\{X_1, X_2, ..., X_n\}$ are i.i.d. $Bern(p_x)$ is implicit, and it is has nothing to do with our null hypothesis. This assumption is usually valid. In our case, $\{X_1, X_2, ..., X_n\}$ represent different whether the corresponding study participant smokes or not, and they are usually independent. However, say we have the pariticipant represented by $X_1$ as a very good friend of the pariticipant represented by $X_2$, whether they smoke or not may or may not be independent. To simplify our mathematical derivation, we ignore such complexities. Also, $X_i$ and $Y_i$ are paired, which is implied by the contingency table. In our case, $X_i$ and $Y_i$ refer to the same participant. 
+
+
+An observation of the data (contingency table) is equivalent to a pair of sequences of observations of $\{X_1, X_2, ..., X_n\}$ and $\{Y_1, Y_2, ..., Y_n\}$, i.e. $\{x_1, x_2, ..., x_n\}$ and $\{y_1, y_2, ..., y_n\}$. For example:
+
+```
+Observation of data 1:
+X: 11110000
+Y: 11100000
+
+Observation of data 2:
+X: 11101000
+Y: 11100000
+
+...
+
+Observatoin of data "number of all possible permutations":
+X: 00001111
+Y: 00000111
+```
+
+An important assumption implicit in the Fisher's exact test is that the four marginal totals of the contingency table are known, which is called "conditional on marginal totals" in statistics. You might wonder if this assumption is valid or not. If we assume that the sample size is a constant, all possible contingency tables might have different marginal totals. However, in short words, this is not a big issue when we are testing for independence between $X_i$ and $Y_i$ [@_fisher_2018a]. 
+
+As a result, for any of the data observations, $\sum_{i=1}^{n} x_i = n_{1,*}$ and $\sum_{i=1}^{n} y_i = n_{*,1}$. 
+
+If the null hypothesis is true, i.e. $X_i$ and $Y_j$ are independent ($X_i \perp Y_j$) for $i = 1, 2, ..., n$ and $j = 1, 2, ..., n$, the probability of each observation of the data is equal to others. Mathematically,
+
+\begin{align*}
+    & \Pr((X_1=x_1, X_2=x_2, ..., X_n=x_n) (Y_1=y_1, Y_2=y_2, ..., Y_n=y_n)) && \\
+    & = \Pr((X_1=x_1, X_2=x_2, ..., X_n=x_n)) \Pr((Y_1=y_1, Y_2=y_2, ..., Y_n=y_n)) && H_0 \text{specified independence between random variables}\\
+    & = \prod_{i=1}^n Pr(X_i = x_i) \prod_{i=1}^n Pr(Y_i = y_i) && \text{Assumption of i.i.d.} \\
+    & = (p_X^{o_{1,1}} (1-p_X)^{o_{2,1}}) (p_Y^{o_{1,1}} (1-p_Y)^{o_{1,2}}) && \text{Conditional on marginal totals} \\
+\end{align*}
+
+The specific probability actually does not matter, and we will see why in the following description. 
+
+Another result of conditional on marginal totals is that if we know any one of the $o_{1,1}$, $o_{1,2}$, $o_{2,1}$, and $o_{2,2}$, we know the rest three of them. Then, we arbitrarily choose $o_{1,1}$ as the variable. That is, we change $o_{1,1}$ directly, which determines the values of three other ones. For each fixed $o_{1,1}$, the possible observations of the data, i.e. the possible observations of $\{X_1, X_2, ..., X_n\}$ and $\{Y_1, Y_2, ..., Y_n\}$, are mutually exclusive. Then, conditional on marginal totals, the number of all possible observations of the data is $\sum_{o_{1,1}} g(o_{1,1})$ for $\max(0, n_{*, 1} + n_{1, *} - n) \le o_{1,1} \le \min(n_{1, *}, n_{*, 1})$. 
+
+If the null hypothesis is true, the probability of each observation of data is equal to others, as proved above. The probability of observing $o_{1,1}$ is 
+
+\begin{align*}
+    P(o_{1,1}) & = \frac{\Pr(\text{all possible observations of data for a fixed } o_{1,1})}
+                        {\Pr(\text{all possible observations of data for all possible } o_{1,1})} && \\
+    &   \text{(denote the number of all possible observations of data for a fixed } o_{1,1} \text{ as } g(o_{1,1}) \text{)} && \\
+    & = \frac{ g(o_{1,1}) \cdot (p_X^{o_{1,1}} (1-p_X)^{o_{2,1}}) (p_Y^{o_{1,1}} (1-p_Y)^{o_{1,2}}) }
+             { [\sum_{k = max(0, n_{*, 1} + n_{1, *} - n)}^{\min(n_{1, *}, n_{*, 1})} g(k) ]
+               \cdot (p_X^{o_{1,1}} (1-p_X)^{o_{2,1}}) (p_Y^{o_{1,1}} (1-p_Y)^{o_{1,2}}) } && \\
+    & \text{(Cancel the probability of each observation of data.)} &&\\
+    & = \frac{ g(o_{1,1}) }
+             { \sum_{k = max(0, n_{*, 1} + n_{1, *} - n)}^{\min(n_{1, *}, n_{*, 1})} g(k) }
+\end{align*}
+
+Then, we derive the formula of $g(o_{1,1})$ and $\sum_{k = max(0, n_{*, 1} + n_{1, *} - n)}^{\min(n_{1, *}, n_{*, 1})} g(k)$. 
+
+Although $\sum_{k = max(0, o_{1,1} - o_{2,2})}^{\min(n_{1, *}, n_{*, 1})} g(k)$ looks more complicated, it is actually easier if we are solving it by thinking about permuting the sequence of $(x_1, x_2, ..., x_n)$ and $(y_1, y_2, ..., y_n)$ given $\sum_{i=1}^{n} x_i = n_{1,*}$ and $\sum_{i=1}^{n} y_i = n_{*,1}$. 
+
+Let's denote $(x_1, x_2, ..., x_n)$ as $x^n$ and $(y_1, y_2, ..., y_n)$ as $y^n$. This notation is usually called the Cartesian product of random variables [@_cartesian_2017a]. Because we can permute $x^n$ and $y^n$ independently, the number of all possible permutations is 
+
+\begin{align*}
+  & \sum_{k = max(0, n_{*, 1} + n_{1, *} - n)}^{\min(n_{1, *}, n_{*, 1})} g(k)  && \\
+  = & (\text{the number of all possible permutations of } x^n \text{ given } \sum_{i=1}^{n} x_i = n_{1,*}) &&  \\
+    & \cdot (\text{the number of all possible permutations of } y^n \text{ given } \sum_{i=1}^{n} y_i = n_{*,1}) && \\
+  = & {n \choose n_{1, *}} \cdot {n \choose n_{*, 1}} && \\
+\end{align*}
+
+Using this approach (usually called combinatorics or counting approach [@_vandermonde_2017; @_combinatorics_2017]), $g(o_{1,1})$ is slightly more complicated. 
+
+\begin{align*}
+g(o_{1,1}) & = (\text{the number of all possible permutations of } x^n \text{ given } \sum_{i=1}^{n} x_i = n_{1,*}) && \\
+           & \cdot (\text{the number of all possible permutations of } y^n \text{ given } \sum_{i=1}^{n} y_i = n_{*,1} \text{ such that } \sum_{i=1}^{n} y_i x_i = o_{1,1} ) && \\
+           & \text{(You can also think the second term as the number of overlapping 1s between two permutations is } o_{1,1} \text{)} && \\
+           & = {n \choose n_{1, *}} \cdot { n_{1, *} \choose o_{1,1} } \cdot { {n - n_{1, *} } \choose {n_{*, 1} - o_{1,1}} } && \\
+           & \text{(The second term is to choose } o_{1,1} \text{ positions of } y^n \text{ permutations within all } n_{1, *} \text{ 1s of } x^n \text{ permutations.)} &&\\
+           & \text{(The third term is to choose } {n_{*, 1} - o_{1,1}} \text{ positions of } y^n \text{ permutations within all } n - n_{1, *} \text{ 0s of } x^n \text{ permutations, in order to have no overlapping 1s. )} &&\\
+           & \text{(Once the positions in the second and third terms are chose, a permutation of} y^n \text{ is determined.)} &&\\
+\end{align*}
+
+Then, we have our probability of observing $o_{1,1}$:
+
+\begin{align*}
+P(o_{1,1}) = & \frac{ g(o_{1,1}) }
+                    { \sum_{k = max(0, n_{*, 1} + n_{1, *} - n)}^{\min(n_{1, *}, n_{*, 1})} g(k) } &&\\
+           = & \frac{{n \choose n_{1, *}} \cdot { n_{1, *} \choose o_{1,1} } \cdot { {n - n_{1, *} } \choose {n_{*, 1} - o_{1,1}} }}
+                    {{n \choose n_{1, *}} \cdot {n \choose n_{*, 1}}} &&\\
+           = & \frac{ { n_{1, *} \choose o_{1,1} } \cdot { {n - n_{1, *} } \choose {n_{*, 1} - o_{1,1}} } }
+                    { {n \choose n_{*, 1}} } &&\\
+           = & \frac{ { {o_{1,1} + o_{1,2}} \choose o_{1,1} } \cdot { { o_{2,1} + o_{2,2} } \choose { o_{2,1}} } }
+                    { {n \choose { o_{1,1} + o_{2,1} }} }
+\end{align*}
+
+$P(o_{1,1})$ is equal to the defined test statistic $p$.
+
+Finally, let $o_{1,1}$ be an observation of the random variable $O_{1,1}$. Thus, $P(O_{1,1})$ is the probability mass function of the distribution of $O_{1,1}$. By definition of the hypergeometric distribution, which is described in the next subsection, $O_{1,1}$ is a random variable following the hypergeometric distribution. 
+```{r, echo=FALSE}
+knitr::asis_output("\U220E")
+```
+
+
+## p-value procedure
+
+Then, let's plug in our data and perform the p-value procedure:
+
+```{r}
+ds_2x2_tbl
+n = sum(ds_2x2_tbl)
+
+p_test_stat <- (choose(ds_2x2_tbl[1, 1] + ds_2x2_tbl[1, 2], ds_2x2_tbl[1, 1]) 
+                * choose(ds_2x2_tbl[2, 1] + ds_2x2_tbl[2, 2], ds_2x2_tbl[2, 1])
+                / choose(n, ds_2x2_tbl[1, 1] + ds_2x2_tbl[2, 1]))
+
+p_test_stat
+```
+
+In order to visualize the p-value procedure, we need to make a plot of the probability mass function (pmf) of our test statistic, i.e. a plot of the pmf of hypergeometric distribution with certain parametres. 
+
+From wikipedia, <https://en.wikipedia.org/wiki/Hypergeometric_distribution>:
+
+*Definition* A random variable $X$ follows the hypergeometric distribution if its pmf is given by
+
+$$ P(X=k) = \frac { { {K}\choose{k} } { {N-K} \choose {n-k}} }
+                  { {N}\choose{n} } $$
+where
+
+- Parameter $N$ is the population size.
+- Parameter $K$ is the number of success states in the population.
+- Parameter $n$ is the number of draws.
+- Variable $k$ is the number of observed successes, and its support is $k \in \{max(0, n+K-N), ..., min(n, K)\}$.
+
+In our case (according to the definition of $p$):
+
+- $N$ = `sum(ds_2x2_tbl)`
+- $K$ = `o11 + o12` = `ds_2x2_tbl[1, 1] + ds_2x2_tbl[1, 2]`
+- $n$ = `o11 + o21` = `ds_2x2_tbl[1, 1] + ds_2x2_tbl[2, 1]`
+- Support of k is $k \in \{max(0, n+K-N), ..., min(n, K)\}$.
+
+```{r}
+ds_2x2_tbl
+
+N <- sum(ds_2x2_tbl)
+K <- ds_2x2_tbl[1, 1] + ds_2x2_tbl[1, 2]
+n <- ds_2x2_tbl[1, 1] + ds_2x2_tbl[2, 1]
+
+k_supp <- seq(max(0, n+K-N), min(n, K))
+# k_supp is as expected
+k_supp
+
+# We will use dhyper to calculate the probabilities
+# From the documentation of dhyper:
+# p(x) = choose(m, x) choose(n, k-x) / choose(m+n, k) 
+# for x = 0, ..., k.
+# Then, we plug in our parameters generated using the wikipedia notation:
+P_X_equalTo_k <- dhyper(x = k_supp, m = K, n = N-K, k = n)
+P_X_equalTo_k
+# This is slightly confusing, you have to check each parameter carefully. 
+qplot(x = k_supp, y = P_X_equalTo_k, geom = 'point')
+```
+
+Then, we perform the p-value procedure. The p-value of a two-tailed Fisher's exact test is 
+
+$$\sum_{P(x) \le P(o_{1,1})} P(x)$$ 
+
+That is, the sum of the probabilities of **possible observations** with the test statistic $P(x)$ is lower than or equal to the test statistic of our current observation $P(o_{1,1})$. The algebra format of the test statistic is identical to that of the probability of the observation. 
+
+In addition, the p-value definition here is quite different from our previous definitions, such as the p-value in z-test. However, keep in mind one interpretation of p-value: "a p-value is the probability getting a result as extreme or more extreme than the event you actually did observe" [@_twoway_]. In two-tailed Fisher's exact test, the extremeness is the probability of observing a certain data (contingency table) under $H_0$, and we sum all probabilities lower than or equal to the current observation in two-tailed test. 
+
+What makes the p-value of Fihser's exact test more complicated is that the definition of "extremeness" when calculating one-tailed Fihser's exact test p-value is quite different from that of two-tailed. In one-tailed test:
+
+- If the alternative hypothesis is the odds ratio $<$ 1, the as extreme and more extreme cases are the possible observations with odds ratio lower than or equal to that of the current observation. 
+
+- If the alternative hypothesis is the odds ratio $>$ 1, the as extreme and more extreme cases are the possible observations with odds ratio greather than or equal to that of the current observation. 
+
+We leave the mathematical formula of one-tailed Fisher's exact test p-value as "to think about" question 2. 
+
+```{r}
+two_sided_p_val <- sum(P_X_equalTo_k[P_X_equalTo_k <= p_test_stat])
+two_sided_p_val
+
+# Compare to fisher.test
+two_sided_ref_p_val <- fisher.test(ds_2x2_tbl, alternative='two.sided')$p.val
+two_sided_ref_p_val
+all.equal(two_sided_p_val, two_sided_ref_p_val)
+
+# alternative hypothesis is less than
+one_sided_ahl_p_val <- sum(P_X_equalTo_k[k_supp <= ds_2x2_tbl[1, 1]])
+one_sided_ahl_p_val
+
+one_sided_ahl_ref_p_val <- fisher.test(ds_2x2_tbl, alternative='l')$p.val
+one_sided_ahl_ref_p_val
+all.equal(one_sided_ahl_p_val, one_sided_ahl_ref_p_val)
+
+# alternative hypothesis is greater than
+one_sided_ahg_p_val <- sum(P_X_equalTo_k[k_supp >= ds_2x2_tbl[1, 1]])
+one_sided_ahg_p_val
+
+one_sided_ahg_ref_p_val <- fisher.test(ds_2x2_tbl, alternative='g')$p.val
+one_sided_ahg_ref_p_val
+all.equal(one_sided_ahg_p_val, one_sided_ahg_ref_p_val)
+```
+
+## To think about
+
+1. Change $o_{1, 1}$ to $13$ and $o_{2, 1}$ to $2$ to obtain the following table, and perform one-tailed and two-tailed tests. Why the sum of one-tail p-values is not 1? Why the p-value of two-tailed test is not equal to any of the one-tailed test? Hint: check the p-value calculation procedure. 
+
+```{r, echo=F}
+ds_2x2_tbl2 <- ds_2x2_tbl
+ds_2x2_tbl2[1, 1] <- 13
+ds_2x2_tbl2[2, 1] <- 2
+ds_2x2_tbl2
+```
+
+2. What are the mathematical formulas of one-tailed Fisher's exact test p-values? The alternative hypotheses of one-tailed Fisher's exact test can be `less` or `greater` when calling the function `fisher.test`. 
+
+3. In `ds_2x2_tbl`, if we only change $o_{1, 1}$ and $o_{2, 1}$ but not their sums, what are all possible changes? Among these changes, which ones have odds ratios bigger than 1? What are the probabilities of observing them if the null hypothesis is true? What is the relashionship between these probabilities and the probability mass function of our test statistic?
+
+4. Rearrange the `ds_2x2_tbl` table in at least two different ways, e.g. making "smoke" as the first row and non-disease as the first column, and then perform two-tailed Fisher exact test on the rearranged table. Are the p-values different from the original one? Why? Hint: check how the test statistic $P$ is calculated. 
+
+5. (Optional) This question is related to the optional proof. In the hypergeometric distribution of $O_{1,1}$, why the support is $max(0, n_{*, 1} + n_{1, *} - n) \le o_{1,1} \le \min(n_{1, *}, n_{*, 1})$? Hint: the contingency table is conditional on marginal totals. 
+
+# References
+
+
