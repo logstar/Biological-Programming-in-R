@@ -1,0 +1,419 @@
+---
+title: "BIOM612 Experimental Design"
+author: "Dorothy Hammond, PhD MPH and Deanne Taylor PhD"
+date: "2/1/2018"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '3'
+  pdf_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+  word_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Setup
+
+Packages to install this week:
+
+* corrgram
+* epitools
+
+# Introduction
+
+This week's lab focuses rather heavily on biomedical statistics, which  strategies do not always overlap with statistical design for laboratory-based experiments.  We will revisit additional topics in experimental design considerations for laboratory experiments in following laboratories.
+
+For now, we'll focus on getting you acquainted with biomedical approaches to statistics. Biomedical statistics often take different approaches to experimental design than you would have encountered in typical statistics courses. Because biostatistics methods are often employed in human subject data, it's good to introduce you to these concepts, especially odds ratios and relative risks.
+
+Additional topics in biostatistics, such as survival curves and treatment effecs will also be explored in future labs and lectures in this course. However, to get a good handle on this topic, you should consider a full biostatistics course.
+
+
+# Risks and Odds 
+
+A well designed biomedical study is one in which the researcher has taken the time and made the effort to organize the study/experiment properly to ensure that the right type of data is generated, and there is enough of the data available to answer the relevant question. The researcher also has to consider other unmeasured/unassessed varianbles that may influence the interpretation of the result. 
+
+In class we introduced a few types of experimental designs, and looked at the different factors that may confound our resulting association obtained. 
+This lab will forcus on trying your hands on analyzing risk, odds, and correlation analysis using R.
+
+We will be using both full functions to do the calculations as well as R packages. We often encounter situations in which an R package isn't sufficient to complete an analysis, so we give examples and can point  to resources that have full functions available. Additionally, writing a function allows you to use the same tool for different analysis with little to no change in code.
+
+For analyses, we'll use the R package epitools, which you should install.
+
+The full functions for RR and Odds Ratios are from this webpage by Avril Coghlan: 
+
+http://a-little-book-of-r-for-biomedical-statistics.readthedocs.io/en/latest/src/biomedicalstats.html
+
+Please bookmark that webpage for your future reference. We do not have time in this course to cover all the topics there, but you may find the additional topics interesting or useful for your research, and the background you get from this course should allow you to more quickly pick up and learn them.
+
+## Calculating Relative Risks / Risk Ratio for a Study
+
+Let us take a cohort study as our first example. A cohort study is a study design in which you have information on a study population who were exposed to "something" of interest (treatment, environmental or other exposures) and also on whether the same individuals in the study population have a certain disease or not (outcome). Your data should look something like this
+
+```{r CHUNK 1}
+myDataMatrix <- matrix(c(2250,6222,1231,14897), nrow = 2, byrow = TRUE)
+colnames(myDataMatrix) <- c("Disease-Yes", "Disease-No")
+rownames(myDataMatrix) <- c( "Exposed", "Unexposed")
+print(myDataMatrix)
+```
+
+# Proportion tests and 2x2 tables.
+
+Going back to prop.test(), we can use the 2x2 table we generated in myData Matrix to report the proportion test:
+
+```{r Chunk 2a prop test on a 2x2}
+
+#2x2 data transformed to a table of proportions, just to see:
+prop.table(myDataMatrix)
+
+pt_test<-prop.test(myDataMatrix)
+pt_test
+
+```
+
+The 95% confidence interval in prop.table does not cross zero, so we can be confident that there is a difference in proportions. What is the actual proportional difference in exposure for those who had disease?
+
+```{r Chunk 2b proportion analysis}
+
+pt_test<-prop.test(myDataMatrix)
+pt_diff<-pt_test$estimate[1] - pt_test$estimate[2]
+pt_diff
+```
+
+The difference between the two proportions is about 19%.
+
+As a rule of thumb, proportional differences are often reported as risk ratios in biomedical statistics.
+
+# Calculate Relative Risk / Risk Ratio
+
+Calculating the relative risk (RR) of having disease given exposure is the probability of having the disease for people who were exposed to the treatment or environmental factor, divided by the probability of having the disease for people who were not exposed to that treatment or environmental factor.
+
+## Function for Risk Ratios
+
+```{r CHUNK 3}
+
+calcRelativeRisk <- function(mymatrix, alpha=0.05, referencerow=2)
+{
+     numrow <- nrow(mymatrix)
+     myrownames <- rownames(mymatrix)
+     for (i in 1:numrow)
+     {
+        rowname <- myrownames[i]
+        DiseaseUnexposed <- mymatrix[referencerow,1]
+        ControlUnexposed <- mymatrix[referencerow,2]
+        if (i != referencerow)
+        {
+           DiseaseExposed <- mymatrix[i,1]
+           ControlExposed <- mymatrix[i,2]
+           totExposed <- DiseaseExposed + ControlExposed
+           totUnexposed <- DiseaseUnexposed + ControlUnexposed
+           probDiseaseGivenExposed <- DiseaseExposed/totExposed
+           probDiseaseGivenUnexposed <- DiseaseUnexposed/totUnexposed
+
+           # calculate the relative risk
+           relativeRisk <- probDiseaseGivenExposed/probDiseaseGivenUnexposed
+           print(paste("category =", rowname, ", relative risk = ",relativeRisk))
+
+           # calculate a confidence interval
+           confidenceLevel <- (1 - alpha)*100
+           sigma <- sqrt((1/DiseaseExposed) - (1/totExposed) +
+                         (1/DiseaseUnexposed) - (1/totUnexposed))
+           # sigma is the standard error of estimate of log of relative risk
+           z <- qnorm(1-(alpha/2))
+           lowervalue <- relativeRisk * exp(-z * sigma)
+           uppervalue <- relativeRisk * exp( z * sigma)
+           print(paste("category =", rowname, ", ", confidenceLevel,
+              "% confidence interval = [",lowervalue,",",uppervalue,"]"))
+        }
+     }
+  }
+```
+
+## Testing the RR functions
+
+To use the function:
+
+```{r CHUNK 4a function RR}
+calcRelativeRisk(myDataMatrix,alpha = 0.05)
+```
+
+Compare to the epitools risk ratio:
+
+```{r chunk 4b: epitools RR}
+
+library(epitools)
+
+#rev means reversing "b"oth columns/rows to match inputs into our above function.  This is because epitools expects the reversed input from what we start with. The results will be similar to our function.
+
+rr_epi <- riskratio(myDataMatrix, rev="b", conf.level = 0.95) 
+rr_epi$measure
+
+```
+
+In earlier tests, we expect our confidence intervals for a difference to not overlap 0 to reject the null.
+
+Recall this line in our function in chunk 3:
+
+relRisk <- probDiseaseGivenExposed/probDiseaseGivenUnexposed
+
+ If the quantities (exposed/unexposed) are equal the null will give a value of 1. In this case, we have to find a confidence interval that does not overlap 1 to reject the null because we are testing proportions.
+
+In our case of myDataMatrix, the confidence intervals don't overlap the number 1, so we can assume the population proportions are different.
+
+How do we represent this?
+
+pct increase (rr > 1) = (RR CI lower bound – 1) x 100
+
+When the RR is less than 1, so there's a decrease in risk, the risk ratio bound can be calculated by:
+
+pct decrease (rr < 1) = (1 – RR CI upper bound) x 100
+
+So here, in our results, our odds ratio of disease by exposure is > 1.
+
+Based on the lower confidence bound, we can state that the risk of disease after exposure is at least (3.26 -1 )*100 = 226% higher in the exposed group.
+
+# Odds Ratio
+
+Recall that a probability of 0.80 is equivalent to 80% chance of an event occuring.  Odds express the likelihood of a success given a certain number of trials. 
+ To express an 80% chance of occurring to odds, we can divide the difference from 1:
+ 
+ $$ \frac{0.80}{(1-0.80)}= \frac{0.80}{0.20} = 4 $$
+ 
+Therefore, the odds of success are 4 to 1, where for every four successes we can expect one failure.
+ 
+
+## Function for Odds Ratios
+
+```{r CHUNK 5}
+ calcOddsRatio <- function(mymatrix,alpha=0.05,referencerow=2,quiet=FALSE)
+{
+   numrow <- nrow(mymatrix)
+   myrownames <- rownames(mymatrix)
+
+   for (i in 1:numrow)
+   {
+      rowname <- myrownames[i]
+      DiseaseUnexposed <- mymatrix[referencerow,1]
+      ControlUnexposed <- mymatrix[referencerow,2]
+      if (i != referencerow)
+      {
+         DiseaseExposed <- mymatrix[i,1]
+         ControlExposed <- mymatrix[i,2]
+
+         totExposed <- DiseaseExposed + ControlExposed
+         totUnexposed <- DiseaseUnexposed + ControlUnexposed
+
+         probDiseaseGivenExposed <- DiseaseExposed/totExposed
+         probDiseaseGivenUnexposed <- DiseaseUnexposed/totUnexposed
+         probControlGivenExposed <- ControlExposed/totExposed
+         probControlGivenUnexposed <- ControlUnexposed/totUnexposed
+
+         # calculate the odds ratio
+         oddsRatio <- (probDiseaseGivenExposed*probControlGivenUnexposed)/
+                      (probControlGivenExposed*probDiseaseGivenUnexposed)
+         if (quiet == FALSE)
+         {
+            print(paste("category =", rowname, ", odds ratio = ",oddsRatio))
+         }
+
+         # calculate a confidence interval
+         confidenceLevel <- (1 - alpha)*100
+         sigma <- sqrt((1/DiseaseExposed)+(1/ControlExposed)+
+                       (1/DiseaseUnexposed)+(1/ControlUnexposed))
+         # sigma is the standard error of our estimate of the log of the odds ratio
+         z <- qnorm(1-(alpha/2))
+         lowervalue <- oddsRatio * exp(-z * sigma)
+         uppervalue <- oddsRatio * exp( z * sigma)
+         if (quiet == FALSE)
+         {
+            print(paste("category =", rowname, ", ", confidenceLevel,
+               "% confidence interval = [",lowervalue,",",uppervalue,"]"))
+         }
+      }
+   }
+   if (quiet == TRUE && numrow == 2) # If there are just two treatments (exposed/nonexposed)
+   {
+      return(oddsRatio)
+   }
+}
+```
+
+## Testing the OR functions
+
+How to use the odds ratio function:
+
+```{r CHUNK 6a function for OR}
+ calcOddsRatio(myDataMatrix, alpha = 0.05)
+
+```
+
+```{r CHUNK 6b epitools for OR}
+#from epitools
+
+or_epi <- oddsratio(myDataMatrix, rev="b", conf.level=0.95)
+or_epi$measure
+
+```
+
+Representing odds ratios is different than presenting risk ratios. For odds ratios, we would state that the odds ratio of contracting a disease after exposure is 4.38 with a confidence interval of (4.06, 4.72). 
+
+Which to use, OR or RR? This is up to you. It depends on the message you are trying to convey. As risk drops towards zero, the odds ratio does tend to approximate to the risk ratio, so in those cases it's almost equivalent to report one or another. 
+
+
+# Calculating Odds ratio for a case with more than one exposure
+Example of an odds ratio with more than one exposure.
+See the above linked webpage for more information.
+
+Estimating the odds ratio for a developing lung cancer with exposure to smoking cigarettes, vesus using e-cigarettes, compared to no smoking
+
+```{r CHUNK 7}
+myDataMatrix_2 <- matrix(c(30,24,76,241,82,509), nrow = 3, byrow = TRUE)
+colnames(myDataMatrix_2) <- c("Disease", "Control")
+rownames(myDataMatrix_2) <- c("cigarette", "e-cigarette", "Unexposed")
+print(myDataMatrix_2)
+calcOddsRatio(myDataMatrix_2, referencerow = 3)
+```
+
+# Covariances and Correlation
+
+We discussed correlation and covariance briefly in this and previous lectures, and here we go into more detail.
+
+Covariance is a measure of how two variables vary "together" -- do the values of one variable change magnitude with the other? In other words, do the two variables have similar behavior over the range of values we are testing?
+
+From lecture, we stated that a covariance $s_{xy}$ of two variables in the same data set, (x and y) indicates their relationship to one another. 
+
+From a single data set, a sample covariance is defined as:
+
+$$ s_{xy} = \frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})  $$
+where $s_{x,y}$ measures how x and y are linearly related to one another. Positive covariances indicate positive relationships (same direction), while negative covariances indicate negative relationships (opposite direction). Note again we're using $\frac{1}{n-1}$ because we're dealing with sample statistics.
+
+Let's look at that equation more closely.  Note that the equation is summing over i=1 to n, where n is the number of samples taken in the data set. In order for the covariance to be correctly calculated, the points must be calculated together in the order of suspected correlation. In the case of a data set where x and y are height and weight, for example, from the same set of individuals, then it is easy to see that we can calculate the relationship of height and weight within a single dataset. It gets trickier when analyzing covariance over two related vectors that are not from the same dataset. In that case, without having the advantage of matching over the same dataset,  you would have to be careful about how you define 'i' -- point to point comparisons -- in the two datasets to make sure they were correctly registered in time if you're interested in time correlation, or correlated in some other measurement to one another.
+
+From a population perspective, when we want to measure one variable against an entire population, we can calculate the population mean $\sigma_{xy}$ of means of x and y ($\mu_x$ and $\mu_y$):
+
+$$ \sigma_{xy}=   \frac{1}{N}\sum_{i=1}^{n}(x_i-\mu_x)(y_i-\mu_y)  $$
+
+Here's an example:
+
+```{r CHUNK 8 mtcars correlation}
+
+mpg<-mtcars$mpg
+wt<-mtcars$wt
+
+plot(mpg, wt, pch=19, cex=0.5, main="mtcars wt vs mpg")
+
+#covariance analysis  "the long way" according to the equations above Chunk 8.
+
+cov_longway<- 1 / (length(mpg)-1) * sum( (wt - mean(wt)) * (mpg-mean(mpg)))
+
+#Covariance the easy way:
+cov( wt, mpg)
+
+```
+
+Covariance says there's a negative relationship between mpg and curbsite weight.
+
+Pearson correlation  is a normalized form of covariance, normalized by the multiplied standard deviations in paired data. The sample form and the population form for covariance (where $\sigma_{xy}$ is defined above):
+
+$$ r_{xy}=\frac{s_{xy}}{s_{x}s_{y}}  ~~~~~~~~~\rho_{xy}=\frac{\sigma_{xy}}{\sigma_{x}\sigma_{y}}$$
+This is the default form in the cor() function in R, method="pearson"
+
+In R, Pearson correlation can be calculated by the cor() function,(help(cor)) which defaults to the Pearson method. The assumptions of Pearson's method are:
+
+* continuous
+* linear
+* normally distributed 
+* paired correctly (old faithful data is obviously paired by observation)
+* no extreme outliers 
+* linear
+* have equal variance (homoscedastic -- more on that next week)
+
+
+```{r Chunk 9 Correlation}
+library(corrgram)
+
+mpg<-mtcars$mpg
+wt<-mtcars$wt
+
+shapiro.test(mpg)
+shapiro.test(wt)
+
+#looks good!
+
+cor(mpg, wt, method="pearson") #pearson is the default
+
+#We can generate a p-value of correlation with cor.test():
+cor.test(mpg, wt,
+         method = "pearson",
+         conf.level = 0.95)
+
+#Views of correlation with corrgram():
+#the numbers in the diagonal are the minimum/maximum in each variable.
+corrgram(mtcars,  lower.panel=panel.shade, upper.panel=panel.pie,
+         diag.panel=panel.minmax, text.panel=panel.txt)
+
+#Correlation values
+
+corrgram(mtcars, order=TRUE, upper.panel=panel.cor, main="mtcars")
+```
+
+See also this webpage for more corrgram examples:
+
+https://cran.r-project.org/web/packages/corrgram/vignettes/corrgram_examples.html
+
+To think about in lab:
+
+* Generate the correlation coefficient "the long way" 
+
+# Homework Questions Week 4
+
+## Question 1: {-}
+30 points
+
+Given the following data:
+
+```{r, echo=FALSE}
+HW_q1 <- matrix(c(39,22,87,90,64,810,98,122,12,1280), nrow = 5, byrow = TRUE)
+colnames(HW_q1) <- c("Disease", "No-Disease")
+rownames(HW_q1) <- c("Beer","Wine","Vodka","Tequila","Unexposed")
+print(HW_q1)
+```
+* 1a: Enter the data in R and print to display the data in a tabular form
+* 1b: Using either of the odds ratios equations, compute the odds ratio of each exposure (drink). Edit where necessary so that the output assigns the names of the exposure in your output.
+* 1c: After the data has been collected you find out that gender, age, and family history of the disease is a potential confounder, how would you control for it in the analysis?
+
+
+## Question 2: {-}
+30 points
+
+2a: For the data presented in Q1, calculate the relative risk for each exposure.
+2b: Using the equation for RR, how would you expect the result to change if the number of people exposed who contracted the disease was doubled? Test your hypothesis.
+2c: From the equation for the Odds Ratio, how would the odds ratio change if the number of people exposed who contracted the disease was doubled? Test your hypothesis. 
+
+
+## Question 3: {-}
+30 points
+
+Code a simple function called c_inc that takes as input 2 numbers and computes the cummulative incidence of disease. Hint: see slide 32 from lecture.
+
+## Question 4: {-}
+10 points
+
+* 3a: Generate a correlogram with correlation values for the UK seatbelt data  (see ?Seatbelts). You will need to use this form for the data: corrgram(Seatbelts[,1:8], etc etc )
+* 3b: What is the greatest correlate for rear-seat passengers killed?
+* 3c: What effects do the petrol prices have on death rates? 
+
+
+
+
+
+
+
