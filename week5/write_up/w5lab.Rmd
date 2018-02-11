@@ -72,7 +72,7 @@ We will go through some differences between one-sample and two-sample statistica
 
 ### To think about
 
-1. If we run two-sample proportion test without `as.matrix()`, i.e. `prop.test(x = disease_smoke_tbl, alternative = 'two.sided', correct = F)`, what will happen? Is the message given by R helpful? The different R behavior with or without `as.matrix()` is generally becuase R treats matrix and dataframe differently. If you are not sure about which one to use, read the documentation carefully and generate fake data for testing. 
+1. If we run two-sample proportion test without `as.matrix()`, i.e. `prop.test(x = disease_smoke_tbl, alternative = 'two.sided', correct = F)`, what will happen? Is the message given by R helpful? The different R behavior with or without `as.matrix()` is generally because R treats matrix and dataframe differently. If you are not sure about which one to use, read the documentation carefully and generate fake data for testing. 
 
 ## 2 x 2 contingency table
 
@@ -99,7 +99,7 @@ Imagine that you are implementing a test procedure of two-sample proportions, th
 
 - non-smoke proportions of disease and healthy conditions
 
-If you are the programmer, it is probably a good idea to choose one type of comparison and leave the table formating problem to the users, assuming that the users know what they are doing. 
+If you are the programmer, it is probably a good idea to choose one type of comparison and leave the table formatting problem to the users, assuming that the users know what they are doing. 
 
 In addition to "manually" generating the 2 x 2 contingency table as above, you can automatically generate the table from a "raw" dataset of measurements. In the above example, it could be a table of two columns, disease and smoke.
 
@@ -149,7 +149,7 @@ Even though there are more lines of code in the "automatic" method, it is less e
 
 Mathematically or statistically, "a contingency table is a type of table in a matrix format that displays the (multivariate) frequency distribution of the variables", copied from Wikipedia. The variables in the quote refer to random variables, and the frequency distribution is the frequency of observations. 
 
-In the above example, the randome variables are $\{X_1, X_2, ..., X_n\}$ denoting whether a participant has disease or not, and $\{Y_1, Y_2, ..., Y_n\}$ denoting whether a participant smokes or not. $X_i$ and $Y_i$ are paired, i.e. they refer to the same participant. In the context, it is obvious that a participant can either has the disease or not, and a participant can either smoke or not smoke. This dichotomy implies they follow Bernoulli distributions. 
+In the above example, the random variables are $\{X_1, X_2, ..., X_n\}$ denoting whether a participant has disease or not, and $\{Y_1, Y_2, ..., Y_n\}$ denoting whether a participant smokes or not. $X_i$ and $Y_i$ are paired, i.e. they refer to the same participant. In the context, it is obvious that a participant can either has the disease or not, and a participant can either smoke or not smoke. This dichotomy implies they follow Bernoulli distributions. 
 
 The frequency distribution in the quote refers to the four number entries in the 2 x 2 table, which lists the number of observations of paired $X_i$ and $Y_i$. 
 
@@ -163,7 +163,7 @@ The frequency distribution in the quote refers to the four number entries in the
 
 ## General idea of statistical tests for two-sample proportions
 
-This subsection mighe be too abstract, so you can skim over and come back after reading the sections of concrete two-sample proportion tests.
+This subsection might be too abstract, so you can skim over and come back after reading the sections of concrete two-sample proportion tests.
 
 To mathematically formalize the problem stated in two-sample proportion test:
 
@@ -173,7 +173,7 @@ Denote the four entries of the 2 x 2 contingency table as $n_{1,1}$, $n_{1,2}$, 
 
 Because the proportions are actually functions of frequencies ($n_{i, j}$), the goal of designing a statistical test of two-sample proportions is to derive a test statistic $T = u(n_{1,1}, n_{1,2}, n_{2,1}, n_{2, 2})$ that measures the difference between $p_1$ and $p_2$, where $u$ is a function of $n_{1,1}$, $n_{1,2}$, $n_{2,1}$, and $n_{2, 2}$. Meanwhile, $T$ also defines a random variable following certain probability distribution. 
 
-Then, we can use $T$ and its distribution to perform the critical region procedure or p-value procedure. In order to perform the confidence interval procedure, some extra algera is usually necessary. 
+Then, we can use $T$ and its distribution to perform the critical region procedure or p-value procedure. In order to perform the confidence interval procedure, some extra algebra is usually necessary. 
 
 Although there are multiple "frequentist procedures" of hypothesis testing, mostly critical region procedure, p-value procedure, and confidence interval procedure, they are inherently the same algebra with different interpretations.
 
@@ -211,9 +211,9 @@ sc_disease_smoke_tbl / sc_disease_smoke_tbl['total', 'total']
 
 ```
 
-The product of the marginal proportions of a pair of row and column seems to be not very meaningful, but it is related to the definition of joint distribution of two random variables. In 2x2 contingency table, the rows represent the outcomes of a random variable, and the columns represent the outcomes of another random variable. In the above example, the rows represent the outcomes of the random variable of whether a participant smokes or not, and the columns represent the outcomes of the random variable of whether a participant has the disease or not. The four number entries are the frequency distribution of these two random variables. If we assume that the population marginal proportions are equal to the sample marginal proportions, the product of each pair of row and column marginal proportions refers to the proportion of that pair of outcomes when the two random variablse are **independent**. 
+The product of the marginal proportions of a pair of row and column seems to be not very meaningful, but it is related to the definition of joint distribution of two random variables. In 2x2 contingency table, the rows represent the outcomes of a random variable, and the columns represent the outcomes of another random variable. In the above example, the rows represent the outcomes of the random variable of whether a participant smokes or not, and the columns represent the outcomes of the random variable of whether a participant has the disease or not. The four number entries are the frequency distribution of these two random variables. If we assume that the population marginal proportions are equal to the sample marginal proportions, the product of each pair of row and column marginal proportions refers to the proportion of that pair of outcomes when the two random variables are **independent**. 
 
-Following is an example of the joint distribution of 2 independent random variables from wikipedia [@_joint_2017]:
+Following is an example of the joint distribution of 2 independent random variables from Wikipedia [@_joint_2017]:
 
 > We are drawing red and blue balls from an urn. Suppose each of two urns contains twice as many red balls as blue balls, and no others, and suppose one ball is randomly selected from each urn, with the two draws independent of each other. The probability of drawing a red ball from either of the urns is 2/3, and the probability of drawing a blue ball is 1/3. We can present the joint probability distribution as the following table:
 
@@ -240,7 +240,7 @@ Then, we explore the test statistic of the Pearson's $\chi^2$ test. Intuitively,
 
 Denote the observed counts of the contingency table as $o_{i,j}$, where $i$ is the row index and $j$ is column index. Similarly, denote the expected counts as $e_{i,j}$, and the joint probability of two random variables as $p_{i, j}$. Let the sample size as $n$, which is the sum of 4 entries in a 2x2 contingency table. 
 
-The table of observed counts of two random variablse A and B:
+The table of observed counts of two random variables A and B:
 
       A=1       A=2
 ---  ---------  ----------
@@ -291,7 +291,7 @@ x2
 chisq.test(ds_2x2_tbl, correct = F)$statistic
 ```
 
-We leave the last step for you as a "To think about" questoin, which is to apply critical region or p-value procedures on the test statistic of our data. 
+We leave the last step for you as a "To think about" question, which is to apply critical region or p-value procedures on the test statistic of our data. 
 
 ## To think about
 
@@ -360,7 +360,7 @@ We use the same notation as the $\chi^2$ test section:
 
 Denote the observed counts of the contingency table as $o_{i,j}$, where $i$ is the row index and $j$ is column index. Let the sample size as $n$, which is the sum of 4 entries in a 2x2 contingency table. 
 
-The table of observed counts of two random variablse A and B:
+The table of observed counts of two random variables A and B:
 
                    Y=1                              Y=0                            Marginal Total
 ----------------  --------------------             -------------------            -----------------------
@@ -380,7 +380,7 @@ For those of you who are interested in the underlying mathematics of the test st
 
 *Proof.* The rows represent a random variable $X$ following Bernoulli distribution with unknown parameter $p_X$. Similarly, the columns represent a random variable $Y$ following Bernoulli distribution with unknown parameter $p_y$.
 
-Since we have the sample size as $n$, we have $n$ independent and identically distributed (i.i.d.) random variables $\{X_1, X_2, ..., X_n\}$ of $Bern(p_x)$. Similarly,  we have $n$ i.i.d. random variables $\{Y_1, Y_2, ..., Y_n\}$ of $Bern(p_Y)$. Note that the assumption that $\{X_1, X_2, ..., X_n\}$ are i.i.d. $Bern(p_x)$ is implicit, and it is has nothing to do with our null hypothesis. This assumption is usually valid. In our case, $\{X_1, X_2, ..., X_n\}$ represent different whether the corresponding study participant smokes or not, and they are usually independent. However, say we have the pariticipant represented by $X_1$ as a very good friend of the pariticipant represented by $X_2$, whether they smoke or not may or may not be independent. To simplify our mathematical derivation, we ignore such complexities. Also, $X_i$ and $Y_i$ are paired, which is implied by the contingency table. In our case, $X_i$ and $Y_i$ refer to the same participant. 
+Since we have the sample size as $n$, we have $n$ independent and identically distributed (i.i.d.) random variables $\{X_1, X_2, ..., X_n\}$ of $Bern(p_x)$. Similarly,  we have $n$ i.i.d. random variables $\{Y_1, Y_2, ..., Y_n\}$ of $Bern(p_Y)$. Note that the assumption that $\{X_1, X_2, ..., X_n\}$ are i.i.d. $Bern(p_x)$ is implicit, and it is has nothing to do with our null hypothesis. This assumption is usually valid. In our case, $\{X_1, X_2, ..., X_n\}$ represent different whether the corresponding study participant smokes or not, and they are usually independent. However, say we have the participant represented by $X_1$ as a very good friend of the participant represented by $X_2$, whether they smoke or not may or may not be independent. To simplify our mathematical derivation, we ignore such complexities. Also, $X_i$ and $Y_i$ are paired, which is implied by the contingency table. In our case, $X_i$ and $Y_i$ refer to the same participant. 
 
 
 An observation of the data (contingency table) is equivalent to a pair of sequences of observations of $\{X_1, X_2, ..., X_n\}$ and $\{Y_1, Y_2, ..., Y_n\}$, i.e. $\{x_1, x_2, ..., x_n\}$ and $\{y_1, y_2, ..., y_n\}$. For example:
@@ -493,9 +493,9 @@ p_test_stat <- (choose(ds_2x2_tbl[1, 1] + ds_2x2_tbl[1, 2], ds_2x2_tbl[1, 1])
 p_test_stat
 ```
 
-In order to visualize the p-value procedure, we need to make a plot of the probability mass function (pmf) of our test statistic, i.e. a plot of the pmf of hypergeometric distribution with certain parametres. 
+In order to visualize the p-value procedure, we need to make a plot of the probability mass function (pmf) of our test statistic, i.e. a plot of the pmf of hypergeometric distribution with certain parameters. 
 
-From wikipedia, <https://en.wikipedia.org/wiki/Hypergeometric_distribution>:
+From Wikipedia, <https://en.wikipedia.org/wiki/Hypergeometric_distribution>:
 
 *Definition* A random variable $X$ follows the hypergeometric distribution if its pmf is given by
 
@@ -545,11 +545,11 @@ That is, the sum of the probabilities of **possible observations** with the test
 
 In addition, the p-value definition here is quite different from our previous definitions, such as the p-value in z-test. However, keep in mind one interpretation of p-value: "a p-value is the probability getting a result as extreme or more extreme than the event you actually did observe" [@_twoway_]. In two-tailed Fisher's exact test, the extremeness is the probability of observing a certain data (contingency table) under $H_0$, and we sum all probabilities lower than or equal to the current observation in two-tailed test. 
 
-What makes the p-value of Fihser's exact test more complicated is that the definition of "extremeness" when calculating one-tailed Fihser's exact test p-value is quite different from that of two-tailed. In one-tailed test:
+What makes the p-value of Fisher's exact test more complicated is that the definition of "extremeness" when calculating one-tailed Fisher's exact test p-value is quite different from that of two-tailed. In one-tailed test:
 
 - If the alternative hypothesis is the odds ratio $<$ 1, the as extreme and more extreme cases are the possible observations with odds ratio lower than or equal to that of the current observation. 
 
-- If the alternative hypothesis is the odds ratio $>$ 1, the as extreme and more extreme cases are the possible observations with odds ratio greather than or equal to that of the current observation. 
+- If the alternative hypothesis is the odds ratio $>$ 1, the as extreme and more extreme cases are the possible observations with odds ratio greater than or equal to that of the current observation. 
 
 We leave the mathematical formula of one-tailed Fisher's exact test p-value as "to think about" question 2. 
 
@@ -592,7 +592,7 @@ ds_2x2_tbl2
 
 2. What are the mathematical formulas of one-tailed Fisher's exact test p-values? The alternative hypotheses of one-tailed Fisher's exact test can be `less` or `greater` when calling the function `fisher.test`. 
 
-3. In `ds_2x2_tbl`, if we only change $o_{1, 1}$ and $o_{2, 1}$ but not their sums, what are all possible changes? Among these changes, which ones have odds ratios bigger than 1? What are the probabilities of observing them if the null hypothesis is true? What is the relashionship between these probabilities and the probability mass function of our test statistic?
+3. In `ds_2x2_tbl`, if we only change $o_{1, 1}$ and $o_{2, 1}$ but not their sums, what are all possible changes? Among these changes, which ones have odds ratios bigger than 1? What are the probabilities of observing them if the null hypothesis is true? What is the relationship between these probabilities and the probability mass function of our test statistic?
 
 4. Rearrange the `ds_2x2_tbl` table in at least two different ways, e.g. making "smoke" as the first row and non-disease as the first column, and then perform two-tailed Fisher exact test on the rearranged table. Are the p-values different from the original one? Why? Hint: check how the test statistic $P$ is calculated. 
 
