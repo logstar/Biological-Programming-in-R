@@ -1,0 +1,633 @@
+---
+title: "Lab Work and Assignment 3 for Biom612 (Week 3) v2"
+author: "Deanne Taylor,  with some edits by Yuanchao Zhang"
+date: "Jan 29th, 2018"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '3'
+  pdf_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+  word_document:
+    toc: yes
+    toc_depth: '3'
+---
+# Starting Up
+
+Packages to install this week:
+
+* UsingR
+* gtools
+* lawstat
+* moments
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(knitr)
+library(ggplot2)
+library(nortest)
+library(pwr)
+library(gtools)
+library(lawstat)
+library(moments)
+opts_chunk$set(tidy.opts=list(width.cutoff=80),tidy=TRUE)
+
+```
+
+# Lab Updates
+
+A series of "To Think About" questions are presented below. These are not to be passed in as homework problems. They are not graded.
+
+The only required homework problems are below the words "Homework Assignment."
+
+The "To Think About" questions are only meant to test your own knowledge of the material  and will be discussed in lab.
+
+
+# Bernoulli Variable
+The {1,0} sample space random variable was introduced last week, specifically for a coin toss. We call this kind of random variable a "Bernoulli variable" and it's generated with a Bernoulli process: flipping a coin.
+
+We can use the sample() function to generate a set of coin tosses using an approximation to the Bernoulli process. Let's assume 0=tails, and 1=heads. We know that in a fair coin, a flip is independent, and not affected by the previous coin flip's results. A fair coin's sample space of {0,1} has equal probabilities of being sampled. That is, p=0.50 for each of heads or tails. Therefore, the random variable generated from the coin toss is "iid" -- Independent and Identically Distributed. 
+
+```{r Chunk 1a: Bernoulli example on 20 iid coin tosses}
+#Run this chunk several times to get a feel for what's going on.
+
+n = 20   #Number of Bernoulli Trials
+p = 0.50 #Probability of heads
+
+bern_set<-sample(c(0,1), size=n, replace=TRUE, prob=c(1-p,p))
+bern_set  
+
+#What is the number of successes (heads) in this test? 
+
+ratio_successes<-sum(bern_set)/n
+ratio_successes
+
+```
+
+A little trick-- if you don't want your random variable to change every time you use it, there's a function called 'set.seed()' that allows you to retrieve the earlier randomization result by setting a randomization parameter. You call it right before your randomization:
+
+```{r Chunk 1b: using set.seed to retrieve a random sample}
+
+set.seed(1234)
+bern_set_ss<-sample(c(0,1), size=n, replace=TRUE, prob=c(1-p,p))
+bern_set_ss  
+ratio_successes_ss<-sum(bern_set_ss)/n
+ratio_successes_ss
+
+```
+
+The set.seed() only works for the code immediately executing after it, but it's good to help retrieve and set results. If you re-sampled a random distribution after you 'used' set.seed() it would still randomly sample the data.
+
+
+To Think About: 
+
+* What if you used replace=FALSE in sample? What does this mean? 
+* In Chunk 1, why is p set to  c(1-p, p)?
+* How would you use the functions above to generate a distribution?
+
+
+# Binomial Coefficient
+
+The binomial coefficient is "n choose k" or nCk or  ${{n}\choose{k}}$,  and is just a shorthand for a factorial expansion: 
+
+$${{n}\choose{k}} = \frac{n!}{k!(n-k)!}$$
+A binomial coefficient equals the number of combinations of k items that can be selected from a set of n trials.
+
+Another way of saying this is, how do we get k unordered outcomes from n possibilities?
+
+We can easily explore the binomial coefficient with R's  choose() function/
+
+How many possible permutations of 2 heads (and 8 tails) are there in a 5-repeat coin toss? (think this: (1,1,0,0,0), (1,0,1,0,0), (1,0,0,1,0) ... and all permutations on the way to... (0,0,0,1,1)). How many of those are there?
+
+```{r Chunk 2: binomial coefficient choose()}
+
+#Number of ways to get k objects in a n-member trial: choose(n,k) 
+
+choose(5,2) 
+
+```
+
+To think about:
+
+* How many arrangements of 2 successes can you get in 3 coin flips?
+* Try choose(1000,1). Does that make sense?
+* Does choose(2,5) have a meaning? 
+
+## Examples using the binomial coefficient
+
+Let's look at a few examples for our analyses.
+
+### Flipping a coin 
+
+If a coin is flipped 5 times then there will be ${{5}\choose{3}}=10$ (5C3) ways that three heads can show up in the 5 flips:
+
+$${{5}\choose{3}}= \frac{5!}{3!(5-3)!} =10$$
+
+```{r Chunk 3: permutation function test for 5 choose 3}
+
+#binomial 5C3 calculation result:
+choose(5,3) 
+
+#permutations is a gtools package. ?permutations for help
+x<-c(1,0)
+permtest5C3<-permutations(n=2, r=5, v=x, repeats.allowed=TRUE)
+permtest5C3
+
+#sum up how many heads show up in each combination of permtest
+permsums5C3<-rowSums(permtest5C3) 
+permsums5C3
+#how many of these are equal to three?
+length(which(permsums5C3==3))
+#What are the permutations that satisify 5C3?
+permtest5C3[which(permsums5C3==3),]
+
+```
+
+However, we don't have to limit the binomial coefficient to just two element sample spaces. 
+
+### Testing an 5-element sample set.
+
+Imagine you have a 5-element sample space:  {a, b, c, d, e}. 
+To find out how many different subsets of 2 elements this space has:
+
+$${{5}\choose{2}}= \frac{5!}{2!(5-2)!} = \frac{120}{12}=10$$
+
+```{r Chunk 4: permutation function test for 5 choose 2}
+
+#binomial 5C2 calculation result:
+choose(5,2) 
+
+# The combinations function is also in the  gtools package. ?combinations for help
+
+x<-c("a", "b", "c", "d", "e", "f")
+permtest5C2<-combinations(5,2,letters[1:5], repeats.allowed=FALSE)
+permtest5C2
+
+# For this example we use combinations() and not permutations() because combinations() will not return both (a,b) and (b,a), while permutations() will. 
+
+```
+
+To think about:
+
+* 5C3 and 5C2 both had a result of 10. 
+* Why couldn't we use combinations()  for our examples above for x=c(1,0) in Chunk 3? 
+* Why couldn't we use permutations() instead of combinations in Chunk 4?
+
+
+### Probability of observing k heads in n flips
+
+Let's calculate the probability of observing only two heads with four flips of a fair coin.
+
+We start with the binomial coefficient:
+
+$${{4}\choose{2}}= \frac{4!}{2!(4-2)!} = \frac{24}{4}=6$$
+
+```{r Chunk 5: perm function test 4 choose 2}
+
+#binomial 4C2 calculation result:
+choose(4,2) 
+
+x<-c(1,0) 
+
+permtest4C2<-permutations(n=2, r=4, v=x, repeats.allowed=TRUE)
+
+permtest4C2
+
+#sum up how many heads show up in each combination of permtest
+
+permsums4C2<-rowSums(permtest4C2) 
+permsums4C2
+
+#how many of these configurations are equal to two?
+length( which(permsums4C2==2) )
+
+#What are the permutations that satisify 4C2?
+permtest4C2[which(permsums4C2==2),]
+
+```
+
+The full length of all outcomes of successes in four flips of a coin is 16, representing all different combinations of successes in four flips. See variable permsums4C2
+
+For 4C2, two heads will show up 6 times, out of all 16  possible outcomes of four flips of a coin.  
+
+Therefore, we know that the probability of finding two heads in four flips of a coin is 6/16 or 3/8 or 0.375.
+
+To think about:
+
+* From the help files, it says "Note that choose(n, k) is defined for all real numbers n and integer k" meaning that n can be a decimal number. What would something like 6.75 choose 2 mean?
+
+# Binomial Distribution
+
+We just went  through the long way of calculating the probabilty of seeing two heads in a trial of four flips of a coin.  There's an easy way to go about this, using the binomial distribution equation. The binomial equation represents the probability of exactly x successes in n Bernoulli trials. Recall Bernoulli trials implies the sample space is {0,1}
+
+See also https://en.wikipedia.org/wiki/Binomial_distribution
+
+We can generate a binomial distribution using the binomial coefficient, with the number of trials n, k items, and the probability of success p. 
+
+Back to our example, the probability of getting exactly k successes in n Bernoulli trials is given by the probability mass function:
+
+$$Pr(k;n,p) =  {{n}\choose{k}} \cdot p^k \cdot (1-p)^{n-k}$$
+
+```{r Chunk 6a: binomial distribution test}
+
+#Probability of seeing two heads in a trial of four flips of a coin.
+#Note we have to give the probability of heads as 0.5, as this is a fair coin.
+
+#Probability the long way:
+length(which(permsums4C2==2))/length(permsums4C2)
+
+#Probability using the binomial distribution function dbinom():
+dbinom(x=2, size=4, prob=0.5) #Prob. for 4C2
+
+```
+
+# Standard errors
+
+There is no explicit standard error (SE) function in R. It can be calculated very simply using available functions.
+
+```{r Chunk 6b: Standard Errors CORRECTED}
+
+tcga_lihc<-read.csv("TCGA_LIHC_clinical.csv",  na.string="NA", stringsAsFactors=FALSE, row.names=1)
+
+height_cm<-tcga_lihc$height
+
+mean_height_cm<-mean(height_cm, na.rm=T)
+sd_height_cm<-sd(height_cm, na.rm=T)
+
+SE_height<-sd_height_cm/sqrt(length(height_cm))
+
+```
+
+
+# Significance Tests and Confidence Intervals
+
+Some of these examples follow along with Chapter 7, in _Using R_ by John Verzani, available in our class course reserve as an e-book on CANVAS and is your assigned reading.
+
+## Confidence intervals using simulation
+
+Verzani 7.1: Simulating a data set and estimating confidence intervals 
+
+```{r Chunk 7: Verzani page 179-180}
+
+pop = rep(0:1,c(10000-5600, 5600))
+phat = mean(sample(pop,100))
+phat
+
+res = c()
+for(i in 1:1000) res[i] = mean(sample(pop,100))
+quantile(res,c(0.1,0.9)) # 80% of the time
+quantile(res,c(0.05,0.95)) # 90% of the time
+quantile (res, c (0.025,0.975)) # 95% of the time
+
+```
+
+## Confidence intervals for a population proportion
+
+We begin studying confidence intervals with a test we've explored last week: the one-sample test of proportion. Other coverage of confidence intervals will be covered below for each test under Significance Tests.
+
+Verzani covers the CI for prop.test() in section 7.2.1 : Using prop.test() to find confidence intervals
+
+### CI for proportions: Verzani example 7.2
+
+```{r Chunk 8: Verzani Example 7.2}
+
+n = 1013
+phat = 466/n
+SE = sqrt(phat*(1-phat) / n) 
+
+alpha = .05
+
+zstar = -qnorm(alpha/2)
+zstar # nearly 2 if doing by hand
+
+c(phat - zstar*SE, phat + zstar*SE) #phat +/- CI 
+
+phat + c(-1,1)*zstar*SE
+
+
+```
+
+```{r Chunk 9: using prop.test for CI}
+#See Verzani page 184-185
+
+prop.test(466,1013,conf.level=0.95)
+
+```
+
+### CI example on heavy smokers
+
+This exercise is taken from Week 2 lab (prop.test), testing if a normally distributed second study of lung cancer has more heavy smokers than the number of heavy smokers in a previous study.  Here, the normal distribution for a second trial is assumed where 30/200 patients out of that distribution are heavy smokers. We (arbitrarily) will define "heavy smokers" as the upper 10% of the previous study.
+The null hypothesis of no difference can be rejected if p < 0.05. 
+
+
+```{r Chunk 10: Proportion Confidence Intervals using TCGA data}
+
+hs = 30     # Second study number of heavy smokers
+p0 = .10    # Previous study's heavy smoker proportion
+n2 = 200    # Second study's number of patients
+
+#no Yates correction, and alterative hypothesis is p>=p0 
+propresult<-prop.test(hs, n2, p=p0, correct=FALSE, alternative="greater", conf.level = 0.95) 
+
+print(propresult)
+
+```
+
+
+In "propresult", we see that the "alternative hypothesis" would be that the true proportion p is greater than 0.10 from the previous study's heavy smokers. Not a surprise, as that's what we stipulated in the parameters in Chunk #10.
+
+What does the confidence interval range in propresult mean? It means that in a normal distribution, we expect that anywhere from 0.113 and 1.0 (13% and 100%) of the values 
+
+The p-value as Chunk 10 is written is about 0.01. The confidence interval of the second test's modeled distribution values at 95% confidence level falls between about 0.113 and 1.0. That interval does not contain the previous study's proportion value of 0.10, so therefore this value falls outside of that range. 
+
+
+```{r Chunk 11: Confidence interval for OSTP}
+
+#using the binomial distribution (see class notes)
+alpha <-0.05 
+
+# Here we use rbinom to model how many times we get 'heads' on a fair coin if we trial by tossing the coin it 20 times, then repeat the trial 10 times. We can also think of this as the number of ‘successes’ in a trial with n observations, repeated m times.
+
+# One trial is 20 tosses of a coin, then repeating for  10 trials:
+n<-20    #20 tosses of a coin (n=observations)
+m<-10    #10 times (m=size, number of trials)
+p<-0.5  #probability of heads,expected value for fair coin toss
+
+set.seed(12345)
+
+binomial_trials<-rbinom(m,n,p)
+
+binomial_trials 
+#Looking at the result will help it make sense to you.
+#There are 10 results from m=10 trials.
+#In each of the trials, there are up to n heads showing.
+
+#divide by n to get proportion.
+binomial_prop<-binomial_trials/n  
+
+binomial_prop
+#Note that the binomial_prop is the proportion of heads showing on each trial out of n=20. 
+
+#Standard Error: 
+SE = sqrt(binomial_prop*(1-binomial_prop)/n)  #std error
+
+z0 = qnorm(1-alpha/2) #two-tailed critical value (week 2)
+
+#Show the sampling-based confidence intervals around the true value of the probability 0.5
+
+matplot(rbind(binomial_prop - z0*SE, binomial_prop + z0*SE),+ rbind(1:m,1:m),type="l",lty=1, xlim=c(0,1))
+
+abline(v=p)                  # draw line for p=0.5
+
+
+
+```
+
+```{r Chunk 13: Verzani Example 7.3}
+zstar = 0.03 / sqrt(.57*(1-.57)/1000)
+zstar
+
+alpha = 2* pnorm(-zstar)
+alpha
+1- alpha
+
+
+```
+
+## One sample Student's t-test
+
+One-sample tests of the mean are useful for limited types of tests but do get used once in a while, such as comparing a distribution of test results to a published experimental value.
+
+```{r Chunk 12: one-sample T test, tidy=TRUE}
+
+tcga_luad<-read.csv("TCGA_LUAD_clinical.csv",  na.string="NA", stringsAsFactors=FALSE, row.names=1)
+
+#Determine if the distribution from TCGA_LUAD could have been generated by a (random) process with a specific mean. 
+
+mu0<-mean(tcga_luad$years_smoked, na.rm=TRUE)
+
+t.test(tcga_luad$years_smoked, mu=mu0, alternative="two.sided")
+
+#Add something to the mean to show how the one-sample t-test's pvalue
+#diminishes as the test mean moves away from true mean at mu0 (31.63)
+
+mu_add<-2
+t.test(tcga_luad$years_smoked, mu= mu0 + mu_add, alternative="two.sided")
+
+```
+
+## Confidence intervals for means (Verzani 7.3)
+
+We can use the same approach to find a confidence interval for $\mu$, the population mean, from the sample mean as we did with the normal distribution:
+
+### Verzani 7.3: Confidence intervals for the population mean, $\mu$
+
+```{r Chunk 14: Verzani Example 7.4}
+
+xbar = 66; s = 4; n = 30
+alpha = 0.2
+tstar = qt(1 - alpha/2, df = n-1)
+tstar
+SE = s/sqrt(n)
+c(xbar - tstar*SE, xbar + tstar*SE)
+
+```
+
+```{r Chunk 15: Verzani Example 7.5}
+
+ozs = c(1.95, 1.80, 2.10, 1.82, 1.75, 2.01, 1.83, 1.90)
+qqnorm(ozs) # approximately linear
+t.test(ozs,conf.level=0.80)
+
+```
+
+```{r Chunk 16: Verzani Example 7.6}
+x = c(175, 185, 170, 184, 175)
+t.test(x, conf.level = 0.90, alt="less")
+
+```
+
+## Wilcoxon Signed-Rank test
+
+There are two applications we can use to determine symmetry, like with testing for normality, we can check symmetry with a plot, or a statistical test.
+
+Below is a way to use the function() function to generate your own code. We do this for symplot, a symmetry plot. Note that the "function(x)" call passes the value of x into the commands inside the function brackets.
+
+```{r Chunk 17: symmetry plot}
+#Code for symplot slightly adapted from Ross Ihaka. Ross, with Robert Gentleman, is one of the founders of the R statistical software system. 
+
+symplot =function(x) {
+  x_finite<-x[which(is.finite(x))]
+  n = length(x_finite)
+  n2 = n %/% 2
+  sx = sort(x_finite)
+  mx = median(x_finite)
+  plot(mx - sx[1:n2], rev(sx)[1:n2] - mx,
+  xlab = "Distance Below Median",
+  ylab = "Distance Above Median",
+  pch=20)
+  abline(a = 0, b = 1, lty = "dotted")
+}
+
+#example
+randset<-rnorm(1000)
+symplot(randset)
+
+```
+
+However, the downside is symmetry plots don't do well when there are few points. For instance, run a  symplot(rnorm(20)) and see how that performs. The normal distribution is obviously symmetric, but smaller samples from a distribituion will not approach the true distribution symmetry.
+
+Another alterative is using a statistical test. There are several to choose from, but so far the only one I know of that is specifically designed for symmetry testing is the function symmetry.test() in the lawstats package. This performs well on smaller sets of points. The alternative hypothesis is that the distribution is asymmetric. "How symmetric" depends on the user. Some people accept symmetry tests down to a level of 0.001 or below.
+
+```{r Chunk 18: symmetry.test}
+
+#Note: symmetry.test takes longer to run as n gets larger.
+n<-100 
+myrnorm<-rnorm(n)
+symmetry.test(myrnorm)
+symplot(myrnorm)
+
+```
+
+
+#  Wilcoxon Signed-Rank test
+
+```{r Chunk 19: One-sample Wilcoxon Test }
+
+symmetry.test(tcga_luad$cigarettes_per_day)
+
+#is the data symmetric around mu=2 (is mu a good median descriptor?)
+
+wilcox.test(tcga_luad$cigarettes_per_day, mu=2, conf.int=TRUE, conf.level=0.9)
+
+
+```
+
+# Power analysis for one-sample t-test
+```{r Chunk 20: Power analysis for a one-sample t-test }
+#see also https://cran.r-project.org/web/packages/pwr/vignettes/pwr-vignette.html
+
+#from class example in the notes:
+pwr.t.test( sig.level = 0.05, n=18,
+           power = 0.95, type="one.sample",
+          alternative = "two.sided")
+
+```
+
+
+
+# HOMEWORK Assignment 3 {-}
+
+Feel free to work on this if you finish lab early but you should be working on your homework individually and preferably outside of lab.
+
+Create a new R Markdown file for submitting this assignment. You should submit both your knit file in HTML and the original Rmd file to the Week 1 homework submission link in CANVAS. This homework is due 2/5/18 at 11:59 PM (evening).
+
+For this assignment, please produce the markdown file and your knit file (pdf, html or doc), by submitting your files in the Assignment 2 link in the Week 2 Module.
+
+## Question 1 {-} 
+
+Write an R routine/chunk employing the binomial coefficient with the choose() function to produce a plot for the binomial distribution.
+
+You can check your distribution and graph by installing the ExpRep package and using the function S_Local_Limit_Theorem().
+
+## Question 2 {-}
+
+In R, show that (any of the) resulting binomial distributions you generate in Q1 have a mean=np and standard deviation= $\sqrt( np(1-p))$
+
+Use the mean and standard deviation as calculated above, to limit the distribution range (xlim) on your plot. You can also use ylim=c() to include a y-range based on the maximum in your data.
+
+## Question 3 {-}
+From Verzani, chapter 7, exercise 7.12.  Also see lecture slides/handout.
+
+The phrasing, “The true value, p, is in the confidence interval with 95%
+probability” requires some care. Either p is or isn’t in a given interval. What it means is that if we repeated the sampling, there is a 95% chance the true value is in the random interval. We can investigate this with a simulation. The commands below will find several confidence intervals at once. 
+
+```{r HW Q3 Verani page 186 exercise 7.12}
+
+m = 50 # toss 20 coins 50 times
+n = 20
+p = 0.5
+alpha = 0.10
+zstar = qnorm(1 - alpha/2) 
+set.seed(2265) #please leave this seed value as is.
+phat = rbinom(m,n,p)/n #divide by n for proportions
+SE = sqrt(phat*(1 - phat)/n) # compute SE
+
+#We can find the proportion that contains p using
+sum(phat - zstar * SE < p & p < phat + zstar * SE)/m
+
+#and draw a nice graphic with
+matplot(rbind(phat -  zstar*SE, phat + zstar*SE), + rbind(1:m,1:m),type="l",lty=1)
+abline(v=p) # indicate parameter value
+```
+
+Do the simulation above. What percentage of the 50 confidence intervals contain the population mean?
+
+## Question 4 {-}
+Adapted from Problem 7.20 in Verzani.
+
+We can investigate how robust the T statistic is to changes in the underlying
+parent population from normality. In particular, we can verify that if the parent
+population is not too skewed or is symmetric without too heavy a tail then the T statistic will still have the t-distribution for its sampling distribution.
+
+The qqplot() function is related to the qqnorm() function. The difference is that qqplot allows us to plot one distribution against another. One way to look at this is there is one distribution along the x-axis, and the second distribution against the y-axis. 
+
+We will simulate one of several distributions in the 'res' variable. We will then plot that simulated distribution against the randomly sampled t-distribution rt(), which is similar to rnorm() in that it samples randomly from the t-distribution.
+
+Here we are graphing the 'res' sample distribution against the t-distribution. Variations away from the linear match on  t-distribution means  that the t-test won't perform well on that distribution,  as the t-distribution is not 'matching' up with the results.
+
+```{r Homework Q4}
+
+n = 10
+m = 250
+df = n-1
+res = c()
+
+for(i in 1:m) {
+   x=rbeta(m,5,2) # Change this line only with examples below.
+  res[i] = (mean(x) - 0)/(sd(x)/sqrt(n))
+  }
+
+qqplot(res, rt(m,df=df)) 
+qqline(res, rt(m,df=df))
+
+# examples to try to replace in the line above:
+#x = rnorm(n) #original rnorm()
+#x=runif(n)-1/2 #r uniform distribution
+#x=rt(n, 3) # t distribution
+#x=rt (n, 30) #t distribution
+#x=rexp(n)-1 #exponential distribution
+#x=rbeta(m,5,2) #beta distributions with skew
+#x=rbeta(m,2,5)
+#x=rbeta(m,5,5)
+
+```
+
+The quantile-quantile plot compares the distribution of the rnorm() sample with a sample from the t-distribution with rt(). You will see that the points are close to linear, as the sampling distribution is the t-distribution.
+
+To test different parent populations against the t-statistic, you can change the line x=rnorm(n) to some other distributions with mean a. For example, try:
+
+* a short-tailed distribution with x=runif(n)-1/2; 
+* a symmetric, long-tailed distribution with x =rt(n, 3); 
+* a not so long-tailed, symmetric distribution with x=rt (n, 30); 
+*  a skewed distribution with x=rexp(n)-1.
+* beta distributions: x=rbeta(m,2,5) and two others.
+
+Provide your qqplot and qqline plots of the fits to the t-distribution as in the example above.  Which of the above distributions seem to fit well to the t-distribution? 
+
+## Question 5 {-}
+
+Adapted from Verzani, Chapter 7, Problem 7.18 page 191
+Need: library(UsingR)
+
+The data set normtemp (UsingR) contains measurements of 130 healthy, randomly selected individuals. The variable temperature contains normal body temperature. 
+
+a. Does the data appear to come from a normal distribution? If so, find a 90% confidence interval for the mean normal body temperature. 
+b. Does it include 98.6 degrees F?
+c. What is a significance test's p-value for a 102.1 degrees F temperature against the normtest distribution?
+
+
+

@@ -1,0 +1,436 @@
+\documentclass[12pt, t, xcolor=dvipsnames]{beamer}
+
+% draft will print out comment
+% final will hide all comment
+\usepackage[draft]{pdfcomment}
+\usepackage{xspace}
+\usepackage{appendixnumberbeamer}
+\usepackage{xcolor}
+\usepackage{minted}
+\usepackage[scale=2]{ccicons}
+\usepackage{booktabs}
+\usepackage{graphicx}
+% \usepackage[absolute,overlay]{textpos}
+\usepackage{pgfplots}
+\usepackage{amsthm}
+\usepackage{amsmath}
+
+
+% \usepackage{hyperref}
+% \includeonlyframes{current}
+
+\newcommand{\pdfnote}[1]{\marginnote{\pdfcomment[icon=note]{#1}}}
+
+
+\useoutertheme{metropolis}
+\useinnertheme{metropolis}
+\usefonttheme{metropolis}
+\usecolortheme{metropolis}
+
+\pgfplotsset{compat=1.14}
+
+\newtheorem{mydef}{Definition}
+
+\setbeamercolor{normal text}{fg=black!95, bg=white}
+%\setbeamersize{text margin left=6mm, text margin right=6mm} 
+\setlength{\leftmargini}{0pt}
+
+\usemintedstyle{borland}
+
+\graphicspath{ {figures/} }
+
+\setbeamercolor{framesource}{fg=gray}
+\setbeamerfont{framesource}{size=\tiny}
+
+\makeatletter
+\renewcommand{\footnoterule}{}
+\define@key{beamerfootnote}{nonumber}[true]{\edef\beamer@footarg{0}\def\@makefnmark{}}% have to set a number in \beamer@footarg, then it won't be automatically generated one. setting \@makefnmark to be empty means the number isn't printed. but only use this in a group else it affects following footnotes!
+% instead of 'nonumber', could just use 0 as an optional argument to \footnote, but OP reports that keyval complains about this in some situations
+% http://tex.stackexchange.com/questions/89539
+\newcommand{\source}[1]{{\footnote[nonumber]{%
+    \begin{beamercolorbox}[right,wd=\dimexpr\hsize-1.8em\relax]{framesource}
+      \usebeamerfont{framesource}\usebeamercolor[fg]{framesource} Source: {#1}
+    \end{beamercolorbox}}}}
+\setlength{\footnotesep}{0cm}%\footnotesep is the space between footnotes (generated with a \rule)
+\makeatother
+
+% inspired by [beamer: footnote text collides with navigation symbols](http://tex.stackexchange.com/a/5855)
+\addtobeamertemplate{sidebar right}{\setbeamertemplate{navigation symbols}{}}{}
+\addtobeamertemplate{footline}{\hfill\usebeamertemplate***{navigation symbols}%
+    \hspace*{0.1cm}\par\vskip 2pt}{}
+
+% \setbeamercolor{framesource}{fg=gray}
+% \setbeamerfont{framesource}{size=\tiny}
+% 
+% \newcommand{\source}[1]{\begin{textblock*}{4cm}(8.7cm,8.6cm)
+%     \begin{beamercolorbox}[ht=0cm,right]{framesource}
+%         \usebeamerfont{framesource}\usebeamercolor[fg]{framesource} Source: {#1}
+%     \end{beamercolorbox}
+% \end{textblock*}}
+
+\tikzset{
+  every overlay node/.style={
+    draw=black,fill=white,rounded corners,anchor=north west,
+  },
+}
+
+\def\tikzoverlay{%
+   \tikz[baseline,overlay]\node[every overlay node]
+}%
+
+\definecolor{codegray}{gray}{0.95}
+\newcommand{\code}[1]{\colorbox{codegray}{\textcolor{black!95}{\texttt{#1}}}}
+%\newcommand{\code}[1]{\texttt{#1}}}
+
+\newminted{R}{fontsize=\scriptsize, 
+              frame=lines,
+              bgcolor=codegray,
+              framesep=1mm}
+
+\newcommand {\framedgraphic}[2] {
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{#2}
+        \end{center}
+    \end{frame}
+}
+
+\pgfmathdeclarefunction{gauss}{3}{%
+  \pgfmathparse{1/(#3*sqrt(2*pi))*exp(-((#1-#2)^2)/(2*#3^2))}%
+}
+
+\title{Week 3 Lab}
+% \subtitle{}
+\date{Tuesday, January 30/Thursday, February 1}
+%\author{Yuanchao Zhang}
+% \institute{}
+% \titlegraphic{\hfill\includegraphics[height=1.5cm]{logo.pdf}}
+\renewcommand\appendixname{Appendix}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Plan for today}
+\setbeamertemplate{section in toc}[sections numbered]
+\begin{minipage}[t][3cm][t]{\textwidth}
+  \tableofcontents
+\end{minipage}
+
+\end{frame}
+
+
+\section{Changes of lab session format}
+
+\begin{frame}{Changes of lab session administration}
+  \begin{itemize}
+    \item Lab handout:
+    \begin{itemize}
+       \item Include "To Think About" questions
+     \end{itemize}
+    \item Lab format:
+    \begin{itemize}
+       \item More similar to benchwork lab, e.g. chemistry
+       \item Less lecturing
+       \item More reading and practicing
+     \end{itemize}
+  \end{itemize}
+  \pdfnote{The instructors will make sure that the lab topics will all be covered in the lecture. }
+\end{frame}
+
+\begin{frame}{If you were confused by the previous lab format...}
+\begin{itemize}
+  \item Sorry. We (TAs) did not clearly explain the design. 
+  
+  \item The previous lab sessions were designed to \alert{prepare} you for reading the write-up independently:
+
+  \begin{itemize}
+    \item Review important theoretical points in the lecture
+    \item Explore programming concepts interactively (more time for questions)
+    \item Make sure that the code can be executed on you computer
+    \item Generally explain the design of code
+    \item Give personal suggestions on controversial topics
+    \item Leave the reading after the lab session at your own pace
+    \item Leave trouble-shooting to Canvas or office hour
+    \item Leave practicing to homework assignments
+  \end{itemize}
+
+\end{itemize}
+
+\pdfnote{T1: Generally more helpful to have two ways of explaining the same concept.}
+
+\pdfnote{T2: Get answers to your questions on certain concepts.}
+
+\pdfnote{T3: So that you will not waste time on weird errors when reading the write-up. }
+
+\pdfnote{T4: Explain why we chose this way to implement an idea. }
+
+\pdfnote{T6: You all have your own pace of reading. }
+
+\end{frame}
+
+\begin{frame}{If you were confused by the previous homework...}
+\begin{itemize}
+  \item Grading:
+  \begin{itemize}
+    \item We are not expecting you to give us a single "correct" answer.
+    \item We are expecting you to explain your reasoning in your answer.
+    \item We will accept all reasonable answers with important reasoning steps.
+    \item However, do not think too far away. There is always a solution using the lecture and lab materials.
+    \item If you are thinking about methods not covered in the lecture or lab, discuss with the TAs or instructors.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{If you were confused by the previous homework...}
+\begin{itemize}
+  \item You can:
+  \begin{itemize}
+    \item Start early. 
+    \item Get help during office hour or through Canvas. 
+  \end{itemize}
+  \item We will:
+  \begin{itemize}
+    \item The instructors will try to put the homework quesetions in a more controlled context. 
+    \item The instructors will try to ask more natural questions. 
+    \item We TAs will try to discuss possible confusions about the homework at the end of the lab. 
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\section*{Recap}
+
+\begin{frame}{Recap}
+  \begin{itemize}
+    \item Different interpretations of random variable.
+    \item The normal distribution.
+    \item Testing for normality:
+    \begin{itemize}
+      \item Plotting: Histogram, density plot, and Q-Q plot.
+      \item Statistical testing: Shapiro-Wilk normality test and Anderson-Darling normality test
+    \end{itemize}
+    \item The central limit theorem.
+    \item One-sample tests of proportion
+    \begin{itemize}
+      \item z-test and $\chi^2$-test
+      \item One-sided versus two-sided
+      \item Power analysis
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{Bernoulli distribution} % (fold)
+\label{sec:bernoulli_distribution}
+
+\begin{frame}{Bernoulli distribution}
+Notation: $X \sim \text{Bern}(p)$
+
+Parameter: $p \in [0, 1]$ -- success probability of a Bernoulli trial.
+
+Support: $x \in \{0, 1\}$
+
+Probability mass function: \begin{equation*}
+  f(x; p)=\begin{cases}
+    p, & \text{for $x = 1$}.\\
+    q = (1-p), & \text{for x = 0}.
+  \end{cases}
+\end{equation*}
+
+Bernoulli distribution is a special case of binomial distribution. 
+
+R has \code{rbinom()} but not \code{rbern()}. 
+
+\pdfnote{More fun in binom. }
+\source{\url{https://en.wikipedia.org/wiki/Bernoulli_distribution}}
+\source{\url{https://en.wikipedia.org/wiki/Bernoulli_trial}}
+\end{frame}
+% section bernoulli_distribution (end)
+
+
+
+\section{Binomial Coefficient} % (fold)
+\label{sec:binomial_coefficient}
+
+\begin{frame}{Binomial Coefficient}
+
+\begin{theorem}[Binomial theorem]
+$$ (x+y)^n = \sum_{k=0}^n \binom{n}{k} x^{n - k} y^k $$
+\end{theorem}
+
+\begin{mydef}[Binomial coefficient]
+Any of the positive integers that occurs as a coefficient in the binomial theorem is a binomial coefficient.
+\end{mydef}
+
+Notation: $$\binom{n}{k} = \frac{ n! }{ k!(n-k)! }$$
+
+\source{\url{https://en.wikipedia.org/wiki/Binomial_theorem}}
+\source{\url{https://en.wikipedia.org/wiki/Binomial_coefficient}}
+
+\end{frame}
+% section binomial_coefficient (end)
+
+\section{Binomial Distribution} % (fold)
+\label{sec:binomial_distribution}
+
+\begin{frame}{Binomial Distribution}
+Intuition: the distribution of the sum of $n$ random variables $i.i.d.$ $\text{Bern}(p)$.
+
+$$X \sim B(n, p)$$
+
+\begin{itemize}
+  \item Parameters:
+  \begin{itemize}
+    \item $n \in N_0$ -- number of trials
+    \item $p \in [0, 1]$ -- success probability in each trial
+  \end{itemize}
+  \item Support: $x \in \{0, 1, 2, ..., n\}$
+  \item Probability mass function: $$f(x; n, p) = \binom{n}{k} \cdot p^k \cdot (1-p)^{n-k}$$
+\end{itemize}
+
+\source{\url{https://en.wikipedia.org/wiki/Binomial_distribution}}
+\end{frame}
+
+% section binomial_distribution (end)
+
+\section{Confidence Intervals} % (fold)
+\label{sec:confidence_intervals}
+
+\begin{frame}{Confidence interval}
+\begin{itemize}
+  \item Intuition: express the confidence of estimating population parameter using a sample of observations as an interval of estimates.
+  \item Straightforward in algebraical definitions:
+  \begin{itemize}
+    \item Closely related to hypothesis testing.
+    \item Multiple methods to calculate the confidence intervals (CIs) of the same population parameter. 
+  \end{itemize}
+  
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Controversy of interpreting confidence interval}
+\begin{itemize}
+  \item Controversial interpretations of confidence level (described without mathematical rigor):
+  \begin{itemize}
+    \item Apply algebraical equivalence: probability that the population parameter lies in the interval.
+    \item Apply frequentist claimed definition: the proportion of intervals containing the population parametres in a large number of samples. 
+  \end{itemize}
+  \item The controversy lies in the philosophical question of whether the population parameter is random (algebraical interpretation) or constant (frequentist interpretation). 
+  \item The algebraical interpretation is usually referred as "\alert{misinterpretation}" or "incorrect".
+\end{itemize}
+\vspace{-3mm}
+\source{\url{https://onlinecourses.science.psu.edu/stat414/node/197}}
+\source{\href{https://stats.stackexchange.com/questions/6652/what-precisely-is-a-confidence-interval}{whuber at StatsExchange}}
+\end{frame}
+
+\begin{frame}{Example: constant or random population parameter}
+\begin{itemize}
+  \item Scenario: estimate the mean effect of a drug on a disease measured as continuous value with arbitrary unit in $\mathbb{R}$.
+  \item Population parameter: the mean effect of the drug, $\mu$.
+  \item Categorization (determined using domain specific knowledge): for the same disease, a drug is good if its $\mu \geq 100$, otherwise bad.
+  \item Sample: 500 patients. Mean 110. 95\% confidence interval of population mean: $[100, 120]$.
+  \item Which claim on the drug do you prefer?
+  \begin{itemize}
+    \item Significantly good, $p \leq 0.05$. (constant)
+    \item 97.5\% chance to be good. (random)
+  \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+% section confidence_intervals (end)
+
+\section{One sample Student’s t-test} % (fold)
+\label{sec:One sample Student’s t-test}
+
+% section section_name (end)
+\begin{frame}{One sample Student’s t-test}
+Intuition from CI perspective: calculate CI for population mean without requiring large sample size or known population standard deviation.
+
+\begin{theorem}
+If $X_1, X_2, ..., X_n$ are normally distributed random variables with mean $\mu$ and variance $\sigma^2$, then a confidence interval of confidence level $1 -− \alpha$ for the population mean $\mu$ is: $$ \bar{x} \pm t_{\alpha/2, n-1} (\frac{s}{\sqrt{n}})$$
+\end{theorem}
+
+\source{\url{https://onlinecourses.science.psu.edu/stat414/node/199}}
+\end{frame}
+
+\section{One sample Wilcoxon Signed-Rank test} % (fold)
+\label{sec:one_sample_wilcoxon_signed_rank_test}
+
+% section one_sample_wilcoxon_signed_rank_test (end)
+\begin{frame}{One sample Wilcoxon Signed-Rank test}
+\begin{itemize}
+  \item Null hypothesis ($H_0$): the distribution of a sample is symmetric about $\mu_0$.
+
+  \item Non-parametric test procedure: no known model for data points. 
+
+  \item Intuition: 
+  \begin{itemize}
+    \item Use rank to ignore the magnitude of differences between different data points.
+    \item Use sign, whether greater than or less than $\mu_0$, to describe the "direction" of the data point relative to $\mu_0$
+    \item If $H_0$ is true, the sum of signed rank follows certain distribution.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+% section significance_tests (end)
+
+\section{Power analysis for one-sample t-test} % (fold)
+\label{sec:power_analysis_for_one_sample_t_test}
+
+% section power_analysis_for_one_sample_t_test (end)
+
+\begin{frame}{General procedure of power analysis}
+\begin{itemize}
+  \item Calculation of power: usually before having the data, if the \alert{alternative hypothesis $H_1$} is true, how likely can we \alert{reject the null hypothesis $H_0$} with significance level \alert{$\alpha$}. 
+  \item Parameters:
+  \begin{itemize}
+    \item Arbitrary constants: $H_1$, $H_0$, and $\alpha$.
+    \item Constant depend on $H_1$ and $H_0$: $effect size$. 
+    \item Variables: power and sample size $n$. 
+    \item A priori power analysis: set power and calculate $n$. 
+    \item Post hoc power analysis: set $n$ and calculate power. 
+  \end{itemize}
+  \item By convention from Wikipedia, power is set to $0.8$ when calculating sample size.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Intuition of power analysis}
+\begin{itemize}
+  \item Good intuition of power analysis is unknown to me. 
+  \item Best I can get is $\text{power} = 1 - \beta$.
+  \item Why? No generalized mathematical framework for calculating power comparing to hypothesis testing. 
+  \item Better to reason through the calculation of each specific case using the definition: $$\text{power} = \Pr {\big (}{\text{reject }}H_{0}\mid H_{1}{\text{ is true}}{\big )}$$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Power analysis for one-sample t-test}
+\begin{itemize}
+  \item $H_0$: population mean $\mu = \mu_0$.
+  \item $\alpha = 0.05$.
+  \item Set $n$ or power.
+  \item Very complicated in deriving the mathematical formula of $\text{power} = \Pr {\big (}{\text{reject }}H_{0}\mid H_{1}{\text{ is true}}{\big )}$. 
+  \begin{itemize}
+    \item Various $H_1$s: $\mu = \mu_1$, or $\mu > \mu_0$, or $\mu < \mu_0$, or $\mu \neq \mu_0$.
+    \item Different $H_1$s may result in different formulas.
+  \end{itemize}
+  \item Very complicated interpretation of the effect size.
+  \begin{itemize}
+    \item Assumes population variance takes certain value.
+    \item Possibly various calculation methods. 
+  \end{itemize}
+  
+  \item Call \code{pwr.t.test} to avoid complexities, and check the mathematics when necessary (usually not). 
+\end{itemize}
+
+\end{frame}
+
+
+% section power_analysis (end)
+
+\begin{frame}[c]
+  \large{Questions?}
+\end{frame}
+
+
+\end{document}
