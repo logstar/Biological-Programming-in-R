@@ -1,0 +1,15 @@
+\frametitle{z-test}
+
+$$z = \frac{\hat{p} -p_0}{\sqrt{\frac{p_0 (1- p_0)}{n}}}$$
+
+Intuition: apply central limit theorem on $n$ random variales $i.i.d.$ Bernoulli distribution.
+
+\begin{Theorem}
+
+Let ${X_1, X_2, ..., X_n}$ be a sequence of $i.i.d.$ random variables with mean $E \left[{X_i}\right] = \mu$ and finite variance $Var \left({X_i}\right) = \sigma^2$ .
+Define $\displaystyle S_n = \frac{1}{n} \sum_i X_i$ . Then, as $n \to \infty$, $\displaystyle S_n \xrightarrow {\mathcal{D}} \mathcal{N} \left({\mu,\sigma^2/n}\right).$
+
+\end{Theorem}
+
+Test
+\pdfnote{Most of the times, a statistical concept has two parts, intuition and proof. Intuition gives you a general idea of the concept, and you can feel that it makes sense. The proof is mostly use detailed algebra crunchings to support the concept. Here, we only show the concept but not giving the proof. Intuition is usually enough for biologists. Keep in mind that intuitions can be wrong. Intuition is also not necessarily how the concept is came up with. Some concepts have no intuitions, you can memorize them or prove them independently to get the idea. Assume each RV follows Bernoulli(p). Then, their sample mean which is the proportion. The RV of their sample mean converges to N(p0, bernoulli var). Standardize the sample mean for z-test. CLT gives asymptotic results, which means results on large number of samples. }

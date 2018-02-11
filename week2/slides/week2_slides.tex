@@ -2,7 +2,7 @@
 
 % draft will print out comment
 % final will hide all comment
-\usepackage[draft]{pdfcomment}
+\usepackage[final]{pdfcomment}
 \usepackage{xspace}
 \usepackage{appendixnumberbeamer}
 \usepackage{xcolor}
@@ -13,7 +13,7 @@
 % \usepackage[absolute,overlay]{textpos}
 \usepackage{pgfplots}
 % \usepackage{hyperref}
-
+% \includeonlyframes{current}
 
 \newcommand{\pdfnote}[1]{\marginnote{\pdfcomment[icon=note]{#1}}}
 
@@ -214,7 +214,15 @@ Probability density distribution (PDF) of the normal distribution:
 
 \source{\href{https://en.wikipedia.org/wiki/Normal_distribution}{Normal Distribution at en.wikipedia.org}}
 
-\pdfnote{RV: many interpretations, essentially specifies the distribution of outcomes. Bernoulli RV 0.5. Simulate using coin flip. After we flip, we observed the RV once. Coin is not RV. Some people think of a coin flip has been performed in infinite parallel universes, so that each coin flip is a RV. RV is also interpreted as a function mapping outcome to probability. RV can also be interpreterd as a generator of observations. Statisticians like multiple interpretations of the same thing, and this might be the reason why you can use so many ways to do one thing in R. }
+\pdfnote{T1: RV: many definitions, essentially specifies the probability of outcomes. Bernoulli RV 0.5. Simulate using coin flip. After we flip, we observed the RV once. RV is abstract. Coin is not RV. }
+
+\pdfnote{T2: Important convention, RV in upper case letter, and observations in lower case letter. After throwing 10 times, you can interpret the outcome as 10 observations of the same RV, or 1 observation of 10 RVs. It is more common to interpret it as 1 obs of 10 RVs, because we usually use a bunch of independent and identically distributed for explanation of concepts. Sometimes also called iid observations for simplification. }
+
+\pdfnote{T3: If you read wikipedia, RV is defined as a function mapping outcomes to their probabilities. This is also defined in a popular probability theory book. However, it does not make sense that you can observe a function, since a funcion only defines a mapping, and the value you give to the function is actually your observation. Also, the value you give is actually not decided by yourself, so it is random. Therefore RV is more like a "variable" of the probability density/mass function.}
+
+\pdfnote{T4: Sometimes I also think a randV as a generator of outcomes. }
+
+\pdfnote{T5: Statisticians like multiple interpretations of the same thing, and this might be the reason why you can use so many ways to do one thing in R. Because of so many common interpretations used implicitly in different contexts, it is not possible to simply stick with a single one. A better option is to try your own interpretation, then you can make a new interpretation yourself.}
 \end{frame}
 
 
@@ -461,6 +469,7 @@ quite easy to demonstrate with simulation.
 
 
 \begin{frame}{Demonstrate central limit theorem with simulation}
+
 \begin{Theorem}
 
 Let ${X_1, X_2, ..., X_n}$ be a sequence of $i.i.d.$ random variables with mean $E \left[{X_i}\right] = \mu$ and finite variance $Var \left({X_i}\right) = \sigma^2$ . 
@@ -882,6 +891,15 @@ shapiro.test(tcga_luad$years_smoked)
 $$z = \frac{\hat{p} -p_0}{\sqrt{\frac{p_0 (1- p_0)}{n}}}$$
 
 Intuition: apply central limit theorem on $n$ random variales $i.i.d.$ Bernoulli distribution.
+
+\begin{Theorem}
+
+Let ${X_1, X_2, ..., X_n}$ be a sequence of $i.i.d.$ random variables with mean $E \left[{X_i}\right] = \mu$ and finite variance $Var \left({X_i}\right) = \sigma^2$ . 
+Define $\displaystyle S_n = \frac{1}{n} \sum_i X_i$ . Then, as $n \to \infty$, $\displaystyle S_n \xrightarrow {\mathcal{D}} \mathcal{N} \left({\mu,\sigma^2/n}\right).$
+
+\end{Theorem}
+
+\pdfnote{Most of the times, a statistical concept has two parts, intuition and proof. Intuition gives you a general idea of the concept, and you can feel that it makes sense. The proof is mostly use detailed algebra crunchings to support the concept. Here, we only show the concept but not giving the proof. Intuition is usually enough for biologists. Keep in mind that intuitions can be wrong. Intuition is also not necessarily how the concept is came up with. Some concepts have no intuitions, you can memorize them or prove them independently to get the idea. Assume each RV follows Bernoulli(p). Then, their sample mean which is the proportion. The RV of their sample mean converges to N(p0, bernoulli var). Standardize the sample mean for z-test. CLT gives asymptotic results, which means results on large number of samples. }
 \end{frame}
 
 \begin{frame}[fragile]{z-test}
@@ -921,13 +939,16 @@ z >= z0
 \begin{frame}[fragile]{$\chi^2$-test}
 Intuition: z-test with multiple catogries. For each category, apply central limit theorem on $n$ random variales $i.i.d.$ Bernoulli distribution.
 
+\vspace{-3mm}
+
 $$X^2 = \sum_{i=1}^{k}\frac{(x_i - n p_i)^2}{n p_i}$$
 
+\vspace{-1mm}
 There are $k$ total categories and $n$ total observations. $x_i$ is the number of observations of category $i$. $p_i$ is the hypothesized probability of observing category $i$. 
 
-$X^{2}$ followed the $\chi^{2}$ distribution with $(k-1)$ degrees of freedom.
+When null hypothesis is correct, as $n \rightarrow \infty$, $X^{2}$ followed the $\chi^{2}$ distribution with $(k-1)$ degrees of freedom stated by CLT.
  
-
+\pdfnote{For each category, n iid Bnl RVs define the proportion, and the proportion converges to normal dist. Then, you have k normal RVs of their proportions. The sum of the squares of k RV observations follows chi-squared distribution. In your null hypothesis, you specify p i, and reject null hypothesis according to chi-sq dist. Algebracially, chi-sq is the same as z-test.}
 \end{frame}
 
 \begin{frame}[fragile]{$\chi^2$-test}
@@ -1000,16 +1021,16 @@ print(abs(z))
   \begin{itemize}
     \item $\Pr(X \geq x | H)$ for right tail event
     \item $\Pr(X \leq x | H)$ for left tail event
-    \item $2min{\Pr(X \geq x | H), \Pr(X \leq x | H)}$ for double tail event
+    \item $2min\{\Pr(X \geq x | H), \Pr(X \leq x | H)\}$ for double tail event
   \end{itemize}
   \item Interpret p-value
   \begin{itemize}
-    \item \alert{Important} : $\Pr(evidence | hypothesis) \neq \Pr(hypothesis | evidence)$
+    \item \alert{Important} : $$\Pr(evidence | hypothesis) \neq \Pr(hypothesis | evidence)$$
   \end{itemize}
   \item Bayes' theorem applied to inference: $$P(H|E) = P(E|H) \cdot \frac{P(H)}{P(E)}$$
 \end{itemize}
 
-\pdfnote{The probability of observing a result given that some hypothesis is true is not equivalent to the probability that a hypothesis is true given that some result has been observed. data = observation = evidence. p(H) is the prior probability, which estimates the probability of the hypothesis H before the data E. P(H|E) is the posterior probability. P(E|H) is the probability of observing E given H. As a function of E with H fixed, this is the likelihood – it indicates the compatibility of the evidence with the given hypothesis. P(E) is sometimes termed the marginal likelihood or "model evidence". This factor is the same for all possible hypotheses being considered, so this factor does not enter into determining the relative probabilities of different hypotheses.}
+\pdfnote{T1: The probability of observing a result given that some hypothesis is true is not equivalent to the probability that a hypothesis is true given that some result has been observed. T2: data = observation = evidence. T3: p(H) is the prior probability, which estimates the probability of the hypothesis H before the data E. T4: P(H|E) is the posterior probability. T5: P(E|H) is the probability of observing E given H. As a function of E with H fixed, this is the likelihood – it indicates the compatibility of the evidence with the given hypothesis. T6: P(E) is sometimes termed the marginal likelihood or "model evidence". This factor is the same for all possible hypotheses being considered, so this factor does not enter into determining the relative probabilities of different hypotheses. Non-informative prior, i.e. uniform across all events. }
 
 \source{\url{https://en.wikipedia.org/wiki/P-value}}
 \source{\url{https://en.wikipedia.org/wiki/Bayesian_inference}}
@@ -1027,7 +1048,7 @@ Two-sided:
 
 \source{\href{https://catalog.flatworldknowledge.com/bookhub/reader/3318?e=fwk-shafer-ch08_s02}{flatworldknowledge}}
 
-\pdfnote{In one-sided test, we set critical value z-a with alpha significance level according to the specific tail we are choosing. To calculate p-value, integrate from one end to test statistic according to the hypothesis. In two-sided test, we set critical value with half of alpha. The p-value is one sided p-value times 2. }
+\pdfnote{T1: In one-sided test, we set critical value z-a with alpha significance level according to the specific tail we are choosing. To calculate p-value, integrate from one end to test statistic according to the hypothesis. In two-sided test, we set critical value with half of alpha. The p-value is one sided p-value times 2. T2: Good way to memorize type I and II errors. Type I is alpha or false positive, when doing hypothesis testing. Set alpha to a low value to ensure low false positive. T3: Type II error is beta or false negative, i.e. 1 - power, which we will talk about later. }
 \end{frame}
 
 \begin{frame}[fragile]{Two-sided one sample test of proportion}
