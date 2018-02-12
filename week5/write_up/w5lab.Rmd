@@ -2,19 +2,23 @@
 title: "BIOM612 Week 5 Lab Handout"
 author: "Ammar Naqvi and Yuanchao Zhang"
 date: "2/7/2018"
-output: 
-  html_document:
+output:
+  pdf_document:
     toc: yes
     toc_depth: '3'
-    number_sections: true
-bibliography: week5.bib
-csl: ieee.csl
-link-citations: true
+    latex_engine: xelatex
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: '3'
+link-citations: yes
 nocite: |
   @_contingency_2018, @_fisher_2018a, @_comparing_, |
   @_chisquared_2018, @_comparing_a, @agresti_survey_1992, @_hypergeometric_2018, |
   @_cartesian_2017a, @_hypergeometric_2018a, @_hypothesis_, @_exact_2017, |
   @_hypergeometric_
+csl: ieee.csl
+bibliography: week5.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -371,7 +375,7 @@ Marginal total    $o_{1,1} + o_{2,1} = n_{*,1}$    $o_{1,2} + o_{2,2} = n_{*,2}$
 Then, we define our test statistic 
 
 $$p = \frac{{o_{1,1} + o_{1,2} \choose o_{1,1}} {o_{2,1} + o_{2,2} \choose o_{2,1}} }
-           {n \choose o_{1,1} + o_{2, 1}}$$
+           { {n \choose {o_{1,1} + o_{2, 1}}} } $$
 
 
 If the null hypothesis is true, the test statistic $p$ defines a hypergeometric distribution of a random variable $O_{1,1}$, and the probability of observing $o_{1,1}$ is equal to $p$. 
@@ -500,7 +504,7 @@ From Wikipedia, <https://en.wikipedia.org/wiki/Hypergeometric_distribution>:
 *Definition* A random variable $X$ follows the hypergeometric distribution if its pmf is given by
 
 $$ P(X=k) = \frac { { {K}\choose{k} } { {N-K} \choose {n-k}} }
-                  { {N}\choose{n} } $$
+                  { {{N}\choose{n}} } $$
 where
 
 - Parameter $N$ is the population size.
