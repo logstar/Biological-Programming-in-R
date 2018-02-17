@@ -3,14 +3,14 @@ title: "BIOM612 Week 5 Lab Handout"
 author: "Ammar Naqvi and Yuanchao Zhang"
 date: "2/7/2018"
 output:
-  pdf_document:
-    toc: yes
-    toc_depth: '3'
-    latex_engine: xelatex
   html_document:
     number_sections: yes
     toc: yes
     toc_depth: '3'
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+    latex_engine: xelatex
 link-citations: yes
 nocite: |
   @_contingency_2018, @_fisher_2018a, @_comparing_, |
@@ -100,7 +100,7 @@ sc_disease_smoke_tbl
 
 Most of R two-sample proportion test functions takes in the 2 x 2 contingency table **without** the "total" column and row as input. For example, in the example above, `prop.test()` takes the contingency table `disease_smoke_tbl` as input for two-sample proportion test. 
 
-One thing you have to be sure about is which proportions are tested. For example, in the above example of two-sample proportion test, the disease proportions of smoke and non-smoke are tested for equality, because `prop 1 = 0.00990099 = 10 / (1000 + 10)` and `prop 2 = 0.04761905 = 5 / (100 + 5)` are shown in the result. 
+One thing you have to be sure about is which proportions are tested. For example, in the above example of two-sample proportion test, the disease proportions of smoke and non-smoke are tested for equality, because `prop 1 = 0.06542056 = 35 / (35 + 500)` and `prop 2 = 0.1428571 = 50 / (50 + 300)` are shown in the result. 
 
 Imagine that you are implementing a test procedure of two-sample proportions, there are multiple ways to obtain two proportions for testing. Still using the previous example, in addition to comparing the disease proportion of smoke or non-smoke conditions, we can also compare:
 
@@ -516,6 +516,103 @@ ds_2x2_tbl2
 t(ds_2x2_tbl)
 ```
 
-# References
 
+# McNemar's Test
+
+McNemar's test is basically a paired version of Chi-square test. For example, you asked whether the participants liked the device before and after the experiment:
+
+                    After experiment
+                         Yes   No
+Before experiment: Yes    6    2
+                    No    8    4
+
+Here, what you want to test is whether the number of the participants who liked the device were significantly changed between before and after the experiment. 
+
+Effect size -> The effect size of the Fisher's exact test can be calculated in the same way as the one for the Chi-square test.
+
+Running a McNemar's exact test is pretty similar to Chi-square.
+```{r chunk 12}
+data <- matrix(c(6, 2, 8, 4), ncol=2, byrow=T)
+mcnemar.test(data)
+
+```
+
+Example taken from http://yatani.jp/teaching/doku.php?id=hcistats:chisquare. 
+
+# Kolmogorov-Smirnov Test
+Generate data for KS test
+```{r chunk 13}
+x <- rnorm(50) 
+y <- runif(30)
+```
+
+Does distributions x and y come from the same distribution?
+
+Ho = Distributions come from the same distributions
+Ha = Distributions come from different distributions 
+
+```{r chunk 14}
+ks.test(x,y)
+```
+
+The default KS test is two sided. What about one-sided?
+```{r chunk 15}
+ks.test(x, y, alternative = "less")
+ks.test(x, y, alternative = "greater")
+```
+
+**To think about**
+We are clearly simulating data from different distributions (normal and uniform), but the KS test below does not result in a significant p-value. Why? 
+
+```{r chunk 16}
+x <- rnorm(10)
+y <- runif(6)
+ks.test(x, y)
+```
+
+## qqplots
+Generate data to assess normality
+
+```{r chunk 17}
+x <- rnorm(500) 
+y <- runif(300)
+```
+
+Now that we have simulated data and stored them in variables x and y, let's assess normality.
+
+Is “x” normally distributed? 
+```{r chunk 18}
+qqnorm(x)
+qqline(x)
+```
+
+What about “y”? How do you expect the plots to look like?
+```{r chunk 19}
+qqnorm(y)
+qqline(y)
+```
+
+**To think about**
+Sometimes qqplots may be difficult to interpret, how else could you visualize the distributions in addition to qqplots?
+
+# Homework Questions {-}
+
+Create a new R Markdown file for submitting this assignment. You should submit both your knit file in HTML and the original Rmd file to the Week 5 homework submission link in CANVAS. 
+
+1. You obtain RNA-seq data. You get countTable of the all the genes expressed from a cancer patient with acute lymphoblastic leuekmia (CD19+ cells) and from a control (normal) sample. You are asked to compare the distributions.
+
+What would be the first step? And how would you do it (in R)? 
+
+2. You see an asymmetrical distribution in your data. Why do you see this (biologically)? 
+
+What test would you use to make the comparison? 
+
+3. Using packages e1071 in R, what functions would you use to measure the skew of these datasets? 
+
+4. You are a given multiple sets of samples and you plot a histogram and you realize that for a subset of genes the shape of the distribution is always flat or Uniform. 
+
+What genes are these and why do you think so? 
+
+
+# REFERENCES
 
