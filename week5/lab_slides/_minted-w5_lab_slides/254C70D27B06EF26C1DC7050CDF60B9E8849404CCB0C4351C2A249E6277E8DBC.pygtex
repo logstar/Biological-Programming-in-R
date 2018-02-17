@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+y \PYG{o}{\PYGZlt{}\PYGZhy{}} runif\PYG{p}{(}\PYG{l+m}{300}\PYG{p}{)}
+qqnorm\PYG{p}{(}y\PYG{p}{)}
+qqline\PYG{p}{(}y\PYG{p}{)}
+\end{Verbatim}

@@ -1,0 +1,12 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+x \PYG{o}{\PYGZlt{}\PYGZhy{}} rnorm\PYG{p}{(}\PYG{l+m}{50}\PYG{p}{)}
+y \PYG{o}{\PYGZlt{}\PYGZhy{}} runif\PYG{p}{(}\PYG{l+m}{30}\PYG{p}{)}
+
+ks.test\PYG{p}{(}x\PYG{p}{,}y\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  Two\PYGZhy{}sample Kolmogorov\PYGZhy{}Smirnov test}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} data:  x and y}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} D = 0.56, p\PYGZhy{}value = 6.303e\PYGZhy{}06}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} alternative hypothesis: two\PYGZhy{}sided}
+\end{Verbatim}

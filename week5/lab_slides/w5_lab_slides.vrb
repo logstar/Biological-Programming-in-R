@@ -1,0 +1,11 @@
+\frametitle{qqplots}
+\begin{minted}[fontsize=\scriptsize,
+               frame=lines,
+               bgcolor=codegray,
+               framesep=1mm]{R}
+y <- runif(300)
+qqnorm(y)
+qqline(y)
+\end{minted}
+
+\includegraphics[height=0.5\textheight, keepaspectratio]{runif_qqnorm}

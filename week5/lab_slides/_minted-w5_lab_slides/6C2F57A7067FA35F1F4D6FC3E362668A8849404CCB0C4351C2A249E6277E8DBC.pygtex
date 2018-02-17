@@ -1,0 +1,14 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+fisher.test\PYG{p}{(}ds\PYGZus{}2x2\PYGZus{}tbl\PYG{p}{,} alternative\PYG{o}{=}\PYG{l+s}{\PYGZsq{}two.sided\PYGZsq{}}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  Fisher\PYGZsq{}s Exact Test for Count Data}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} data:  ds\PYGZus{}2x2\PYGZus{}tbl}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} p\PYGZhy{}value = 0.0001724}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} alternative hypothesis: true odds ratio is not equal to 1}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} 95 percent confidence interval:}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  0.2584247 0.6776792}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} sample estimates:}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} odds ratio}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}   0.420428}
+\end{Verbatim}

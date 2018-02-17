@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+data \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{k+kt}{matrix}\PYG{p}{(}\PYG{k+kt}{c}\PYG{p}{(}\PYG{l+m}{6}\PYG{p}{,} \PYG{l+m}{2}\PYG{p}{,} \PYG{l+m}{8}\PYG{p}{,} \PYG{l+m}{4}\PYG{p}{),} ncol\PYG{o}{=}\PYG{l+m}{2}\PYG{p}{,} byrow\PYG{o}{=}\PYG{n+nb+bp}{T}\PYG{p}{)}
+mcnemar.test\PYG{p}{(}data\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  McNemar\PYGZsq{}s Chi\PYGZhy{}squared test with continuity correction}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} data:  data}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} McNemar\PYGZsq{}s chi\PYGZhy{}squared = 2.5, df = 1, p\PYGZhy{}value = 0.1138}
+\end{Verbatim}

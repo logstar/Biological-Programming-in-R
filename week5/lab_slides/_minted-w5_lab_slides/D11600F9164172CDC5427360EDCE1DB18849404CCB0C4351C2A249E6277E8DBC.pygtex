@@ -1,0 +1,5 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+x \PYG{o}{\PYGZlt{}\PYGZhy{}} rnorm\PYG{p}{(}\PYG{l+m}{500}\PYG{p}{)}
+qqnorm\PYG{p}{(}x\PYG{p}{)}
+qqline\PYG{p}{(}x\PYG{p}{)}
+\end{Verbatim}

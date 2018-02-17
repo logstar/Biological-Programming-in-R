@@ -1,0 +1,8 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+chisq.test\PYG{p}{(}ds\PYGZus{}2x2\PYGZus{}tbl\PYG{p}{,} correct \PYG{o}{=} \PYG{n+nb+bp}{F}\PYG{p}{)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}  Pearson\PYGZsq{}s Chi\PYGZhy{}squared test}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} data:  ds\PYGZus{}2x2\PYGZus{}tbl}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} X\PYGZhy{}squared = 14.613, df = 1, p\PYGZhy{}value = 0.000132}
+\end{Verbatim}
